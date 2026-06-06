@@ -204,8 +204,10 @@ Route::prefix('v1')->group(function () {
             Route::post('blog-tags',           [AdminBlogController::class, 'storeTag']);
             Route::put('blog-tags/{tag}',      [AdminBlogController::class, 'updateTag']);
             Route::delete('blog-tags/{tag}',   [AdminBlogController::class, 'destroyTag']);
+        });
 
-            // Settings (super_admin enforced in controller)
+        // Settings — super_admin only
+        Route::middleware('role:super_admin')->group(function () {
             Route::get('settings',             [SettingController::class, 'index']);
             Route::put('settings',             [SettingController::class, 'update']);
         });
