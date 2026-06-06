@@ -170,8 +170,8 @@ export default function PropertiesPage() {
       return next
     })
     try {
-      if (isFav) await removeFavorite(property.id)
-      else await addFavorite(property.id)
+      if (isFav) await removeFavorite(property.slug)
+      else await addFavorite(property.slug)
     } catch {
       // Revert on error
       setFavoriteIds((prev) => {

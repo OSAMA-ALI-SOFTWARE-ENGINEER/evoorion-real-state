@@ -158,13 +158,13 @@ export async function getFavorites(): Promise<FavoritesResponse> {
   return res.data
 }
 
-export async function addFavorite(propertyId: number): Promise<ApiResponse<null>> {
-  const res = await api.post<ApiResponse<null>>(`/favorites/${propertyId}`)
+export async function addFavorite(propertySlug: string): Promise<ApiResponse<null>> {
+  const res = await api.post<ApiResponse<null>>(`/favorites/${propertySlug}`)
   return res.data
 }
 
-export async function removeFavorite(propertyId: number): Promise<ApiResponse<null>> {
-  const res = await api.delete<ApiResponse<null>>(`/favorites/${propertyId}`)
+export async function removeFavorite(propertySlug: string): Promise<ApiResponse<null>> {
+  const res = await api.delete<ApiResponse<null>>(`/favorites/${propertySlug}`)
   return res.data
 }
 

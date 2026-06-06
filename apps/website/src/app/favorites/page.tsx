@@ -47,7 +47,7 @@ export default function FavoritesPage() {
     setProperties((prev) => prev.filter((p) => p.id !== property.id))
 
     try {
-      await removeFavorite(property.id)
+      await removeFavorite(property.slug)
     } catch {
       // Revert
       setFavoriteIds((prev) => new Set([...prev, property.id]))
