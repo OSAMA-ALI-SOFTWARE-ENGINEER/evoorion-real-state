@@ -46,6 +46,8 @@ Route::prefix('v1')->group(function () {
         // Social OAuth — returns a redirect, not JSON (browser-based flow)
         Route::get('social/{provider}/redirect', [SocialAuthController::class, 'redirect']);
         Route::get('social/{provider}/callback', [SocialAuthController::class, 'callback']);
+        // Exchange a one-time 30s code (from OAuth redirect) for the actual bearer token
+        Route::post('social/exchange', [SocialAuthController::class, 'exchange']);
     });
 
     // Public master data endpoints (rate-limited)

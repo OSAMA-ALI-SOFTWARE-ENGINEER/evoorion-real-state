@@ -2,12 +2,14 @@
 
 namespace App\Http\Controllers\Api\V1;
 
+use App\Models\SocialExchangeCode;
 use App\Models\User;
 use App\Traits\ApiResponse;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Str;
+use Laravel\Socialite\Contracts\Provider as SocialiteProvider;
 use Laravel\Socialite\Facades\Socialite;
 
 class SocialAuthController
@@ -20,9 +22,17 @@ class SocialAuthController
     {
         abort_unless(in_array($provider, self::ALLOWED_PROVIDERS), 422, 'Unsupported provider');
 
-        return Socialite::driver($provider)->stateless()->redirect();
+        /** @var SocialiteProvider $driver */
+        $driver = Socialite::driver($provider);
+
+        return $driver->stateless()->redirect();
     }
 
+    /**
+     * OAuth callback — issues a 30-second single-use exchange code.
+     * The actual bearer token is NEVER placed in the URL; the frontend
+     * must POST the exchange code to /auth/social/exchange to receive it.
+     */
     public function callback(string $provider): RedirectResponse
     {
         abort_unless(in_array($provider, self::ALLOWED_PROVIDERS), 422, 'Unsupported provider');
@@ -30,50 +40,103 @@ class SocialAuthController
         $frontendUrl = config('app.frontend_url', 'http://localhost:3000');
 
         try {
-            $socialUser = Socialite::driver($provider)->stateless()->user();
+            /** @var SocialiteProvider $driver */
+            $driver     = Socialite::driver($provider);
+            $socialUser = $driver->stateless()->user();
 
-            $user = User::firstOrCreate(
-                ['email' => $socialUser->getEmail()],
-                [
+            // ── 1. Verify the social provider confirmed this email ──────────
+            if ($provider === 'google') {
+                $emailVerified = $socialUser->user['email_verified'] ?? false;
+                if (!$emailVerified) {
+                    return redirect("{$frontendUrl}/auth/callback?error=email_not_verified");
+                }
+            }
+            // Facebook does not reliably expose email_verified; we enforce
+            // below by refusing to auto-link to an existing password account.
+
+            $email = $socialUser->getEmail();
+
+            if (!$email) {
+                return redirect("{$frontendUrl}/auth/callback?error=no_email");
+            }
+
+            // ── 2. Guard against account-takeover via email matching ────────
+            $existing = User::where('email', $email)->first();
+
+            if ($existing) {
+                // User registered with email + password and has NOT linked this provider before
+                $alreadyLinked = $existing->social_provider === $provider;
+
+                if (!$alreadyLinked && $existing->password !== null) {
+                    // Do NOT silently link — the password user did not authorise this.
+                    // Redirect them to sign in with their password instead.
+                    return redirect("{$frontendUrl}/auth/callback?error=email_exists");
+                }
+
+                // Safe to update: account was already linked or is a pure social account
+                if (!$existing->is_active) {
+                    return redirect("{$frontendUrl}/auth/callback?error=account_disabled");
+                }
+
+                $existing->update([
+                    'social_provider' => $provider,
+                    'social_id'       => $socialUser->getId(),
+                    'avatar_url'      => $existing->avatar_url ?? $socialUser->getAvatar(),
+                    'last_login_at'   => now(),
+                ]);
+
+                $user = $existing;
+            } else {
+                // Brand-new account created via social login
+                $user = User::create([
                     'name'            => $socialUser->getName() ?? $socialUser->getNickname() ?? 'User',
+                    'email'           => $email,
                     'password'        => null,
                     'role'            => 'user',
                     'is_active'       => true,
                     'social_provider' => $provider,
                     'social_id'       => $socialUser->getId(),
                     'avatar_url'      => $socialUser->getAvatar(),
-                ]
-            );
-
-            // Update social fields if user already existed via email
-            if (!$user->wasRecentlyCreated) {
-                $user->update([
-                    'social_provider' => $provider,
-                    'social_id'       => $socialUser->getId(),
-                    'avatar_url'      => $user->avatar_url ?? $socialUser->getAvatar(),
                     'last_login_at'   => now(),
                 ]);
             }
 
-            if (!$user->is_active) {
-                return redirect("{$frontendUrl}/auth/callback?error=account_disabled");
-            }
+            // ── 3. Issue a 30-second single-use exchange code (not the token) ──
+            $plainToken = $user->createToken('social-api-token')->plainTextToken;
+            $code       = SocialExchangeCode::issue($plainToken);
 
-            $token = $user->createToken('social-api-token')->plainTextToken;
-
-            $userData = urlencode(json_encode([
-                'id'         => $user->id,
-                'name'       => $user->name,
-                'email'      => $user->email,
-                'role'       => $user->role,
-                'avatar_url' => $user->avatar_url,
-            ]));
-
-            return redirect("{$frontendUrl}/auth/callback?token={$token}&user={$userData}");
+            // Only the short-lived exchange code goes in the URL — never the token.
+            return redirect("{$frontendUrl}/auth/callback?code={$code}")
+                ->header('Referrer-Policy', 'no-referrer');
         } catch (\Throwable $e) {
             Log::error("Social auth [{$provider}] failed", ['error' => $e->getMessage()]);
 
             return redirect("{$frontendUrl}/auth/callback?error=auth_failed");
         }
+    }
+
+    /**
+     * Exchange a single-use code (received from the OAuth callback redirect)
+     * for the actual Sanctum bearer token. Code expires in 30 seconds
+     * and is deleted immediately on first use (one-time only).
+     */
+    public function exchange(Request $request): JsonResponse
+    {
+        $request->validate(['code' => 'required|string|size:64']);
+
+        $record = SocialExchangeCode::where('code', $request->code)
+            ->where('expires_at', '>', now())
+            ->first();
+
+        if (!$record) {
+            return $this->error('Invalid or expired code', null, 422);
+        }
+
+        $token = $record->token;
+
+        // Delete immediately — truly one-time use
+        $record->delete();
+
+        return $this->success(['token' => $token], 'Token exchanged');
     }
 }
