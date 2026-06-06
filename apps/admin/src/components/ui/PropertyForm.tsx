@@ -1,9 +1,13 @@
 'use client'
 
-import { useEffect, useState, type FormEvent } from 'react'
+import { useEffect, useRef, useState, type FormEvent } from 'react'
 import { useRouter } from 'next/navigation'
-import { getAreas, getDevelopers, getOperationTypes, createProperty, updateProperty } from '@/lib/api'
-import type { Area, Developer, OperationType, Property } from '@/types'
+import Image from 'next/image'
+import {
+  getAreas, getDevelopers, getOperationTypes, createProperty, updateProperty,
+  uploadPropertyImage, updatePropertyImage, deletePropertyImage,
+} from '@/lib/api'
+import type { Area, Developer, OperationType, Property, PropertyImage } from '@/types'
 
 interface FormState {
   title:             string
@@ -88,10 +92,10 @@ function toPayload(f: FormState): Record<string, unknown> {
 
 // ── Field components ──────────────────────────────────────────────────────────
 
-function Field({ label, children, required }: { label: string; children: React.ReactNode; required?: boolean }) {
+function Field({ label, children, required, htmlFor }: { label: string; children: React.ReactNode; required?: boolean; htmlFor?: string }) {
   return (
     <div>
-      <label className="block text-sm font-medium text-slate-700 mb-1.5">
+      <label htmlFor={htmlFor} className="block text-sm font-medium text-slate-700 mb-1.5">
         {label}{required && <span className="text-red-400 ml-0.5">*</span>}
       </label>
       {children}
@@ -119,6 +123,7 @@ function AmenityInput({ amenities, onChange }: { amenities: string[]; onChange: 
       <div className="flex gap-2 mb-2">
         <input
           type="text"
+          aria-label="Add amenity"
           value={draft}
           onChange={e => setDraft(e.target.value)}
           onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); add() } }}
@@ -149,6 +154,155 @@ function AmenityInput({ amenities, onChange }: { amenities: string[]; onChange: 
           ))}
         </div>
       )}
+    </div>
+  )
+}
+
+// ── ImageManager ──────────────────────────────────────────────────────────────
+
+function ImageManager({ slug, initial }: { slug: string; initial: PropertyImage[] }) {
+  const [images,    setImages]    = useState<PropertyImage[]>(initial)
+  const [uploading, setUploading] = useState(false)
+  const [error,     setError]     = useState('')
+  const fileRef = useRef<HTMLInputElement>(null)
+
+  async function handleFiles(files: FileList | null) {
+    if (!files?.length) return
+    setError('')
+    setUploading(true)
+    try {
+      for (const file of Array.from(files)) {
+        const noPrimary = images.every(i => !i.is_primary)
+        const res = await uploadPropertyImage(slug, file, noPrimary)
+        setImages(prev => [...prev, res.data])
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Upload failed')
+    } finally {
+      setUploading(false)
+      if (fileRef.current) fileRef.current.value = ''
+    }
+  }
+
+  async function setPrimary(img: PropertyImage) {
+    setError('')
+    try {
+      await updatePropertyImage(slug, img.id, { is_primary: true })
+      setImages(prev => prev.map(i => ({ ...i, is_primary: i.id === img.id })))
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Update failed')
+    }
+  }
+
+  async function remove(img: PropertyImage) {
+    setError('')
+    try {
+      await deletePropertyImage(slug, img.id)
+      setImages(prev => prev.filter(i => i.id !== img.id))
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Delete failed')
+    }
+  }
+
+  return (
+    <div className="bg-white rounded-xl border border-slate-200 p-6 space-y-4">
+      <div className="flex items-center justify-between">
+        <h2 className="text-sm font-semibold text-slate-700 uppercase tracking-wider">Images</h2>
+        <label className={`cursor-pointer inline-flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+          uploading
+            ? 'bg-slate-100 text-slate-400 pointer-events-none'
+            : 'bg-[#C9A84C] hover:bg-[#D4B668] text-slate-900'
+        }`}>
+          {uploading ? (
+            <>
+              <span className="w-3.5 h-3.5 border-2 border-slate-400 border-t-transparent rounded-full animate-spin" />
+              Uploading…
+            </>
+          ) : (
+            '+ Upload Images'
+          )}
+          <input
+            ref={fileRef}
+            type="file"
+            accept="image/jpeg,image/png,image/webp,image/gif"
+            multiple
+            className="sr-only"
+            onChange={e => handleFiles(e.target.files)}
+            disabled={uploading}
+          />
+        </label>
+      </div>
+
+      {error && <p className="text-red-500 text-sm">{error}</p>}
+
+      {images.length === 0 ? (
+        <div
+          className="border-2 border-dashed border-slate-200 rounded-lg p-10 text-center cursor-pointer hover:border-[#C9A84C]/40 transition-colors"
+          onClick={() => fileRef.current?.click()}
+        >
+          <p className="text-slate-400 text-sm">No images yet — click to upload</p>
+          <p className="text-slate-300 text-xs mt-1">JPEG, PNG, WebP · max 10 MB each</p>
+        </div>
+      ) : (
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+          {images
+            .slice()
+            .sort((a, b) => (b.is_primary ? 1 : 0) - (a.is_primary ? 1 : 0) || a.order - b.order)
+            .map(img => (
+              <div key={img.id} className={`relative rounded-lg overflow-hidden border-2 transition-colors ${img.is_primary ? 'border-[#C9A84C]' : 'border-transparent'}`}>
+                <div className="relative aspect-[4/3] bg-slate-100">
+                  <Image
+                    src={img.url}
+                    alt=""
+                    fill
+                    className="object-cover"
+                    sizes="200px"
+                    unoptimized
+                  />
+                </div>
+                {/* Overlay actions */}
+                <div className="absolute inset-0 bg-black/0 hover:bg-black/30 transition-colors flex items-end justify-between p-1.5 opacity-0 hover:opacity-100">
+                  <button
+                    type="button"
+                    title={img.is_primary ? 'Primary image' : 'Set as primary'}
+                    onClick={() => !img.is_primary && setPrimary(img)}
+                    className={`w-7 h-7 rounded-full flex items-center justify-center text-sm transition-colors ${
+                      img.is_primary
+                        ? 'bg-[#C9A84C] text-slate-900 cursor-default'
+                        : 'bg-white/80 text-slate-500 hover:bg-[#C9A84C] hover:text-slate-900'
+                    }`}
+                  >
+                    ★
+                  </button>
+                  <button
+                    type="button"
+                    title="Delete image"
+                    onClick={() => remove(img)}
+                    className="w-7 h-7 rounded-full bg-white/80 text-red-500 hover:bg-red-500 hover:text-white flex items-center justify-center text-xs transition-colors"
+                  >
+                    ✕
+                  </button>
+                </div>
+                {img.is_primary && (
+                  <span className="absolute top-1.5 left-1.5 text-[10px] font-bold bg-[#C9A84C] text-slate-900 px-1.5 py-0.5 rounded leading-none">
+                    PRIMARY
+                  </span>
+                )}
+              </div>
+            ))}
+
+          {/* Drop zone tile */}
+          <div
+            className="aspect-[4/3] rounded-lg border-2 border-dashed border-slate-200 flex items-center justify-center cursor-pointer hover:border-[#C9A84C]/40 transition-colors"
+            onClick={() => fileRef.current?.click()}
+          >
+            <span className="text-slate-300 text-2xl">+</span>
+          </div>
+        </div>
+      )}
+      <p className="text-[11px] text-slate-400">
+        Star (★) = set as primary. Images require Cloudinary credentials in backend <code className="font-mono">.env</code>.
+      </p>
     </div>
   )
 }
@@ -205,7 +359,8 @@ export function PropertyForm({ property }: PropertyFormProps) {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="max-w-5xl space-y-6">
+    <div className="max-w-5xl space-y-6">
+    <form onSubmit={handleSubmit} className="space-y-6">
       {error && (
         <div className="px-4 py-3 rounded-lg bg-red-50 border border-red-200 text-red-600 text-sm">{error}</div>
       )}
@@ -237,8 +392,8 @@ export function PropertyForm({ property }: PropertyFormProps) {
           </Field>
 
           <div className="grid grid-cols-2 gap-4">
-            <Field label="Type" required>
-              <select value={form.type} onChange={e => set('type', e.target.value)} className={selectCls} required>
+            <Field label="Type" required htmlFor="prop-type">
+              <select id="prop-type" value={form.type} onChange={e => set('type', e.target.value)} className={selectCls} required>
                 <option value="apartment">Apartment</option>
                 <option value="villa">Villa</option>
                 <option value="penthouse">Penthouse</option>
@@ -298,8 +453,8 @@ export function PropertyForm({ property }: PropertyFormProps) {
           <div className="bg-white rounded-xl border border-slate-200 p-6 space-y-5">
             <h2 className="text-sm font-semibold text-slate-700 uppercase tracking-wider">Listing</h2>
 
-            <Field label="Status" required>
-              <select value={form.status} onChange={e => set('status', e.target.value)} className={selectCls} required>
+            <Field label="Status" required htmlFor="prop-status">
+              <select id="prop-status" value={form.status} onChange={e => set('status', e.target.value)} className={selectCls} required>
                 <option value="available">Available</option>
                 <option value="sold">Sold</option>
                 <option value="rented">Rented</option>
@@ -333,22 +488,22 @@ export function PropertyForm({ property }: PropertyFormProps) {
           <div className="bg-white rounded-xl border border-slate-200 p-6 space-y-5">
             <h2 className="text-sm font-semibold text-slate-700 uppercase tracking-wider">Classification</h2>
 
-            <Field label="Area" required>
-              <select value={form.area_id} onChange={e => set('area_id', e.target.value)} className={selectCls} required>
+            <Field label="Area" required htmlFor="prop-area">
+              <select id="prop-area" value={form.area_id} onChange={e => set('area_id', e.target.value)} className={selectCls} required>
                 <option value="">Select area…</option>
                 {areas.map(a => <option key={a.id} value={a.id}>{a.name}</option>)}
               </select>
             </Field>
 
-            <Field label="Developer" required>
-              <select value={form.developer_id} onChange={e => set('developer_id', e.target.value)} className={selectCls} required>
+            <Field label="Developer" required htmlFor="prop-developer">
+              <select id="prop-developer" value={form.developer_id} onChange={e => set('developer_id', e.target.value)} className={selectCls} required>
                 <option value="">Select developer…</option>
                 {devs.map(d => <option key={d.id} value={d.id}>{d.name}</option>)}
               </select>
             </Field>
 
-            <Field label="Operation Type" required>
-              <select value={form.operation_type_id} onChange={e => set('operation_type_id', e.target.value)} className={selectCls} required>
+            <Field label="Operation Type" required htmlFor="prop-optype">
+              <select id="prop-optype" value={form.operation_type_id} onChange={e => set('operation_type_id', e.target.value)} className={selectCls} required>
                 <option value="">Select type…</option>
                 {opTypes.map(o => <option key={o.id} value={o.id}>{o.name}</option>)}
               </select>
@@ -375,5 +530,10 @@ export function PropertyForm({ property }: PropertyFormProps) {
         </div>
       </div>
     </form>
+
+    {isEdit && property && (
+      <ImageManager slug={property.slug} initial={property.images ?? []} />
+    )}
+    </div>
   )
 }

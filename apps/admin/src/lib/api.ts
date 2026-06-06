@@ -17,6 +17,7 @@ import type {
   OperationType,
   PaginatedResponse,
   Property,
+  PropertyImage,
 } from '@/types'
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000/api/v1'
@@ -123,6 +124,41 @@ export async function deleteProperty(slug: string) {
 
 export async function restoreProperty(slug: string) {
   return request<ApiResponse<Property>>(`/admin/properties/${slug}/restore`, { method: 'POST' })
+}
+
+export async function uploadPropertyImage(
+  slug: string,
+  file: File,
+  isPrimary = false,
+): Promise<ApiResponse<PropertyImage>> {
+  const tok = getToken()
+  const fd = new FormData()
+  fd.append('image', file)
+  fd.append('is_primary', isPrimary ? '1' : '0')
+  const res = await fetch(`${BASE_URL}/admin/properties/${slug}/images`, {
+    method: 'POST',
+    headers: {
+      Accept: 'application/json',
+      ...(tok ? { Authorization: `Bearer ${tok}` } : {}),
+    },
+    body: fd,
+  })
+  if (!res.ok) {
+    const body = await res.json().catch(() => ({}))
+    throw new Error((body as { message?: string }).message ?? `HTTP ${res.status}`)
+  }
+  return res.json() as Promise<ApiResponse<PropertyImage>>
+}
+
+export async function updatePropertyImage(slug: string, imageId: number, data: { is_primary?: boolean; order?: number }) {
+  return request<ApiResponse<PropertyImage>>(`/admin/properties/${slug}/images/${imageId}`, {
+    method: 'PUT',
+    body: JSON.stringify(data),
+  })
+}
+
+export async function deletePropertyImage(slug: string, imageId: number) {
+  return request<ApiResponse<null>>(`/admin/properties/${slug}/images/${imageId}`, { method: 'DELETE' })
 }
 
 // ── Leads ─────────────────────────────────────────────────────────────────────
