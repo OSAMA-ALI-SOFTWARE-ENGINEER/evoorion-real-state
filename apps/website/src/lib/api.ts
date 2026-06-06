@@ -1,12 +1,15 @@
 import axios from 'axios'
 import type {
   ApiResponse,
+  Area,
   AuthUser,
   BlogPost,
   BlogPostSummary,
   BlogTag,
+  ComparisonResult,
   LeadPayload,
   LoginPayload,
+  OperationType,
   PaginatedResponse,
   Property,
   PropertySummary,
@@ -38,10 +41,19 @@ export interface PropertyFilters {
   featured?: boolean
   search?: string
   area_id?: number
+  operation_type_id?: number
   min_price?: number
   max_price?: number
+  sort_by?: string
+  sort_direction?: 'asc' | 'desc'
   per_page?: number
   page?: number
+}
+
+export interface FavoritesResponse {
+  success: boolean
+  data: PropertySummary[]
+  meta: { total: number; per_page: number; current_page: number; last_page: number }
 }
 
 export async function getProperties(
@@ -117,6 +129,42 @@ export async function getBlogPost(
 
 export async function getBlogTags(): Promise<ApiResponse<BlogTag[]>> {
   const res = await api.get<ApiResponse<BlogTag[]>>('/blog/tags')
+  return res.data
+}
+
+// ── Master data (public) ──────────────────────────────────────────────────────
+
+export async function getAreas(): Promise<ApiResponse<Area[]>> {
+  const res = await api.get<ApiResponse<Area[]>>('/areas')
+  return res.data
+}
+
+export async function getOperationTypes(): Promise<ApiResponse<OperationType[]>> {
+  const res = await api.get<ApiResponse<OperationType[]>>('/operation-types')
+  return res.data
+}
+
+// ── Comparison ────────────────────────────────────────────────────────────────
+
+export async function compareProperties(slugs: string[]): Promise<ApiResponse<ComparisonResult>> {
+  const res = await api.post<ApiResponse<ComparisonResult>>('/properties/compare', { slugs })
+  return res.data
+}
+
+// ── Favorites ─────────────────────────────────────────────────────────────────
+
+export async function getFavorites(): Promise<FavoritesResponse> {
+  const res = await api.get<FavoritesResponse>('/favorites')
+  return res.data
+}
+
+export async function addFavorite(propertyId: number): Promise<ApiResponse<null>> {
+  const res = await api.post<ApiResponse<null>>(`/favorites/${propertyId}`)
+  return res.data
+}
+
+export async function removeFavorite(propertyId: number): Promise<ApiResponse<null>> {
+  const res = await api.delete<ApiResponse<null>>(`/favorites/${propertyId}`)
   return res.data
 }
 

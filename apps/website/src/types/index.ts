@@ -154,3 +154,29 @@ export const BUDGET_RANGES: Record<BudgetRange, { label: string; min: number; ma
   '5m_10m': { label: 'AED 5M – 10M', min: 5_000_000, max: 10_000_000 },
   above_10m: { label: 'AED 10M+', min: 10_000_000, max: 999_999_999 },
 }
+
+// ── Master data ───────────────────────────────────────────────────────────────
+
+export interface Area {
+  id: number
+  name: string
+  slug: string
+  description?: string | null
+}
+
+export interface OperationType {
+  id: number
+  name: string
+  slug: string
+}
+
+// ── Comparison ────────────────────────────────────────────────────────────────
+
+export interface ComparisonResult {
+  properties: Property[]
+  summary: {
+    cheapest: string
+    most_bedrooms: string
+    largest: string
+  }
+}

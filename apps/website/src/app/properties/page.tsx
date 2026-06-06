@@ -1,13 +1,24 @@
 'use client'
 
-import { useEffect, useState, useCallback } from 'react'
+import { useCallback, useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Search, SlidersHorizontal } from 'lucide-react'
-import { getProperties } from '@/lib/api'
+import { Search, SlidersHorizontal, X } from 'lucide-react'
+import {
+  getProperties,
+  getAreas,
+  getOperationTypes,
+  getFavorites,
+  addFavorite,
+  removeFavorite,
+} from '@/lib/api'
 import { PropertyCard } from '@/components/ui/PropertyCard'
 import { SkeletonCard } from '@/components/ui/SkeletonCard'
 import { ScrollReveal } from '@/components/ui/ScrollReveal'
-import type { PropertySummary, PropertyType } from '@/types'
+import { AuthModal } from '@/components/ui/AuthModal'
+import { useAuth } from '@/context/AuthContext'
+import type { Area, OperationType, PropertySummary, PropertyType } from '@/types'
+import { BUDGET_RANGES } from '@/types'
 
 const TYPES: { label: string; value: '' | PropertyType }[] = [
   { label: 'All', value: '' },
@@ -18,14 +29,79 @@ const TYPES: { label: string; value: '' | PropertyType }[] = [
   { label: 'Commercial', value: 'commercial' },
 ]
 
+const SORT_OPTIONS = [
+  { label: 'Price: Low → High', value: 'price_asc' },
+  { label: 'Price: High → Low', value: 'price_desc' },
+  { label: 'Newest First', value: 'newest' },
+  { label: 'Most Viewed', value: 'popular' },
+]
+
+function getSortParams(key: string): { sort_by?: string; sort_direction?: 'asc' | 'desc' } {
+  if (key === 'price_asc') return { sort_by: 'price', sort_direction: 'asc' }
+  if (key === 'price_desc') return { sort_by: 'price', sort_direction: 'desc' }
+  if (key === 'newest') return { sort_by: 'created_at', sort_direction: 'desc' }
+  if (key === 'popular') return { sort_by: 'views_count', sort_direction: 'desc' }
+  return {}
+}
+
+function getPriceParams(key: string): { min_price?: number; max_price?: number } {
+  const range = BUDGET_RANGES[key as keyof typeof BUDGET_RANGES]
+  if (!range) return {}
+  return {
+    min_price: range.min || undefined,
+    max_price: range.max < 999_999_999 ? range.max : undefined,
+  }
+}
+
+const SELECT_CLS =
+  'bg-[#0A0F1E] border border-white/10 text-sm text-white rounded-sm px-3 py-2 outline-none focus:border-gold transition-colors cursor-pointer'
+
 export default function PropertiesPage() {
-  const [properties, setProperties] = useState<PropertySummary[]>([])
-  const [loading, setLoading] = useState(true)
+  const { user } = useAuth()
+  const router = useRouter()
+
+  // Filter state
   const [activeType, setActiveType] = useState<'' | PropertyType>('')
   const [search, setSearch] = useState('')
   const [debouncedSearch, setDebouncedSearch] = useState('')
+  const [areaId, setAreaId] = useState(0)
+  const [opTypeId, setOpTypeId] = useState(0)
+  const [priceKey, setPriceKey] = useState('')
+  const [sortKey, setSortKey] = useState('')
   const [page, setPage] = useState(1)
+
+  // Data state
+  const [properties, setProperties] = useState<PropertySummary[]>([])
+  const [loading, setLoading] = useState(true)
   const [totalPages, setTotalPages] = useState(1)
+  const [areas, setAreas] = useState<Area[]>([])
+  const [opTypes, setOpTypes] = useState<OperationType[]>([])
+
+  // Compare state
+  const [compareList, setCompareList] = useState<PropertySummary[]>([])
+
+  // Favorites state
+  const [favoriteIds, setFavoriteIds] = useState<Set<number>>(new Set())
+  const [showAuth, setShowAuth] = useState(false)
+
+  // Load master data for filter dropdowns
+  useEffect(() => {
+    Promise.all([
+      getAreas().catch(() => ({ data: [] as Area[] })),
+      getOperationTypes().catch(() => ({ data: [] as OperationType[] })),
+    ]).then(([areasRes, opTypesRes]) => {
+      setAreas(areasRes.data ?? [])
+      setOpTypes(opTypesRes.data ?? [])
+    })
+  }, [])
+
+  // Load favorites when user is logged in
+  useEffect(() => {
+    if (!user) { setFavoriteIds(new Set()); return }
+    getFavorites()
+      .then((res) => setFavoriteIds(new Set(res.data.map((p) => p.id))))
+      .catch(() => {})
+  }, [user])
 
   // Debounce search
   useEffect(() => {
@@ -33,32 +109,85 @@ export default function PropertiesPage() {
     return () => clearTimeout(t)
   }, [search])
 
-  const fetchProperties = useCallback(async () => {
-    setLoading(true)
-    try {
-      const res = await getProperties({
-        type: activeType || undefined,
-        search: debouncedSearch || undefined,
-        page,
-        per_page: 9,
-      })
-      setProperties(res.data)
-      setTotalPages(res.meta.pagination.last_page)
-    } catch {
-      setProperties([])
-    } finally {
-      setLoading(false)
-    }
-  }, [activeType, debouncedSearch, page])
+  const fetchProperties = useCallback(
+    async (
+      p: number,
+      s: string,
+      type: '' | PropertyType,
+      aId: number,
+      opId: number,
+      prKey: string,
+      sKey: string,
+    ) => {
+      setLoading(true)
+      try {
+        const res = await getProperties({
+          type: type || undefined,
+          search: s || undefined,
+          area_id: aId || undefined,
+          operation_type_id: opId || undefined,
+          ...getPriceParams(prKey),
+          ...getSortParams(sKey),
+          page: p,
+          per_page: 9,
+        })
+        setProperties(res.data)
+        setTotalPages(res.meta.pagination.last_page)
+      } catch {
+        setProperties([])
+      } finally {
+        setLoading(false)
+      }
+    },
+    [],
+  )
 
   useEffect(() => {
-    fetchProperties()
-  }, [fetchProperties])
+    fetchProperties(page, debouncedSearch, activeType, areaId, opTypeId, priceKey, sortKey)
+  }, [page, debouncedSearch, activeType, areaId, opTypeId, priceKey, sortKey, fetchProperties])
 
-  // Reset page when filters change
+  // Reset to page 1 when filters change
   useEffect(() => {
     setPage(1)
-  }, [activeType, debouncedSearch])
+  }, [debouncedSearch, activeType, areaId, opTypeId, priceKey, sortKey])
+
+  function toggleCompare(property: PropertySummary) {
+    setCompareList((prev) => {
+      if (prev.find((p) => p.id === property.id)) return prev.filter((p) => p.id !== property.id)
+      if (prev.length >= 4) return prev
+      return [...prev, property]
+    })
+  }
+
+  async function toggleFavorite(property: PropertySummary) {
+    if (!user) { setShowAuth(true); return }
+    const isFav = favoriteIds.has(property.id)
+    // Optimistic update
+    setFavoriteIds((prev) => {
+      const next = new Set(prev)
+      if (isFav) next.delete(property.id)
+      else next.add(property.id)
+      return next
+    })
+    try {
+      if (isFav) await removeFavorite(property.id)
+      else await addFavorite(property.id)
+    } catch {
+      // Revert on error
+      setFavoriteIds((prev) => {
+        const next = new Set(prev)
+        if (isFav) next.add(property.id)
+        else next.delete(property.id)
+        return next
+      })
+    }
+  }
+
+  function clearAdvancedFilters() {
+    setAreaId(0); setOpTypeId(0); setPriceKey(''); setSortKey('')
+  }
+
+  const hasAdvancedFilters = !!(areaId || opTypeId || priceKey || sortKey)
 
   return (
     <>
@@ -82,13 +211,14 @@ export default function PropertiesPage() {
 
       {/* Filters */}
       <section className="sticky top-20 z-30 bg-brand/95 backdrop-blur-md border-b border-gold-border">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 space-y-3">
+          {/* Row 1: type pills + search */}
           <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
-            {/* Type pills */}
             <div className="flex flex-wrap gap-2">
               {TYPES.map((t) => (
                 <button
                   key={t.value}
+                  type="button"
                   onClick={() => setActiveType(t.value)}
                   className={`px-4 py-2 text-xs tracking-widest uppercase rounded-sm transition-all duration-200 ${
                     activeType === t.value
@@ -100,10 +230,8 @@ export default function PropertiesPage() {
                 </button>
               ))}
             </div>
-
-            {/* Search */}
             <div className="relative w-full sm:w-64">
-              <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted" />
+              <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted pointer-events-none" />
               <input
                 type="text"
                 placeholder="Search properties…"
@@ -113,11 +241,70 @@ export default function PropertiesPage() {
               />
             </div>
           </div>
+
+          {/* Row 2: advanced filters */}
+          <div className="flex flex-wrap gap-2 items-center">
+            {areas.length > 0 && (
+              <select
+                aria-label="Filter by area"
+                value={areaId}
+                onChange={(e) => setAreaId(Number(e.target.value))}
+                className={`${SELECT_CLS} select-dark`}
+              >
+                <option value={0}>All Areas</option>
+                {areas.map((a) => <option key={a.id} value={a.id}>{a.name}</option>)}
+              </select>
+            )}
+
+            {opTypes.length > 0 && (
+              <select
+                aria-label="Filter by operation type"
+                value={opTypeId}
+                onChange={(e) => setOpTypeId(Number(e.target.value))}
+                className={`${SELECT_CLS} select-dark`}
+              >
+                <option value={0}>Buy or Rent</option>
+                {opTypes.map((o) => <option key={o.id} value={o.id}>{o.name}</option>)}
+              </select>
+            )}
+
+            <select
+              aria-label="Filter by price range"
+              value={priceKey}
+              onChange={(e) => setPriceKey(e.target.value)}
+              className={`${SELECT_CLS} select-dark`}
+            >
+              <option value="">Any Price</option>
+              {(Object.entries(BUDGET_RANGES) as [string, { label: string }][]).map(([k, v]) => (
+                <option key={k} value={k}>{v.label}</option>
+              ))}
+            </select>
+
+            <select
+              aria-label="Sort properties"
+              value={sortKey}
+              onChange={(e) => setSortKey(e.target.value)}
+              className={`${SELECT_CLS} select-dark`}
+            >
+              <option value="">Default Order</option>
+              {SORT_OPTIONS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
+            </select>
+
+            {hasAdvancedFilters && (
+              <button
+                type="button"
+                onClick={clearAdvancedFilters}
+                className="flex items-center gap-1 text-xs text-muted hover:text-white transition-colors"
+              >
+                <X size={12} /> Clear
+              </button>
+            )}
+          </div>
         </div>
       </section>
 
       {/* Grid */}
-      <section className="py-16 bg-brand min-h-[60vh]">
+      <section className={`py-16 bg-brand min-h-[60vh] ${compareList.length > 0 ? 'pb-36' : ''}`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {loading ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -131,25 +318,28 @@ export default function PropertiesPage() {
             </div>
           ) : (
             <AnimatePresence mode="popLayout">
-              <motion.div
-                className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
-                layout
-              >
+              <motion.div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" layout>
                 {properties.map((p, i) => (
                   <ScrollReveal key={p.id} delay={i * 0.05}>
-                    <PropertyCard property={p} />
+                    <PropertyCard
+                      property={p}
+                      isFavorited={favoriteIds.has(p.id)}
+                      onToggleFavorite={toggleFavorite}
+                      isComparing={!!compareList.find((c) => c.id === p.id)}
+                      onToggleCompare={toggleCompare}
+                    />
                   </ScrollReveal>
                 ))}
               </motion.div>
             </AnimatePresence>
           )}
 
-          {/* Pagination */}
           {totalPages > 1 && !loading && (
             <div className="flex justify-center gap-2 mt-12">
               {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
                 <button
                   key={p}
+                  type="button"
                   onClick={() => setPage(p)}
                   className={`w-10 h-10 text-sm rounded-sm transition-all duration-200 ${
                     page === p
@@ -164,6 +354,65 @@ export default function PropertiesPage() {
           )}
         </div>
       </section>
+
+      {/* Floating compare bar */}
+      <AnimatePresence>
+        {compareList.length > 0 && (
+          <motion.div
+            initial={{ y: 100, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: 100, opacity: 0 }}
+            transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+            className="fixed bottom-0 left-0 right-0 z-50 bg-brand-section/95 backdrop-blur-md border-t border-gold-border shadow-2xl"
+          >
+            <div className="max-w-7xl mx-auto px-4 py-4 flex flex-col sm:flex-row items-start sm:items-center gap-4">
+              <div className="flex-1 flex items-center gap-2 overflow-x-auto min-w-0 pb-1 sm:pb-0">
+                {compareList.map((p) => (
+                  <div
+                    key={p.id}
+                    className="flex items-center gap-2 bg-white/5 border border-white/10 rounded-sm px-3 py-2 shrink-0 max-w-[160px]"
+                  >
+                    <span className="text-white text-xs truncate">{p.title}</span>
+                    <button
+                      type="button"
+                      onClick={() => toggleCompare(p)}
+                      className="text-muted hover:text-white transition-colors shrink-0"
+                      aria-label="Remove"
+                    >
+                      <X size={11} />
+                    </button>
+                  </div>
+                ))}
+                {compareList.length < 4 && (
+                  <span className="text-muted/40 text-xs shrink-0 whitespace-nowrap">
+                    {compareList.length === 1 ? 'Add 1 more to compare' : `${4 - compareList.length} more slots`}
+                  </span>
+                )}
+              </div>
+              <div className="flex items-center gap-3 shrink-0">
+                <span className="text-muted text-xs">{compareList.length} / 4</span>
+                <button
+                  type="button"
+                  disabled={compareList.length < 2}
+                  onClick={() => router.push(`/compare?slugs=${compareList.map((p) => p.slug).join(',')}`)}
+                  className="px-5 py-2.5 bg-gold hover:bg-[#D4B668] text-brand text-sm font-semibold rounded-sm transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                >
+                  Compare Now
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setCompareList([])}
+                  className="text-muted hover:text-white text-xs transition-colors"
+                >
+                  Clear
+                </button>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {showAuth && <AuthModal onClose={() => setShowAuth(false)} />}
     </>
   )
 }

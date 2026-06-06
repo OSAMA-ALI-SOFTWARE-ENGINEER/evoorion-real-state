@@ -68,6 +68,11 @@ body {
   animation: shimmer 4s linear infinite;
 }
 
+/* Dark color-scheme for native selects on dark backgrounds */
+.select-dark {
+  color-scheme: dark;
+}
+
 /* Scrollbar */
 ::-webkit-scrollbar {
   width: 6px;

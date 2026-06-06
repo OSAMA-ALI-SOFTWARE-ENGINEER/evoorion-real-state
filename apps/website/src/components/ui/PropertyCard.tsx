@@ -3,11 +3,15 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import { motion } from 'framer-motion'
-import { MapPin, BedDouble, Bath, TrendingUp } from 'lucide-react'
+import { MapPin, BedDouble, Bath, TrendingUp, Heart, Check } from 'lucide-react'
 import type { PropertySummary } from '@/types'
 
 interface PropertyCardProps {
   property: PropertySummary
+  isFavorited?: boolean
+  onToggleFavorite?: (property: PropertySummary) => void
+  isComparing?: boolean
+  onToggleCompare?: (property: PropertySummary) => void
 }
 
 const PLACEHOLDER =
@@ -26,7 +30,13 @@ function getStatusBadge(status: string) {
   return { label: 'READY', cls: 'bg-emerald-600/80 text-white' }
 }
 
-export function PropertyCard({ property }: PropertyCardProps) {
+export function PropertyCard({
+  property,
+  isFavorited = false,
+  onToggleFavorite,
+  isComparing = false,
+  onToggleCompare,
+}: PropertyCardProps) {
   const primaryImage = property.images?.find((i) => i.is_primary)?.url ?? property.images?.[0]?.url
   const imageUrl = primaryImage ?? PLACEHOLDER
   const badge = getStatusBadge(property.status)
@@ -37,6 +47,22 @@ export function PropertyCard({ property }: PropertyCardProps) {
       transition={{ duration: 0.3, ease: 'easeOut' }}
       className="group relative rounded-sm overflow-hidden border border-white/5 hover:border-gold-border bg-[#0d1526] transition-colors duration-300"
     >
+      {/* Heart button — sits above the Link so clicks don't navigate */}
+      {onToggleFavorite && (
+        <button
+          type="button"
+          onClick={(e) => { e.stopPropagation(); onToggleFavorite(property) }}
+          className={`absolute top-3 right-3 z-20 w-8 h-8 flex items-center justify-center rounded-full backdrop-blur-sm transition-all duration-200 ${
+            isFavorited
+              ? 'bg-red-500/90 text-white scale-110'
+              : 'bg-black/40 text-white/70 hover:text-white hover:bg-black/60'
+          }`}
+          aria-label={isFavorited ? 'Remove from saved' : 'Save property'}
+        >
+          <Heart size={13} fill={isFavorited ? 'currentColor' : 'none'} />
+        </button>
+      )}
+
       <Link href={`/properties/${property.slug}`} className="block">
         {/* Image */}
         <div className="relative h-56 overflow-hidden">
@@ -49,21 +75,17 @@ export function PropertyCard({ property }: PropertyCardProps) {
           />
           <div className="absolute inset-0 bg-gradient-to-t from-brand/60 via-transparent to-transparent" />
 
-          {/* Badge */}
+          {/* Status badge */}
           <span
             className={`absolute top-3 left-3 text-[10px] font-bold tracking-[0.15em] px-2.5 py-1 rounded-sm ${badge.cls}`}
           >
             {badge.label}
           </span>
-
-          {/* Type */}
-          <span className="absolute top-3 right-3 text-[10px] text-white/70 tracking-wider uppercase bg-black/40 backdrop-blur-sm px-2 py-1 rounded-sm">
-            {property.type}
-          </span>
         </div>
 
         {/* Content */}
         <div className="p-5">
+          <p className="text-gold text-[10px] tracking-[0.2em] uppercase mb-1 capitalize">{property.type}</p>
           <h3 className="font-serif text-white text-base font-semibold leading-snug mb-2 line-clamp-2 group-hover:text-gold transition-colors duration-300">
             {property.title}
           </h3>
@@ -75,7 +97,6 @@ export function PropertyCard({ property }: PropertyCardProps) {
             </div>
           )}
 
-          {/* Stats row */}
           <div className="flex items-center gap-4 text-muted text-xs mb-4">
             {property.bedrooms > 0 && (
               <div className="flex items-center gap-1">
@@ -92,11 +113,9 @@ export function PropertyCard({ property }: PropertyCardProps) {
           </div>
 
           <div className="flex items-end justify-between">
-            <div>
-              <p className="text-gold font-semibold text-lg leading-tight">
-                {formatPrice(property.price, property.currency ?? 'AED')}
-              </p>
-            </div>
+            <p className="text-gold font-semibold text-lg leading-tight">
+              {formatPrice(property.price, property.currency ?? 'AED')}
+            </p>
             {property.roi_min && property.roi_max && (
               <div className="flex items-center gap-1 text-emerald-400 text-xs">
                 <TrendingUp size={12} />
@@ -106,13 +125,35 @@ export function PropertyCard({ property }: PropertyCardProps) {
           </div>
         </div>
 
-        {/* Bottom CTA */}
+        {/* CTA */}
         <div className="px-5 pb-5">
           <div className="w-full py-2.5 border border-gold-border text-center text-xs tracking-widest uppercase text-gold group-hover:bg-gold group-hover:text-brand transition-all duration-300 rounded-sm">
             View Details
           </div>
         </div>
       </Link>
+
+      {/* Compare toggle — outside Link */}
+      {onToggleCompare && (
+        <button
+          type="button"
+          onClick={() => onToggleCompare(property)}
+          className={`w-full flex items-center gap-2 px-5 py-2.5 text-xs border-t transition-colors duration-200 ${
+            isComparing
+              ? 'border-gold/30 bg-gold/5 text-gold'
+              : 'border-white/5 text-muted hover:text-white'
+          }`}
+        >
+          <div
+            className={`w-3.5 h-3.5 rounded border flex-shrink-0 flex items-center justify-center transition-colors ${
+              isComparing ? 'bg-gold border-gold text-brand' : 'border-muted/40'
+            }`}
+          >
+            {isComparing && <Check size={9} strokeWidth={3} />}
+          </div>
+          {isComparing ? 'Added to comparison' : 'Compare'}
+        </button>
+      )}
     </motion.div>
   )
 }

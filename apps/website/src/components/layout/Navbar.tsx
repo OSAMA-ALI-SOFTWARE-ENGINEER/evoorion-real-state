@@ -5,7 +5,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { usePathname } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Menu, X, Phone, ChevronDown, LogOut, User } from 'lucide-react'
+import { Menu, X, Phone, ChevronDown, LogOut, User, Heart } from 'lucide-react'
 import { useAuth } from '@/context/AuthContext'
 import { AuthModal } from '@/components/ui/AuthModal'
 
@@ -72,6 +72,14 @@ function UserMenu() {
               <p className="text-muted text-xs truncate">{user.email}</p>
             </div>
             <div className="p-1">
+              <Link
+                href="/favorites"
+                onClick={() => setOpen(false)}
+                className="w-full flex items-center gap-2.5 px-3 py-2 text-sm text-muted hover:text-white hover:bg-white/5 rounded-lg transition-colors"
+              >
+                <Heart size={15} />
+                Saved Properties
+              </Link>
               <button
                 onClick={async () => { setOpen(false); await logout() }}
                 className="w-full flex items-center gap-2.5 px-3 py-2 text-sm text-muted hover:text-white hover:bg-white/5 rounded-lg transition-colors"
