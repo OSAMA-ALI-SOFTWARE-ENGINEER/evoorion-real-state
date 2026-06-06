@@ -38,7 +38,7 @@ const FALLBACK_PROPERTIES: PropertySummary[] = [
     bedrooms: 6,
     bathrooms: 7,
     area_sqft: '12000',
-    status: 'off_plan',
+    status: 'available',
     is_featured: true,
     roi_min: '6',
     roi_max: '8',

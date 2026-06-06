@@ -23,12 +23,12 @@ function formatPrice(price: string, currency: string) {
 
 function StatusBadge({ status }: { status: string }) {
   const map: Record<string, string> = {
-    off_plan: 'bg-gold text-brand',
+    rented: 'bg-blue-500 text-white',
     sold: 'bg-red-500 text-white',
     available: 'bg-emerald-600 text-white',
   }
   const labels: Record<string, string> = {
-    off_plan: 'Off-Plan',
+    rented: 'Rented',
     sold: 'Sold',
     available: 'Ready',
   }
@@ -251,7 +251,7 @@ export function PropertyDetailClient({ property }: Props) {
                           className="flex items-center gap-2 py-2 px-3 border border-white/5 rounded-sm bg-brand-section/30 text-muted text-sm"
                         >
                           <div className="w-1.5 h-1.5 rounded-full bg-gold shrink-0" />
-                          {a.name}
+                          {a.amenity}
                         </div>
                       ))}
                     </div>

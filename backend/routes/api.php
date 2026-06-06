@@ -15,7 +15,9 @@ use App\Http\Controllers\Api\V1\Admin\AreaController as AdminAreaController;
 use App\Http\Controllers\Api\V1\Admin\DeveloperController as AdminDeveloperController;
 use App\Http\Controllers\Api\V1\Admin\OperationTypeController as AdminOperationTypeController;
 use App\Http\Controllers\Api\V1\AuthController;
+use App\Http\Controllers\Api\V1\BlogController;
 use App\Http\Controllers\Api\V1\BulkLeadController;
+use App\Http\Controllers\Api\V1\SocialAuthController;
 use App\Http\Controllers\Api\V1\FavoritesController;
 use App\Http\Controllers\Api\V1\LeadController;
 use App\Http\Controllers\Api\V1\LeadDocumentController;
@@ -40,6 +42,10 @@ Route::prefix('v1')->group(function () {
 
         Route::post('forgot-password', [PasswordResetController::class, 'forgotPassword']);
         Route::post('reset-password', [PasswordResetController::class, 'resetPassword']);
+
+        // Social OAuth — returns a redirect, not JSON (browser-based flow)
+        Route::get('social/{provider}/redirect', [SocialAuthController::class, 'redirect']);
+        Route::get('social/{provider}/callback', [SocialAuthController::class, 'callback']);
     });
 
     // Public master data endpoints (rate-limited)
@@ -54,6 +60,13 @@ Route::prefix('v1')->group(function () {
         Route::get('properties', [PropertyController::class, 'index']);
         Route::get('properties/{property}', [PropertyController::class, 'show']);
         Route::post('properties/compare', [PropertyComparisonController::class, 'compare']);
+    });
+
+    // Blog (public, rate-limited)
+    Route::middleware('throttle:120,1')->group(function () {
+        Route::get('blog', [BlogController::class, 'index']);
+        Route::get('blog/tags', [BlogController::class, 'tags']);
+        Route::get('blog/{slug}', [BlogController::class, 'show']);
     });
 
     // Public lead submission (stricter rate limit)

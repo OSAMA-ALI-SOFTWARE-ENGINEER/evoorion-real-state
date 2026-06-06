@@ -7,7 +7,7 @@ export interface PropertyImage {
 
 export interface PropertyAmenity {
   id: number
-  name: string
+  amenity: string
 }
 
 export interface PropertyArea {
@@ -26,7 +26,7 @@ export interface PropertyOperationType {
 }
 
 export type PropertyType = 'villa' | 'apartment' | 'penthouse' | 'townhouse' | 'commercial'
-export type PropertyStatus = 'available' | 'sold' | 'off_plan'
+export type PropertyStatus = 'available' | 'sold' | 'rented'
 
 export interface PropertySummary {
   id: number
@@ -95,6 +95,57 @@ export interface LeadPayload {
 }
 
 export type BudgetRange = 'under_1m' | '1m_3m' | '3m_5m' | '5m_10m' | 'above_10m'
+
+// ── Auth ──────────────────────────────────────────────────────────────────────
+
+export interface AuthUser {
+  id: number
+  name: string
+  email: string
+  role: string
+  avatar_url?: string | null
+}
+
+export interface LoginPayload {
+  email: string
+  password: string
+}
+
+export interface RegisterPayload {
+  name: string
+  email: string
+  password: string
+  password_confirmation: string
+}
+
+// ── Blog ──────────────────────────────────────────────────────────────────────
+
+export interface BlogTag {
+  id: number
+  name: string
+  slug: string
+  posts_count?: number
+}
+
+export interface BlogPostSummary {
+  id: number
+  title: string
+  slug: string
+  excerpt: string | null
+  featured_image_url: string | null
+  published_at: string
+  reading_time: string | null
+  view_count: number
+  author: { id: number; name: string }
+  tags: BlogTag[]
+}
+
+export interface BlogPost extends BlogPostSummary {
+  content: string
+  meta_title: string | null
+  meta_description: string | null
+  author: { id: number; name: string; avatar_url?: string | null }
+}
 
 export const BUDGET_RANGES: Record<BudgetRange, { label: string; min: number; max: number }> = {
   under_1m: { label: 'Under AED 1M', min: 0, max: 1_000_000 },

@@ -28,6 +28,10 @@ class User extends Authenticatable
         'password',
         'role',
         'is_active',
+        'social_provider',
+        'social_id',
+        'avatar_url',
+        'last_login_at',
     ];
 
     /**

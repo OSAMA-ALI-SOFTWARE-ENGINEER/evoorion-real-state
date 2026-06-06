@@ -21,7 +21,7 @@ function formatPrice(price: string, currency: string) {
 }
 
 function getStatusBadge(status: string) {
-  if (status === 'off_plan') return { label: 'OFF-PLAN', cls: 'bg-gold text-brand' }
+  if (status === 'rented') return { label: 'RENTED', cls: 'bg-blue-500/80 text-white' }
   if (status === 'sold') return { label: 'SOLD', cls: 'bg-red-500/80 text-white' }
   return { label: 'READY', cls: 'bg-emerald-600/80 text-white' }
 }
