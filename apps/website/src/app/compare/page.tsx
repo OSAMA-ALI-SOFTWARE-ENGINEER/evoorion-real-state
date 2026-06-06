@@ -202,11 +202,11 @@ export default function ComparePage() {
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <Link
             href="/properties"
-            className="inline-flex items-center gap-2 text-muted hover:text-white text-sm transition-colors mb-8"
+            className="flex w-fit items-center gap-2 text-muted hover:text-white text-sm transition-colors mb-10"
           >
             <ArrowLeft size={15} /> Back to Properties
           </Link>
-          <div className="inline-flex items-center gap-3 mb-4">
+          <div className="flex items-center gap-3 mb-4">
             <div className="h-px w-10 bg-gold" />
             <span className="text-gold text-xs tracking-[0.3em] uppercase">Side by Side</span>
             <div className="h-px w-10 bg-gold" />
