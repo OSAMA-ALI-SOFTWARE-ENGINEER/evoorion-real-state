@@ -313,19 +313,60 @@ export async function getActivityLogs(params?: {
   return request<PaginatedResponse<Record<string, unknown>>>(`/admin/activity-logs${q ? `?${q}` : ''}`)
 }
 
-// ── Blog ──────────────────────────────────────────────────────────────────────
+// ── Blog (admin) ──────────────────────────────────────────────────────────────
 
-export async function getAdminBlogPosts(params?: { page?: number; status?: string }) {
+export async function getAdminBlogPosts(params?: { page?: number; per_page?: number; search?: string; status?: string }) {
   const q = new URLSearchParams(params as Record<string, string>).toString()
-  return request<PaginatedResponse<BlogPost>>(`/blog${q ? `?${q}` : ''}`)
+  return request<PaginatedResponse<BlogPost>>(`/admin/blog${q ? `?${q}` : ''}`)
 }
 
-export async function getAdminBlogPost(slug: string) {
-  return request<ApiResponse<BlogPost>>(`/blog/${slug}`)
+export async function getAdminBlogPost(id: number) {
+  return request<ApiResponse<BlogPost>>(`/admin/blog/${id}`)
 }
 
-export async function getBlogTags() {
-  return request<ApiResponse<BlogTag[]>>('/blog/tags')
+export async function createBlogPost(data: Partial<BlogPost> & { tag_ids?: number[] }) {
+  return request<ApiResponse<BlogPost>>('/admin/blog', { method: 'POST', body: JSON.stringify(data) })
+}
+
+export async function updateBlogPost(id: number, data: Partial<BlogPost> & { tag_ids?: number[] }) {
+  return request<ApiResponse<BlogPost>>(`/admin/blog/${id}`, { method: 'PUT', body: JSON.stringify(data) })
+}
+
+export async function deleteBlogPost(id: number) {
+  return request<ApiResponse<null>>(`/admin/blog/${id}`, { method: 'DELETE' })
+}
+
+export async function restoreBlogPost(id: number) {
+  return request<ApiResponse<BlogPost>>(`/admin/blog/${id}/restore`, { method: 'POST' })
+}
+
+export async function getAdminBlogTags() {
+  return request<ApiResponse<BlogTag[]>>('/admin/blog-tags')
+}
+
+export async function createBlogTag(data: { name: string }) {
+  return request<ApiResponse<BlogTag>>('/admin/blog-tags', { method: 'POST', body: JSON.stringify(data) })
+}
+
+export async function updateBlogTag(id: number, data: { name: string }) {
+  return request<ApiResponse<BlogTag>>(`/admin/blog-tags/${id}`, { method: 'PUT', body: JSON.stringify(data) })
+}
+
+export async function deleteBlogTag(id: number) {
+  return request<ApiResponse<null>>(`/admin/blog-tags/${id}`, { method: 'DELETE' })
+}
+
+// ── Settings ──────────────────────────────────────────────────────────────────
+
+export async function getSettings() {
+  return request<ApiResponse<Record<string, string | null>>>('/admin/settings')
+}
+
+export async function updateSettings(settings: Record<string, string | null>) {
+  return request<ApiResponse<Record<string, string | null>>>('/admin/settings', {
+    method: 'PUT',
+    body: JSON.stringify({ settings }),
+  })
 }
 
 // ── Reports ───────────────────────────────────────────────────────────────────

@@ -232,6 +232,7 @@ export interface BlogPost {
   reading_time?: number | null
   author?: Pick<AuthUser, 'id' | 'name'>
   tags?: BlogTag[]
+  deleted_at?: string | null
   created_at: string
   updated_at: string
 }

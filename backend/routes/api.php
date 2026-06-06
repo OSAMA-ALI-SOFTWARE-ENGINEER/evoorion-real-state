@@ -3,11 +3,13 @@
 use App\Http\Controllers\Api\V1\Admin\ActivityLogController;
 use App\Http\Controllers\Api\V1\Admin\AgencyController;
 use App\Http\Controllers\Api\V1\Admin\AgentController;
+use App\Http\Controllers\Api\V1\Admin\BlogController as AdminBlogController;
 use App\Http\Controllers\Api\V1\Admin\DashboardController;
 use App\Http\Controllers\Api\V1\Admin\NotificationController;
 use App\Http\Controllers\Api\V1\Admin\PropertyAgentController;
 use App\Http\Controllers\Api\V1\Admin\PropertyAmenityController;
 use App\Http\Controllers\Api\V1\Admin\ReportController;
+use App\Http\Controllers\Api\V1\Admin\SettingController;
 use App\Http\Controllers\Api\V1\Admin\UserController;
 use App\Http\Controllers\Api\V1\Admin\PropertyController as AdminPropertyController;
 use App\Http\Controllers\Api\V1\Admin\PropertyImageController;
@@ -190,6 +192,22 @@ Route::prefix('v1')->group(function () {
             Route::post('properties/{property}/images', [PropertyImageController::class, 'store']);
             Route::put('properties/{property}/images/{image}', [PropertyImageController::class, 'update']);
             Route::delete('properties/{property}/images/{image}', [PropertyImageController::class, 'destroy']);
+
+            // Blog admin CRUD
+            Route::get('blog',                 [AdminBlogController::class, 'index']);
+            Route::post('blog',                [AdminBlogController::class, 'store']);
+            Route::get('blog/{id}',            [AdminBlogController::class, 'show']);
+            Route::put('blog/{id}',            [AdminBlogController::class, 'update']);
+            Route::delete('blog/{id}',         [AdminBlogController::class, 'destroy']);
+            Route::post('blog/{id}/restore',   [AdminBlogController::class, 'restore']);
+            Route::get('blog-tags',            [AdminBlogController::class, 'tags']);
+            Route::post('blog-tags',           [AdminBlogController::class, 'storeTag']);
+            Route::put('blog-tags/{tag}',      [AdminBlogController::class, 'updateTag']);
+            Route::delete('blog-tags/{tag}',   [AdminBlogController::class, 'destroyTag']);
+
+            // Settings (super_admin enforced in controller)
+            Route::get('settings',             [SettingController::class, 'index']);
+            Route::put('settings',             [SettingController::class, 'update']);
         });
     });
 });
