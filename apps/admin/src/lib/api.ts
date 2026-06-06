@@ -22,6 +22,16 @@ import type {
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000/api/v1'
 const TOKEN_KEY = 'evoorion_admin_token'
 
+function qs(params?: Record<string, string | number | undefined | null>): string {
+  if (!params) return ''
+  const p = new URLSearchParams()
+  for (const [k, v] of Object.entries(params)) {
+    if (v !== undefined && v !== null && v !== '') p.append(k, String(v))
+  }
+  const s = p.toString()
+  return s ? `?${s}` : ''
+}
+
 function getToken(): string | null {
   if (typeof window === 'undefined') return null
   return localStorage.getItem(TOKEN_KEY)
@@ -86,8 +96,7 @@ export async function getAdminProperties(params?: {
   search?: string
   status?: string
 }) {
-  const q = new URLSearchParams(params as Record<string, string>).toString()
-  return request<PaginatedResponse<Property>>(`/admin/properties${q ? `?${q}` : ''}`)
+  return request<PaginatedResponse<Property>>(`/admin/properties${qs(params)}`)
 }
 
 export async function getAdminProperty(slug: string) {
@@ -125,8 +134,7 @@ export async function getLeads(params?: {
   status?: string
   source?: string
 }) {
-  const q = new URLSearchParams(params as Record<string, string>).toString()
-  return request<PaginatedResponse<Lead>>(`/admin/leads${q ? `?${q}` : ''}`)
+  return request<PaginatedResponse<Lead>>(`/admin/leads${qs(params)}`)
 }
 
 export async function getLead(id: number) {
@@ -225,8 +233,7 @@ export async function deleteOperationType(id: number) {
 // ── Agencies & Agents ─────────────────────────────────────────────────────────
 
 export async function getAgencies(params?: { search?: string }) {
-  const q = new URLSearchParams(params as Record<string, string>).toString()
-  return request<PaginatedResponse<Agency>>(`/admin/agencies${q ? `?${q}` : ''}`)
+  return request<PaginatedResponse<Agency>>(`/admin/agencies${qs(params)}`)
 }
 
 export async function createAgency(data: Partial<Agency>) {
@@ -242,8 +249,7 @@ export async function deleteAgency(id: number) {
 }
 
 export async function getAgents(params?: { search?: string; agency_id?: number }) {
-  const q = new URLSearchParams(params as Record<string, string>).toString()
-  return request<PaginatedResponse<Agent>>(`/admin/agents${q ? `?${q}` : ''}`)
+  return request<PaginatedResponse<Agent>>(`/admin/agents${qs(params)}`)
 }
 
 export async function createAgent(data: Partial<Agent>) {
@@ -265,8 +271,7 @@ export async function restoreAgent(id: number) {
 // ── Users ─────────────────────────────────────────────────────────────────────
 
 export async function getUsers(params?: { search?: string; role?: string }) {
-  const q = new URLSearchParams(params as Record<string, string>).toString()
-  return request<PaginatedResponse<AdminUser>>(`/admin/users${q ? `?${q}` : ''}`)
+  return request<PaginatedResponse<AdminUser>>(`/admin/users${qs(params)}`)
 }
 
 export async function updateUser(id: number, data: Partial<AdminUser>) {
@@ -309,15 +314,13 @@ export async function getActivityLogs(params?: {
   date_from?: string
   date_to?: string
 }) {
-  const q = new URLSearchParams(params as Record<string, string>).toString()
-  return request<PaginatedResponse<Record<string, unknown>>>(`/admin/activity-logs${q ? `?${q}` : ''}`)
+  return request<PaginatedResponse<Record<string, unknown>>>(`/admin/activity-logs${qs(params)}`)
 }
 
 // ── Blog (admin) ──────────────────────────────────────────────────────────────
 
 export async function getAdminBlogPosts(params?: { page?: number; per_page?: number; search?: string; status?: string }) {
-  const q = new URLSearchParams(params as Record<string, string>).toString()
-  return request<PaginatedResponse<BlogPost>>(`/admin/blog${q ? `?${q}` : ''}`)
+  return request<PaginatedResponse<BlogPost>>(`/admin/blog${qs(params)}`)
 }
 
 export async function getAdminBlogPost(id: number) {
