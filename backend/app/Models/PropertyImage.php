@@ -16,6 +16,9 @@ class PropertyImage extends Model
         'public_id',
         'is_primary',
         'order',
+        'type',
+        'caption',
+        'file_name',
     ];
 
     protected $casts = [

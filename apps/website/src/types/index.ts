@@ -1,8 +1,14 @@
+export type PropertyMediaType = 'image' | 'video' | 'file'
+
 export interface PropertyImage {
   id: number
   url: string
   is_primary: boolean
   sort_order?: number
+  order?: number
+  type?: PropertyMediaType
+  caption?: string | null
+  file_name?: string | null
 }
 
 export interface PropertyAmenity {
