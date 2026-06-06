@@ -1,0 +1,453 @@
+name: 'Dashboard & Reports'
+description: |-
+
+  Aggregated platform statistics and agent performance metrics. Requires agent role or above.
+endpoints:
+  -
+    custom: []
+    httpMethods:
+      - GET
+    uri: api/v1/admin/dashboard/stats
+    metadata:
+      custom: []
+      groupName: 'Dashboard & Reports'
+      groupDescription: |-
+
+        Aggregated platform statistics and agent performance metrics. Requires agent role or above.
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Dashboard stats'
+      description: 'Platform-wide counts: leads by status and source, active agents, and property availability.'
+      authenticated: true
+      deprecated: false
+    headers:
+      Authorization: 'Bearer {YOUR_BEARER_TOKEN}'
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 200
+        content: |-
+          {
+            "success": true,
+            "data": {
+              "leads": {
+                "total": 142,
+                "unassigned": 18,
+                "this_month": 24,
+                "last_month": 31,
+                "by_status": {"new": 45, "contacted": 38, "qualified": 22, "closed": 28, "lost": 9},
+                "by_source": {"website": 60, "instagram": 35, "facebook": 28, "whatsapp": 14, "referral": 5}
+              },
+              "agents": {"total": 8, "active": 7},
+              "properties": {"total": 56, "available": 42, "featured": 10}
+            }
+          }
+        headers: []
+        description: ''
+      -
+        custom: []
+        status: 401
+        content: '{"message": "Unauthenticated."}'
+        headers: []
+        description: Unauthenticated
+    responseFields: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer cbDae1g3a6EvfdkZh5VP648'
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - GET
+    uri: api/v1/admin/dashboard/agent-performance
+    metadata:
+      custom: []
+      groupName: 'Dashboard & Reports'
+      groupDescription: |-
+
+        Aggregated platform statistics and agent performance metrics. Requires agent role or above.
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Agent performance'
+      description: 'Per-agent breakdown: assigned properties, total leads, closed leads, and close rate.'
+      authenticated: true
+      deprecated: false
+    headers:
+      Authorization: 'Bearer {YOUR_BEARER_TOKEN}'
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 200
+        content: |-
+          {
+            "success": true,
+            "data": [
+              {
+                "id": 1,
+                "name": "Jane Agent",
+                "email": "jane@evoorion.com",
+                "properties": 5,
+                "leads_total": 32,
+                "leads_closed": 12,
+                "close_rate": 37.5
+              },
+              {
+                "id": 2,
+                "name": "Mark Smith",
+                "email": "mark@evoorion.com",
+                "properties": 3,
+                "leads_total": 18,
+                "leads_closed": 6,
+                "close_rate": 33.3
+              }
+            ]
+          }
+        headers: []
+        description: ''
+    responseFields: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer cbDae1g3a6EvfdkZh5VP648'
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - GET
+    uri: api/v1/admin/reports/lead-funnel
+    metadata:
+      custom: []
+      groupName: 'Dashboard & Reports'
+      groupDescription: |-
+
+        Analytics reports for leads, properties, and agent rankings. Requires agent role or above.
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Lead funnel'
+      description: 'Count of leads at each pipeline stage plus overall conversion rate.'
+      authenticated: true
+      deprecated: false
+    headers:
+      Authorization: 'Bearer {YOUR_BEARER_TOKEN}'
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 200
+        content: |-
+          {
+            "success": true,
+            "data": {
+              "funnel": [
+                {"status": "new", "count": 45},
+                {"status": "contacted", "count": 38},
+                {"status": "qualified", "count": 22},
+                {"status": "closed", "count": 28},
+                {"status": "lost", "count": 9}
+              ],
+              "total": 142,
+              "conversion_rate": 19.7,
+              "new_to_close_rate": 19.7
+            }
+          }
+        headers: []
+        description: ''
+    responseFields: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer cbDae1g3a6EvfdkZh5VP648'
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - GET
+    uri: api/v1/admin/reports/leads-over-time
+    metadata:
+      custom: []
+      groupName: 'Dashboard & Reports'
+      groupDescription: |-
+
+        Analytics reports for leads, properties, and agent rankings. Requires agent role or above.
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Leads over time'
+      description: 'Daily lead counts for the last N days (default 30, max 90). Every day appears — zero-filled.'
+      authenticated: true
+      deprecated: false
+    headers:
+      Authorization: 'Bearer {YOUR_BEARER_TOKEN}'
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters:
+      days:
+        custom: []
+        name: days
+        description: 'Days to look back (1–90). Default: 30.'
+        required: false
+        example: 30
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+    cleanQueryParameters:
+      days: 30
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 200
+        content: |-
+          {
+            "success": true,
+            "data": [
+              {"date": "2025-01-01", "total": 3},
+              {"date": "2025-01-02", "total": 0},
+              {"date": "2025-01-03", "total": 5}
+            ]
+          }
+        headers: []
+        description: ''
+    responseFields: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer cbDae1g3a6EvfdkZh5VP648'
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - GET
+    uri: api/v1/admin/reports/property-performance
+    metadata:
+      custom: []
+      groupName: 'Dashboard & Reports'
+      groupDescription: |-
+
+        Analytics reports for leads, properties, and agent rankings. Requires agent role or above.
+      subgroup: ''
+      subgroupDescription: ''
+      title: ''
+      description: ''
+      authenticated: true
+      deprecated: false
+    headers:
+      Authorization: 'Bearer {YOUR_BEARER_TOKEN}'
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 500
+        content: |-
+          {
+              "message": "Server Error"
+          }
+        headers:
+          cache-control: 'no-cache, private'
+          content-type: application/json
+          access-control-allow-origin: '*'
+        description: null
+    responseFields: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer cbDae1g3a6EvfdkZh5VP648'
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - GET
+    uri: api/v1/admin/reports/agent-leaderboard
+    metadata:
+      custom: []
+      groupName: 'Dashboard & Reports'
+      groupDescription: |-
+
+        Analytics reports for leads, properties, and agent rankings. Requires agent role or above.
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Agent leaderboard'
+      description: 'All agents ranked by leads closed descending, with close rate percentage.'
+      authenticated: true
+      deprecated: false
+    headers:
+      Authorization: 'Bearer {YOUR_BEARER_TOKEN}'
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 200
+        content: |-
+          {
+            "success": true,
+            "data": [
+              {"id": 1, "name": "Jane Agent", "leads_total": 32, "leads_closed": 12, "leads_new": 8, "close_rate": 37.5},
+              {"id": 2, "name": "Mark Smith", "leads_total": 18, "leads_closed": 6, "leads_new": 5, "close_rate": 33.3}
+            ]
+          }
+        headers: []
+        description: ''
+    responseFields: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer cbDae1g3a6EvfdkZh5VP648'
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - GET
+    uri: api/v1/admin/reports/leads-by-source
+    metadata:
+      custom: []
+      groupName: 'Dashboard & Reports'
+      groupDescription: |-
+
+        Analytics reports for leads, properties, and agent rankings. Requires agent role or above.
+      subgroup: ''
+      subgroupDescription: ''
+      title: ''
+      description: ''
+      authenticated: true
+      deprecated: false
+    headers:
+      Authorization: 'Bearer {YOUR_BEARER_TOKEN}'
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 500
+        content: |-
+          {
+              "message": "Server Error"
+          }
+        headers:
+          cache-control: 'no-cache, private'
+          content-type: application/json
+          access-control-allow-origin: '*'
+        description: null
+    responseFields: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer cbDae1g3a6EvfdkZh5VP648'
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - GET
+    uri: api/v1/admin/activity-logs
+    metadata:
+      custom: []
+      groupName: 'Dashboard & Reports'
+      groupDescription: |-
+
+        Audit trail of field-level changes to leads. Requires manager or super_admin role.
+      subgroup: ''
+      subgroupDescription: ''
+      title: ''
+      description: ''
+      authenticated: true
+      deprecated: false
+    headers:
+      Authorization: 'Bearer {YOUR_BEARER_TOKEN}'
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 500
+        content: |-
+          {
+              "message": "Server Error"
+          }
+        headers:
+          cache-control: 'no-cache, private'
+          content-type: application/json
+          access-control-allow-origin: '*'
+        description: null
+    responseFields: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer cbDae1g3a6EvfdkZh5VP648'
+    controller: null
+    method: null
+    route: null

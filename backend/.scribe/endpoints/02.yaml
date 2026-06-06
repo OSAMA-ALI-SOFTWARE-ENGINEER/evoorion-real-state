@@ -1,0 +1,2267 @@
+name: Properties
+description: |-
+
+  Browse, search, and view available properties. No authentication required.
+endpoints:
+  -
+    custom: []
+    httpMethods:
+      - GET
+    uri: api/v1/properties
+    metadata:
+      custom: []
+      groupName: Properties
+      groupDescription: |-
+
+        Browse, search, and view available properties. No authentication required.
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'List properties'
+      description: 'Paginated list of available properties. Supports filtering, sorting, and search.'
+      authenticated: false
+      deprecated: false
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters:
+      search:
+        custom: []
+        name: search
+        description: 'Keyword search on title and description.'
+        required: false
+        example: 'Palm Jumeirah'
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      area_id:
+        custom: []
+        name: area_id
+        description: 'Filter by area ID.'
+        required: false
+        example: 1
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      operation_type_id:
+        custom: []
+        name: operation_type_id
+        description: 'Filter by operation type ID.'
+        required: false
+        example: 1
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      type:
+        custom: []
+        name: type
+        description: 'Filter by type. Allowed: villa, apartment, penthouse, townhouse, commercial.'
+        required: false
+        example: villa
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      featured:
+        custom: []
+        name: featured
+        description: 'Show only featured properties.'
+        required: false
+        example: true
+        type: boolean
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      min_price:
+        custom: []
+        name: min_price
+        description: 'Minimum price.'
+        required: false
+        example: 500000.0
+        type: number
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      max_price:
+        custom: []
+        name: max_price
+        description: 'Maximum price.'
+        required: false
+        example: 3000000.0
+        type: number
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      developer_id:
+        custom: []
+        name: developer_id
+        description: 'Filter by developer ID.'
+        required: false
+        example: 1
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      bedrooms_min:
+        custom: []
+        name: bedrooms_min
+        description: 'Minimum bedrooms.'
+        required: false
+        example: 2
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      bedrooms_max:
+        custom: []
+        name: bedrooms_max
+        description: 'Maximum bedrooms.'
+        required: false
+        example: 4
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      bathrooms_min:
+        custom: []
+        name: bathrooms_min
+        description: 'Minimum bathrooms.'
+        required: false
+        example: 1
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      sort_by:
+        custom: []
+        name: sort_by
+        description: 'Field to sort by. Default: created_at.'
+        required: false
+        example: price
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      sort_direction:
+        custom: []
+        name: sort_direction
+        description: 'asc or desc. Default: desc.'
+        required: false
+        example: asc
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      per_page:
+        custom: []
+        name: per_page
+        description: 'Items per page. Default: 15.'
+        required: false
+        example: 15
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+    cleanQueryParameters:
+      search: 'Palm Jumeirah'
+      area_id: 1
+      operation_type_id: 1
+      type: villa
+      featured: true
+      min_price: 500000.0
+      max_price: 3000000.0
+      developer_id: 1
+      bedrooms_min: 2
+      bedrooms_max: 4
+      bathrooms_min: 1
+      sort_by: price
+      sort_direction: asc
+      per_page: 15
+    bodyParameters:
+      search:
+        custom: []
+        name: search
+        description: 'Must not be greater than 255 characters.'
+        required: false
+        example: pasyzwszwtxpeqq
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+      area_id:
+        custom: []
+        name: area_id
+        description: 'The <code>id</code> of an existing record in the areas table.'
+        required: false
+        example: 12
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+      developer_id:
+        custom: []
+        name: developer_id
+        description: 'The <code>id</code> of an existing record in the developers table.'
+        required: false
+        example: 12
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+      operation_type_id:
+        custom: []
+        name: operation_type_id
+        description: 'The <code>id</code> of an existing record in the operation_types table.'
+        required: false
+        example: 12
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+      type:
+        custom: []
+        name: type
+        description: ''
+        required: false
+        example: villa
+        type: string
+        enumValues:
+          - villa
+          - apartment
+          - penthouse
+          - townhouse
+          - commercial
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+      featured:
+        custom: []
+        name: featured
+        description: ''
+        required: false
+        example: true
+        type: boolean
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+      min_price:
+        custom: []
+        name: min_price
+        description: 'Must be at least 0.'
+        required: false
+        example: 0
+        type: number
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+      max_price:
+        custom: []
+        name: max_price
+        description: 'Must be at least 0.'
+        required: false
+        example: 65
+        type: number
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+      bedrooms_min:
+        custom: []
+        name: bedrooms_min
+        description: 'Must be at least 0.'
+        required: false
+        example: 84
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+      bedrooms_max:
+        custom: []
+        name: bedrooms_max
+        description: 'Must be at least 0.'
+        required: false
+        example: 90
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+      bathrooms_min:
+        custom: []
+        name: bathrooms_min
+        description: 'Must be at least 0.'
+        required: false
+        example: 79
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+      sort_by:
+        custom: []
+        name: sort_by
+        description: ''
+        required: false
+        example: area_sqft
+        type: string
+        enumValues:
+          - price
+          - created_at
+          - views_count
+          - area_sqft
+          - bedrooms
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+      sort_direction:
+        custom: []
+        name: sort_direction
+        description: ''
+        required: false
+        example: asc
+        type: string
+        enumValues:
+          - asc
+          - desc
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+      page:
+        custom: []
+        name: page
+        description: 'Must be at least 1.'
+        required: false
+        example: 64
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+      per_page:
+        custom: []
+        name: per_page
+        description: 'Must be at least 1. Must not be greater than 100.'
+        required: false
+        example: 25
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+    cleanBodyParameters:
+      search: pasyzwszwtxpeqq
+      area_id: 12
+      developer_id: 12
+      operation_type_id: 12
+      type: villa
+      featured: true
+      min_price: 0
+      max_price: 65
+      bedrooms_min: 84
+      bedrooms_max: 90
+      bathrooms_min: 79
+      sort_by: area_sqft
+      sort_direction: asc
+      page: 64
+      per_page: 25
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 200
+        content: |-
+          {
+            "success": true,
+            "data": [
+              {
+                "id": 1,
+                "title": "Luxury Villa in Palm Jumeirah",
+                "slug": "luxury-villa-palm-jumeirah",
+                "type": "villa",
+                "price": "2500000.00",
+                "currency": "AED",
+                "bedrooms": 4,
+                "bathrooms": 3,
+                "area_sqft": "4500.00",
+                "status": "available",
+                "is_featured": true,
+                "views_count": 120,
+                "created_at": "2025-01-15T10:00:00.000000Z"
+              }
+            ],
+            "message": "Operation successful",
+            "meta": {
+              "pagination": {
+                "current_page": 1,
+                "total": 42,
+                "per_page": 15,
+                "last_page": 3
+              }
+            }
+          }
+        headers: []
+        description: ''
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - GET
+    uri: 'api/v1/properties/{property_slug}'
+    metadata:
+      custom: []
+      groupName: Properties
+      groupDescription: |-
+
+        Browse, search, and view available properties. No authentication required.
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Get property'
+      description: 'Retrieve a single property by slug. Increments the view count on each call.'
+      authenticated: false
+      deprecated: false
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters:
+      property_slug:
+        custom: []
+        name: property_slug
+        description: 'The slug of the property.'
+        required: true
+        example: culpa
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+    cleanUrlParameters:
+      property_slug: culpa
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 200
+        content: |-
+          {
+            "success": true,
+            "data": {
+              "id": 1,
+              "title": "Luxury Villa in Palm Jumeirah",
+              "slug": "luxury-villa-palm-jumeirah",
+              "description": "A stunning 4-bedroom villa with private pool and sea view.",
+              "type": "villa",
+              "price": "2500000.00",
+              "currency": "AED",
+              "bedrooms": 4,
+              "bathrooms": 3,
+              "area_sqft": "4500.00",
+              "status": "available",
+              "is_featured": true,
+              "roi_min": "6.00",
+              "roi_max": "8.00",
+              "views_count": 121,
+              "area": {"id": 1, "name": "Palm Jumeirah"},
+              "developer": {"id": 1, "name": "Emaar Properties"},
+              "operation_type": {"id": 1, "name": "For Sale"},
+              "images": [
+                {"id": 1, "url": "https://res.cloudinary.com/demo/image/upload/v1/villa.jpg", "is_primary": true}
+              ],
+              "amenities": [
+                {"id": 1, "name": "Swimming Pool"},
+                {"id": 2, "name": "Gym"}
+              ],
+              "created_at": "2025-01-15T10:00:00.000000Z",
+              "updated_at": "2025-01-20T08:30:00.000000Z"
+            },
+            "message": "Operation successful",
+            "meta": []
+          }
+        headers: []
+        description: ''
+      -
+        custom: []
+        status: 404
+        content: '{"message": "No query results for model [App\\Models\\Property]."}'
+        headers: []
+        description: 'Not found'
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - POST
+    uri: api/v1/properties/compare
+    metadata:
+      custom: []
+      groupName: Properties
+      groupDescription: |-
+
+        Compare 2–4 properties side by side.
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Compare properties'
+      description: |-
+        Compare 2 to 4 available properties by slug. Returns them in the requested order
+        plus a summary identifying the cheapest, most bedrooms, and largest by sqft.
+      authenticated: false
+      deprecated: false
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters:
+      slugs:
+        custom: []
+        name: slugs
+        description: 'Array of 2–4 property slugs to compare.'
+        required: true
+        example:
+          - luxury-villa-palm-jumeirah
+          - city-apartment-downtown
+        type: 'string[]'
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+    cleanBodyParameters:
+      slugs:
+        - luxury-villa-palm-jumeirah
+        - city-apartment-downtown
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 200
+        content: |-
+          {
+            "success": true,
+            "data": {
+              "properties": [
+                {
+                  "id": 1, "title": "Luxury Villa", "slug": "luxury-villa-palm-jumeirah",
+                  "price": "2500000.00", "bedrooms": 4, "bathrooms": 3, "area_sqft": "4500.00", "type": "villa"
+                },
+                {
+                  "id": 2, "title": "City Apartment", "slug": "city-apartment-downtown",
+                  "price": "800000.00", "bedrooms": 2, "bathrooms": 2, "area_sqft": "1200.00", "type": "apartment"
+                }
+              ],
+              "summary": {
+                "cheapest": "city-apartment-downtown",
+                "most_bedrooms": "luxury-villa-palm-jumeirah",
+                "largest": "luxury-villa-palm-jumeirah"
+              }
+            }
+          }
+        headers: []
+        description: ''
+      -
+        custom: []
+        status: 422
+        content: |-
+          {
+            "success": false,
+            "message": "At least 2 available properties are required for comparison"
+          }
+        headers: []
+        description: 'Fewer than 2 available slugs'
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - GET
+    uri: 'api/v1/admin/properties/{property_slug}/agents'
+    metadata:
+      custom: []
+      groupName: Properties
+      groupDescription: |-
+
+        Admin: assign and unassign agents to properties. Requires manager or super_admin role.
+      subgroup: ''
+      subgroupDescription: ''
+      title: ''
+      description: ''
+      authenticated: true
+      deprecated: false
+    headers:
+      Authorization: 'Bearer {YOUR_BEARER_TOKEN}'
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters:
+      property_slug:
+        custom: []
+        name: property_slug
+        description: 'The slug of the property.'
+        required: true
+        example: culpa
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+    cleanUrlParameters:
+      property_slug: culpa
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 500
+        content: |-
+          {
+              "message": "Server Error"
+          }
+        headers:
+          cache-control: 'no-cache, private'
+          content-type: application/json
+          access-control-allow-origin: '*'
+        description: null
+    responseFields: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer cbDae1g3a6EvfdkZh5VP648'
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - GET
+    uri: 'api/v1/admin/properties/{property_slug}/amenities'
+    metadata:
+      custom: []
+      groupName: Properties
+      groupDescription: |-
+
+        Admin: manage amenities attached to a specific property. Requires manager or super_admin role.
+      subgroup: ''
+      subgroupDescription: ''
+      title: ''
+      description: ''
+      authenticated: true
+      deprecated: false
+    headers:
+      Authorization: 'Bearer {YOUR_BEARER_TOKEN}'
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters:
+      property_slug:
+        custom: []
+        name: property_slug
+        description: 'The slug of the property.'
+        required: true
+        example: culpa
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+    cleanUrlParameters:
+      property_slug: culpa
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 500
+        content: |-
+          {
+              "message": "Server Error"
+          }
+        headers:
+          cache-control: 'no-cache, private'
+          content-type: application/json
+          access-control-allow-origin: '*'
+        description: null
+    responseFields: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer cbDae1g3a6EvfdkZh5VP648'
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - POST
+    uri: 'api/v1/admin/properties/{property_slug}/agents/{agent_id}'
+    metadata:
+      custom: []
+      groupName: Properties
+      groupDescription: |-
+
+        Admin: assign and unassign agents to properties. Requires manager or super_admin role.
+      subgroup: ''
+      subgroupDescription: ''
+      title: ''
+      description: ''
+      authenticated: true
+      deprecated: false
+    headers:
+      Authorization: 'Bearer {YOUR_BEARER_TOKEN}'
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters:
+      property_slug:
+        custom: []
+        name: property_slug
+        description: 'The slug of the property.'
+        required: true
+        example: culpa
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      agent_id:
+        custom: []
+        name: agent_id
+        description: 'The ID of the agent.'
+        required: true
+        example: 12
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+    cleanUrlParameters:
+      property_slug: culpa
+      agent_id: 12
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses: []
+    responseFields: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer cbDae1g3a6EvfdkZh5VP648'
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - DELETE
+    uri: 'api/v1/admin/properties/{property_slug}/agents/{agent_id}'
+    metadata:
+      custom: []
+      groupName: Properties
+      groupDescription: |-
+
+        Admin: assign and unassign agents to properties. Requires manager or super_admin role.
+      subgroup: ''
+      subgroupDescription: ''
+      title: ''
+      description: ''
+      authenticated: true
+      deprecated: false
+    headers:
+      Authorization: 'Bearer {YOUR_BEARER_TOKEN}'
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters:
+      property_slug:
+        custom: []
+        name: property_slug
+        description: 'The slug of the property.'
+        required: true
+        example: culpa
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      agent_id:
+        custom: []
+        name: agent_id
+        description: 'The ID of the agent.'
+        required: true
+        example: 12
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+    cleanUrlParameters:
+      property_slug: culpa
+      agent_id: 12
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses: []
+    responseFields: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer cbDae1g3a6EvfdkZh5VP648'
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - POST
+    uri: 'api/v1/admin/properties/{property_slug}/amenities'
+    metadata:
+      custom: []
+      groupName: Properties
+      groupDescription: |-
+
+        Admin: manage amenities attached to a specific property. Requires manager or super_admin role.
+      subgroup: ''
+      subgroupDescription: ''
+      title: ''
+      description: ''
+      authenticated: true
+      deprecated: false
+    headers:
+      Authorization: 'Bearer {YOUR_BEARER_TOKEN}'
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters:
+      property_slug:
+        custom: []
+        name: property_slug
+        description: 'The slug of the property.'
+        required: true
+        example: culpa
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+    cleanUrlParameters:
+      property_slug: culpa
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters:
+      amenity:
+        custom: []
+        name: amenity
+        description: 'Must not be greater than 255 characters.'
+        required: true
+        example: pasyzwszwtxpeqq
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+    cleanBodyParameters:
+      amenity: pasyzwszwtxpeqq
+    fileParameters: []
+    responses: []
+    responseFields: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer cbDae1g3a6EvfdkZh5VP648'
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - PUT
+    uri: 'api/v1/admin/properties/{property_slug}/amenities/{amenity_id}'
+    metadata:
+      custom: []
+      groupName: Properties
+      groupDescription: |-
+
+        Admin: manage amenities attached to a specific property. Requires manager or super_admin role.
+      subgroup: ''
+      subgroupDescription: ''
+      title: ''
+      description: ''
+      authenticated: true
+      deprecated: false
+    headers:
+      Authorization: 'Bearer {YOUR_BEARER_TOKEN}'
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters:
+      property_slug:
+        custom: []
+        name: property_slug
+        description: 'The slug of the property.'
+        required: true
+        example: culpa
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      amenity_id:
+        custom: []
+        name: amenity_id
+        description: 'The ID of the amenity.'
+        required: true
+        example: 12
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+    cleanUrlParameters:
+      property_slug: culpa
+      amenity_id: 12
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters:
+      amenity:
+        custom: []
+        name: amenity
+        description: 'Must not be greater than 255 characters.'
+        required: true
+        example: pasyzwszwtxpeqq
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+    cleanBodyParameters:
+      amenity: pasyzwszwtxpeqq
+    fileParameters: []
+    responses: []
+    responseFields: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer cbDae1g3a6EvfdkZh5VP648'
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - DELETE
+    uri: 'api/v1/admin/properties/{property_slug}/amenities/{amenity_id}'
+    metadata:
+      custom: []
+      groupName: Properties
+      groupDescription: |-
+
+        Admin: manage amenities attached to a specific property. Requires manager or super_admin role.
+      subgroup: ''
+      subgroupDescription: ''
+      title: ''
+      description: ''
+      authenticated: true
+      deprecated: false
+    headers:
+      Authorization: 'Bearer {YOUR_BEARER_TOKEN}'
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters:
+      property_slug:
+        custom: []
+        name: property_slug
+        description: 'The slug of the property.'
+        required: true
+        example: culpa
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      amenity_id:
+        custom: []
+        name: amenity_id
+        description: 'The ID of the amenity.'
+        required: true
+        example: 12
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+    cleanUrlParameters:
+      property_slug: culpa
+      amenity_id: 12
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses: []
+    responseFields: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer cbDae1g3a6EvfdkZh5VP648'
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - GET
+    uri: api/v1/admin/properties
+    metadata:
+      custom: []
+      groupName: Properties
+      groupDescription: |-
+
+        Admin: full CRUD for property listings. Requires manager or super_admin role.
+      subgroup: ''
+      subgroupDescription: ''
+      title: ''
+      description: ''
+      authenticated: true
+      deprecated: false
+    headers:
+      Authorization: 'Bearer {YOUR_BEARER_TOKEN}'
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters:
+      search:
+        custom: []
+        name: search
+        description: 'Must not be greater than 255 characters.'
+        required: false
+        example: pasyzwszwtxpeqq
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+      area_id:
+        custom: []
+        name: area_id
+        description: 'The <code>id</code> of an existing record in the areas table.'
+        required: false
+        example: 12
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+      developer_id:
+        custom: []
+        name: developer_id
+        description: 'The <code>id</code> of an existing record in the developers table.'
+        required: false
+        example: 12
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+      operation_type_id:
+        custom: []
+        name: operation_type_id
+        description: 'The <code>id</code> of an existing record in the operation_types table.'
+        required: false
+        example: 12
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+      type:
+        custom: []
+        name: type
+        description: ''
+        required: false
+        example: townhouse
+        type: string
+        enumValues:
+          - villa
+          - apartment
+          - penthouse
+          - townhouse
+          - commercial
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+      featured:
+        custom: []
+        name: featured
+        description: ''
+        required: false
+        example: false
+        type: boolean
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+      min_price:
+        custom: []
+        name: min_price
+        description: 'Must be at least 0.'
+        required: false
+        example: 0
+        type: number
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+      max_price:
+        custom: []
+        name: max_price
+        description: 'Must be at least 0.'
+        required: false
+        example: 65
+        type: number
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+      bedrooms_min:
+        custom: []
+        name: bedrooms_min
+        description: 'Must be at least 0.'
+        required: false
+        example: 84
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+      bedrooms_max:
+        custom: []
+        name: bedrooms_max
+        description: 'Must be at least 0.'
+        required: false
+        example: 90
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+      bathrooms_min:
+        custom: []
+        name: bathrooms_min
+        description: 'Must be at least 0.'
+        required: false
+        example: 79
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+      sort_by:
+        custom: []
+        name: sort_by
+        description: ''
+        required: false
+        example: views_count
+        type: string
+        enumValues:
+          - price
+          - created_at
+          - views_count
+          - area_sqft
+          - bedrooms
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+      sort_direction:
+        custom: []
+        name: sort_direction
+        description: ''
+        required: false
+        example: asc
+        type: string
+        enumValues:
+          - asc
+          - desc
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+      page:
+        custom: []
+        name: page
+        description: 'Must be at least 1.'
+        required: false
+        example: 64
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+      per_page:
+        custom: []
+        name: per_page
+        description: 'Must be at least 1. Must not be greater than 100.'
+        required: false
+        example: 25
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+    cleanBodyParameters:
+      search: pasyzwszwtxpeqq
+      area_id: 12
+      developer_id: 12
+      operation_type_id: 12
+      type: townhouse
+      featured: false
+      min_price: 0
+      max_price: 65
+      bedrooms_min: 84
+      bedrooms_max: 90
+      bathrooms_min: 79
+      sort_by: views_count
+      sort_direction: asc
+      page: 64
+      per_page: 25
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 500
+        content: |-
+          {
+              "message": "Server Error"
+          }
+        headers:
+          cache-control: 'no-cache, private'
+          content-type: application/json
+          access-control-allow-origin: '*'
+        description: null
+    responseFields: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer cbDae1g3a6EvfdkZh5VP648'
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - POST
+    uri: api/v1/admin/properties
+    metadata:
+      custom: []
+      groupName: Properties
+      groupDescription: |-
+
+        Admin: full CRUD for property listings. Requires manager or super_admin role.
+      subgroup: ''
+      subgroupDescription: ''
+      title: ''
+      description: ''
+      authenticated: true
+      deprecated: false
+    headers:
+      Authorization: 'Bearer {YOUR_BEARER_TOKEN}'
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters:
+      title:
+        custom: []
+        name: title
+        description: 'Must not be greater than 255 characters.'
+        required: true
+        example: pasyzwszwtxpeqq
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      description:
+        custom: []
+        name: description
+        description: ''
+        required: false
+        example: 'Consequatur quisquam recusandae asperiores accusamus nihil repellat.'
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+      type:
+        custom: []
+        name: type
+        description: ''
+        required: true
+        example: commercial
+        type: string
+        enumValues:
+          - villa
+          - apartment
+          - penthouse
+          - townhouse
+          - commercial
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      price:
+        custom: []
+        name: price
+        description: 'Must be at least 0.'
+        required: true
+        example: 77
+        type: number
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      currency:
+        custom: []
+        name: currency
+        description: 'Must be 3 characters.'
+        required: false
+        example: txp
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+      area_id:
+        custom: []
+        name: area_id
+        description: 'The <code>id</code> of an existing record in the areas table.'
+        required: true
+        example: 12
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      location:
+        custom: []
+        name: location
+        description: ''
+        required: false
+        example: culpa
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+      area_sqft:
+        custom: []
+        name: area_sqft
+        description: 'Must be at least 0.'
+        required: false
+        example: 0
+        type: number
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+      bedrooms:
+        custom: []
+        name: bedrooms
+        description: 'Must be at least 0.'
+        required: false
+        example: 65
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+      bathrooms:
+        custom: []
+        name: bathrooms
+        description: 'Must be at least 0.'
+        required: false
+        example: 84
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+      operation_type_id:
+        custom: []
+        name: operation_type_id
+        description: 'The <code>id</code> of an existing record in the operation_types table.'
+        required: true
+        example: 12
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      status:
+        custom: []
+        name: status
+        description: ''
+        required: true
+        example: rented
+        type: string
+        enumValues:
+          - available
+          - sold
+          - rented
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      is_featured:
+        custom: []
+        name: is_featured
+        description: ''
+        required: false
+        example: false
+        type: boolean
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+      roi_min:
+        custom: []
+        name: roi_min
+        description: 'Must be at least 0.'
+        required: false
+        example: 0
+        type: number
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+      roi_max:
+        custom: []
+        name: roi_max
+        description: 'Must be at least 0.'
+        required: false
+        example: 65
+        type: number
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+      developer_id:
+        custom: []
+        name: developer_id
+        description: 'The <code>id</code> of an existing record in the developers table.'
+        required: true
+        example: 12
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      primary_agent_id:
+        custom: []
+        name: primary_agent_id
+        description: 'The <code>id</code> of an existing record in the users table.'
+        required: false
+        example: 12
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+      meta_title:
+        custom: []
+        name: meta_title
+        description: 'Must not be greater than 255 characters.'
+        required: false
+        example: asyzwszwtxpeqqi
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+      meta_description:
+        custom: []
+        name: meta_description
+        description: 'Must not be greater than 255 characters.'
+        required: false
+        example: kymwkiinfowtzmi
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+      amenities:
+        custom: []
+        name: amenities
+        description: ''
+        required: false
+        example:
+          - culpa
+        type: 'string[]'
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+    cleanBodyParameters:
+      title: pasyzwszwtxpeqq
+      description: 'Consequatur quisquam recusandae asperiores accusamus nihil repellat.'
+      type: commercial
+      price: 77
+      currency: txp
+      area_id: 12
+      location: culpa
+      area_sqft: 0
+      bedrooms: 65
+      bathrooms: 84
+      operation_type_id: 12
+      status: rented
+      is_featured: false
+      roi_min: 0
+      roi_max: 65
+      developer_id: 12
+      primary_agent_id: 12
+      meta_title: asyzwszwtxpeqqi
+      meta_description: kymwkiinfowtzmi
+      amenities:
+        - culpa
+    fileParameters: []
+    responses: []
+    responseFields: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer cbDae1g3a6EvfdkZh5VP648'
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - GET
+    uri: 'api/v1/admin/properties/{property_slug}'
+    metadata:
+      custom: []
+      groupName: Properties
+      groupDescription: |-
+
+        Admin: full CRUD for property listings. Requires manager or super_admin role.
+      subgroup: ''
+      subgroupDescription: ''
+      title: ''
+      description: ''
+      authenticated: true
+      deprecated: false
+    headers:
+      Authorization: 'Bearer {YOUR_BEARER_TOKEN}'
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters:
+      property_slug:
+        custom: []
+        name: property_slug
+        description: 'The slug of the property.'
+        required: true
+        example: culpa
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+    cleanUrlParameters:
+      property_slug: culpa
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 500
+        content: |-
+          {
+              "message": "Server Error"
+          }
+        headers:
+          cache-control: 'no-cache, private'
+          content-type: application/json
+          access-control-allow-origin: '*'
+        description: null
+    responseFields: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer cbDae1g3a6EvfdkZh5VP648'
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - PUT
+    uri: 'api/v1/admin/properties/{property_slug}'
+    metadata:
+      custom: []
+      groupName: Properties
+      groupDescription: |-
+
+        Admin: full CRUD for property listings. Requires manager or super_admin role.
+      subgroup: ''
+      subgroupDescription: ''
+      title: ''
+      description: ''
+      authenticated: true
+      deprecated: false
+    headers:
+      Authorization: 'Bearer {YOUR_BEARER_TOKEN}'
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters:
+      property_slug:
+        custom: []
+        name: property_slug
+        description: 'The slug of the property.'
+        required: true
+        example: culpa
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+    cleanUrlParameters:
+      property_slug: culpa
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters:
+      title:
+        custom: []
+        name: title
+        description: 'Must not be greater than 255 characters.'
+        required: false
+        example: pasyzwszwtxpeqq
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      description:
+        custom: []
+        name: description
+        description: ''
+        required: false
+        example: 'Consequatur quisquam recusandae asperiores accusamus nihil repellat.'
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+      type:
+        custom: []
+        name: type
+        description: ''
+        required: false
+        example: townhouse
+        type: string
+        enumValues:
+          - villa
+          - apartment
+          - penthouse
+          - townhouse
+          - commercial
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      price:
+        custom: []
+        name: price
+        description: 'Must be at least 0.'
+        required: false
+        example: 77
+        type: number
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      currency:
+        custom: []
+        name: currency
+        description: 'Must be 3 characters.'
+        required: false
+        example: txp
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+      area_id:
+        custom: []
+        name: area_id
+        description: 'The <code>id</code> of an existing record in the areas table.'
+        required: false
+        example: 12
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      location:
+        custom: []
+        name: location
+        description: ''
+        required: false
+        example: culpa
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+      area_sqft:
+        custom: []
+        name: area_sqft
+        description: 'Must be at least 0.'
+        required: false
+        example: 0
+        type: number
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+      bedrooms:
+        custom: []
+        name: bedrooms
+        description: 'Must be at least 0.'
+        required: false
+        example: 65
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+      bathrooms:
+        custom: []
+        name: bathrooms
+        description: 'Must be at least 0.'
+        required: false
+        example: 84
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+      operation_type_id:
+        custom: []
+        name: operation_type_id
+        description: 'The <code>id</code> of an existing record in the operation_types table.'
+        required: false
+        example: 12
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      status:
+        custom: []
+        name: status
+        description: ''
+        required: false
+        example: available
+        type: string
+        enumValues:
+          - available
+          - sold
+          - rented
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      is_featured:
+        custom: []
+        name: is_featured
+        description: ''
+        required: false
+        example: false
+        type: boolean
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+      roi_min:
+        custom: []
+        name: roi_min
+        description: 'Must be at least 0.'
+        required: false
+        example: 0
+        type: number
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+      roi_max:
+        custom: []
+        name: roi_max
+        description: 'Must be at least 0.'
+        required: false
+        example: 65
+        type: number
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+      developer_id:
+        custom: []
+        name: developer_id
+        description: 'The <code>id</code> of an existing record in the developers table.'
+        required: false
+        example: 12
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      primary_agent_id:
+        custom: []
+        name: primary_agent_id
+        description: 'The <code>id</code> of an existing record in the users table.'
+        required: false
+        example: 12
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+      meta_title:
+        custom: []
+        name: meta_title
+        description: 'Must not be greater than 255 characters.'
+        required: false
+        example: asyzwszwtxpeqqi
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+      meta_description:
+        custom: []
+        name: meta_description
+        description: 'Must not be greater than 255 characters.'
+        required: false
+        example: kymwkiinfowtzmi
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+      amenities:
+        custom: []
+        name: amenities
+        description: ''
+        required: false
+        example:
+          - culpa
+        type: 'string[]'
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+    cleanBodyParameters:
+      title: pasyzwszwtxpeqq
+      description: 'Consequatur quisquam recusandae asperiores accusamus nihil repellat.'
+      type: townhouse
+      price: 77
+      currency: txp
+      area_id: 12
+      location: culpa
+      area_sqft: 0
+      bedrooms: 65
+      bathrooms: 84
+      operation_type_id: 12
+      status: available
+      is_featured: false
+      roi_min: 0
+      roi_max: 65
+      developer_id: 12
+      primary_agent_id: 12
+      meta_title: asyzwszwtxpeqqi
+      meta_description: kymwkiinfowtzmi
+      amenities:
+        - culpa
+    fileParameters: []
+    responses: []
+    responseFields: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer cbDae1g3a6EvfdkZh5VP648'
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - DELETE
+    uri: 'api/v1/admin/properties/{property_slug}'
+    metadata:
+      custom: []
+      groupName: Properties
+      groupDescription: |-
+
+        Admin: full CRUD for property listings. Requires manager or super_admin role.
+      subgroup: ''
+      subgroupDescription: ''
+      title: ''
+      description: ''
+      authenticated: true
+      deprecated: false
+    headers:
+      Authorization: 'Bearer {YOUR_BEARER_TOKEN}'
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters:
+      property_slug:
+        custom: []
+        name: property_slug
+        description: 'The slug of the property.'
+        required: true
+        example: culpa
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+    cleanUrlParameters:
+      property_slug: culpa
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses: []
+    responseFields: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer cbDae1g3a6EvfdkZh5VP648'
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - POST
+    uri: 'api/v1/admin/properties/{property_slug}/restore'
+    metadata:
+      custom: []
+      groupName: Properties
+      groupDescription: |-
+
+        Admin: full CRUD for property listings. Requires manager or super_admin role.
+      subgroup: ''
+      subgroupDescription: ''
+      title: ''
+      description: ''
+      authenticated: true
+      deprecated: false
+    headers:
+      Authorization: 'Bearer {YOUR_BEARER_TOKEN}'
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters:
+      property_slug:
+        custom: []
+        name: property_slug
+        description: 'The slug of the property.'
+        required: true
+        example: culpa
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+    cleanUrlParameters:
+      property_slug: culpa
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses: []
+    responseFields: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer cbDae1g3a6EvfdkZh5VP648'
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - POST
+    uri: 'api/v1/admin/properties/{property_slug}/images'
+    metadata:
+      custom: []
+      groupName: Properties
+      groupDescription: |-
+
+        Admin: upload and manage property images. Requires manager or super_admin role.
+      subgroup: ''
+      subgroupDescription: ''
+      title: ''
+      description: ''
+      authenticated: true
+      deprecated: false
+    headers:
+      Authorization: 'Bearer {YOUR_BEARER_TOKEN}'
+      Content-Type: multipart/form-data
+      Accept: application/json
+    urlParameters:
+      property_slug:
+        custom: []
+        name: property_slug
+        description: 'The slug of the property.'
+        required: true
+        example: culpa
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+    cleanUrlParameters:
+      property_slug: culpa
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters:
+      image:
+        custom: []
+        name: image
+        description: 'Must be an image. Must not be greater than 10240 kilobytes.'
+        required: true
+        example: null
+        type: file
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      is_primary:
+        custom: []
+        name: is_primary
+        description: ''
+        required: false
+        example: false
+        type: boolean
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+      order:
+        custom: []
+        name: order
+        description: 'Must be at least 0.'
+        required: false
+        example: 52
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+    cleanBodyParameters:
+      is_primary: false
+      order: 52
+    fileParameters:
+      image: null
+    responses: []
+    responseFields: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer cbDae1g3a6EvfdkZh5VP648'
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - PUT
+    uri: 'api/v1/admin/properties/{property_slug}/images/{image_id}'
+    metadata:
+      custom: []
+      groupName: Properties
+      groupDescription: |-
+
+        Admin: upload and manage property images. Requires manager or super_admin role.
+      subgroup: ''
+      subgroupDescription: ''
+      title: ''
+      description: ''
+      authenticated: true
+      deprecated: false
+    headers:
+      Authorization: 'Bearer {YOUR_BEARER_TOKEN}'
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters:
+      property_slug:
+        custom: []
+        name: property_slug
+        description: 'The slug of the property.'
+        required: true
+        example: culpa
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      image_id:
+        custom: []
+        name: image_id
+        description: 'The ID of the image.'
+        required: true
+        example: 12
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+    cleanUrlParameters:
+      property_slug: culpa
+      image_id: 12
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters:
+      is_primary:
+        custom: []
+        name: is_primary
+        description: ''
+        required: false
+        example: false
+        type: boolean
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+      order:
+        custom: []
+        name: order
+        description: 'Must be at least 0.'
+        required: false
+        example: 52
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+    cleanBodyParameters:
+      is_primary: false
+      order: 52
+    fileParameters: []
+    responses: []
+    responseFields: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer cbDae1g3a6EvfdkZh5VP648'
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - DELETE
+    uri: 'api/v1/admin/properties/{property_slug}/images/{image_id}'
+    metadata:
+      custom: []
+      groupName: Properties
+      groupDescription: |-
+
+        Admin: upload and manage property images. Requires manager or super_admin role.
+      subgroup: ''
+      subgroupDescription: ''
+      title: ''
+      description: ''
+      authenticated: true
+      deprecated: false
+    headers:
+      Authorization: 'Bearer {YOUR_BEARER_TOKEN}'
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters:
+      property_slug:
+        custom: []
+        name: property_slug
+        description: 'The slug of the property.'
+        required: true
+        example: culpa
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      image_id:
+        custom: []
+        name: image_id
+        description: 'The ID of the image.'
+        required: true
+        example: 12
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+    cleanUrlParameters:
+      property_slug: culpa
+      image_id: 12
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses: []
+    responseFields: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer cbDae1g3a6EvfdkZh5VP648'
+    controller: null
+    method: null
+    route: null

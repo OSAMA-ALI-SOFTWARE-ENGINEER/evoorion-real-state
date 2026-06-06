@@ -1,0 +1,212 @@
+name: Notifications
+description: |-
+
+  In-app notifications for the authenticated user. Each user sees only their own notifications.
+endpoints:
+  -
+    custom: []
+    httpMethods:
+      - GET
+    uri: api/v1/admin/notifications
+    metadata:
+      custom: []
+      groupName: Notifications
+      groupDescription: |-
+
+        In-app notifications for the authenticated user. Each user sees only their own notifications.
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'List notifications'
+      description: "Paginated list of the authenticated user's notifications. Pass `?unread=true` to filter unread only."
+      authenticated: true
+      deprecated: false
+    headers:
+      Authorization: 'Bearer {YOUR_BEARER_TOKEN}'
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters:
+      unread:
+        custom: []
+        name: unread
+        description: 'Return only unread notifications.'
+        required: false
+        example: true
+        type: boolean
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+    cleanQueryParameters:
+      unread: true
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 200
+        content: |-
+          {
+            "success": true,
+            "data": [
+              {
+                "id": "550e8400-e29b-41d4-a716-446655440000",
+                "type": "App\\Notifications\\LeadAssigned",
+                "data": {"lead_id": 1, "lead_name": "Ahmed Al-Rashid"},
+                "read_at": null,
+                "created_at": "2025-01-15T10:00:00.000000Z"
+              }
+            ],
+            "meta": {
+              "total": 5,
+              "per_page": 20,
+              "current_page": 1,
+              "last_page": 1,
+              "unread_count": 3
+            }
+          }
+        headers: []
+        description: ''
+    responseFields: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer cbDae1g3a6EvfdkZh5VP648'
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - GET
+    uri: api/v1/admin/notifications/unread-count
+    metadata:
+      custom: []
+      groupName: Notifications
+      groupDescription: |-
+
+        In-app notifications for the authenticated user. Each user sees only their own notifications.
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Unread count'
+      description: 'Returns the number of unread notifications for the authenticated user.'
+      authenticated: true
+      deprecated: false
+    headers:
+      Authorization: 'Bearer {YOUR_BEARER_TOKEN}'
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 200
+        content: |-
+          {
+            "success": true,
+            "data": {"count": 3}
+          }
+        headers: []
+        description: ''
+    responseFields: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer cbDae1g3a6EvfdkZh5VP648'
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - POST
+    uri: 'api/v1/admin/notifications/{id}/read'
+    metadata:
+      custom: []
+      groupName: Notifications
+      groupDescription: |-
+
+        In-app notifications for the authenticated user. Each user sees only their own notifications.
+      subgroup: ''
+      subgroupDescription: ''
+      title: ''
+      description: ''
+      authenticated: true
+      deprecated: false
+    headers:
+      Authorization: 'Bearer {YOUR_BEARER_TOKEN}'
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters:
+      id:
+        custom: []
+        name: id
+        description: 'The ID of the notification.'
+        required: true
+        example: culpa
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+    cleanUrlParameters:
+      id: culpa
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses: []
+    responseFields: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer cbDae1g3a6EvfdkZh5VP648'
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - POST
+    uri: api/v1/admin/notifications/read-all
+    metadata:
+      custom: []
+      groupName: Notifications
+      groupDescription: |-
+
+        In-app notifications for the authenticated user. Each user sees only their own notifications.
+      subgroup: ''
+      subgroupDescription: ''
+      title: ''
+      description: ''
+      authenticated: true
+      deprecated: false
+    headers:
+      Authorization: 'Bearer {YOUR_BEARER_TOKEN}'
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses: []
+    responseFields: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer cbDae1g3a6EvfdkZh5VP648'
+    controller: null
+    method: null
+    route: null

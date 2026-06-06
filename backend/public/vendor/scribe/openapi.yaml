@@ -1,0 +1,2711 @@
+openapi: 3.0.3
+info:
+  title: 'Evoorion Real Estate API'
+  description: 'Backend API for the Evoorion real estate platform. Admin endpoints require a Bearer token obtained from POST /api/v1/auth/login.'
+  version: 1.0.0
+servers:
+  -
+    url: 'http://localhost:8000'
+tags:
+  -
+    name: Endpoints
+    description: ''
+components:
+  securitySchemes:
+    default:
+      type: http
+      scheme: bearer
+      description: 'Obtain a token via POST /api/v1/auth/login. Send as: Authorization: Bearer {token}'
+security:
+  -
+    default: []
+paths:
+  /api/v1/auth/login:
+    post:
+      summary: 'User login'
+      operationId: userLogin
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  description: 'Must be a valid email address.'
+                  example: morgan93@example.net
+                password:
+                  type: string
+                  description: ''
+                  example: culpa
+              required:
+                - email
+                - password
+  /api/v1/auth/register:
+    post:
+      summary: 'User registration (stub for now)'
+      operationId: userRegistrationstubForNow
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: 'Must not be greater than 255 characters.'
+                  example: pasyzwszwtxpeqq
+                email:
+                  type: string
+                  description: 'Must be a valid email address. Must not be greater than 255 characters.'
+                  example: tremayne.kohler@example.net
+                password:
+                  type: string
+                  description: 'Must be at least 8 characters.'
+                  example: '>?R4Usi|L@vH'
+              required:
+                - name
+                - email
+                - password
+  /api/v1/auth/logout:
+    post:
+      summary: 'User logout'
+      operationId: userLogout
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+  /api/v1/auth/me:
+    get:
+      summary: 'Get authenticated user profile'
+      operationId: getAuthenticatedUserProfile
+      description: ''
+      parameters: []
+      responses:
+        500:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Server Error'
+                properties:
+                  message:
+                    type: string
+                    example: 'Server Error'
+      tags:
+        - Endpoints
+  /api/v1/auth/forgot-password:
+    post:
+      summary: ''
+      operationId: postApiV1AuthForgotPassword
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  description: 'Must be a valid email address.'
+                  example: morgan93@example.net
+              required:
+                - email
+  /api/v1/auth/reset-password:
+    post:
+      summary: ''
+      operationId: postApiV1AuthResetPassword
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  description: 'Must be a valid email address.'
+                  example: morgan93@example.net
+                token:
+                  type: string
+                  description: ''
+                  example: culpa
+                password:
+                  type: string
+                  description: 'Must be at least 8 characters.'
+                  example: dx~rc~
+              required:
+                - email
+                - token
+                - password
+  /api/v1/areas:
+    get:
+      summary: ''
+      operationId: getApiV1Areas
+      description: ''
+      parameters: []
+      responses:
+        500:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Server Error'
+                properties:
+                  message:
+                    type: string
+                    example: 'Server Error'
+      tags:
+        - Endpoints
+  '/api/v1/areas/{area_id}':
+    get:
+      summary: ''
+      operationId: getApiV1AreasArea_id
+      description: ''
+      parameters: []
+      responses:
+        500:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Server Error'
+                properties:
+                  message:
+                    type: string
+                    example: 'Server Error'
+      tags:
+        - Endpoints
+    parameters:
+      -
+        in: path
+        name: area_id
+        description: 'The ID of the area.'
+        example: 12
+        required: true
+        schema:
+          type: integer
+  /api/v1/developers:
+    get:
+      summary: ''
+      operationId: getApiV1Developers
+      description: ''
+      parameters: []
+      responses:
+        500:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Server Error'
+                properties:
+                  message:
+                    type: string
+                    example: 'Server Error'
+      tags:
+        - Endpoints
+  '/api/v1/developers/{developer_id}':
+    get:
+      summary: ''
+      operationId: getApiV1DevelopersDeveloper_id
+      description: ''
+      parameters: []
+      responses:
+        500:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Server Error'
+                properties:
+                  message:
+                    type: string
+                    example: 'Server Error'
+      tags:
+        - Endpoints
+    parameters:
+      -
+        in: path
+        name: developer_id
+        description: 'The ID of the developer.'
+        example: 12
+        required: true
+        schema:
+          type: integer
+  /api/v1/operation-types:
+    get:
+      summary: ''
+      operationId: getApiV1OperationTypes
+      description: ''
+      parameters: []
+      responses:
+        500:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Server Error'
+                properties:
+                  message:
+                    type: string
+                    example: 'Server Error'
+      tags:
+        - Endpoints
+  /api/v1/properties:
+    get:
+      summary: ''
+      operationId: getApiV1Properties
+      description: ''
+      parameters: []
+      responses:
+        500:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Server Error'
+                properties:
+                  message:
+                    type: string
+                    example: 'Server Error'
+      tags:
+        - Endpoints
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                search:
+                  type: string
+                  description: 'Must not be greater than 255 characters.'
+                  example: pasyzwszwtxpeqq
+                  nullable: true
+                area_id:
+                  type: integer
+                  description: 'The <code>id</code> of an existing record in the areas table.'
+                  example: 12
+                  nullable: true
+                developer_id:
+                  type: integer
+                  description: 'The <code>id</code> of an existing record in the developers table.'
+                  example: 12
+                  nullable: true
+                operation_type_id:
+                  type: integer
+                  description: 'The <code>id</code> of an existing record in the operation_types table.'
+                  example: 12
+                  nullable: true
+                type:
+                  type: string
+                  description: ''
+                  example: apartment
+                  enum:
+                    - villa
+                    - apartment
+                    - penthouse
+                    - townhouse
+                    - commercial
+                  nullable: true
+                featured:
+                  type: boolean
+                  description: ''
+                  example: true
+                  nullable: true
+                min_price:
+                  type: number
+                  description: 'Must be at least 0.'
+                  example: 0
+                  nullable: true
+                max_price:
+                  type: number
+                  description: 'Must be at least 0.'
+                  example: 65
+                  nullable: true
+                bedrooms_min:
+                  type: integer
+                  description: 'Must be at least 0.'
+                  example: 84
+                  nullable: true
+                bedrooms_max:
+                  type: integer
+                  description: 'Must be at least 0.'
+                  example: 90
+                  nullable: true
+                bathrooms_min:
+                  type: integer
+                  description: 'Must be at least 0.'
+                  example: 79
+                  nullable: true
+                sort_by:
+                  type: string
+                  description: ''
+                  example: area_sqft
+                  enum:
+                    - price
+                    - created_at
+                    - views_count
+                    - area_sqft
+                    - bedrooms
+                  nullable: true
+                sort_direction:
+                  type: string
+                  description: ''
+                  example: desc
+                  enum:
+                    - asc
+                    - desc
+                  nullable: true
+                page:
+                  type: integer
+                  description: 'Must be at least 1.'
+                  example: 64
+                  nullable: true
+                per_page:
+                  type: integer
+                  description: 'Must be at least 1. Must not be greater than 100.'
+                  example: 25
+                  nullable: true
+  '/api/v1/properties/{property_slug}':
+    get:
+      summary: ''
+      operationId: getApiV1PropertiesProperty_slug
+      description: ''
+      parameters: []
+      responses:
+        500:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Server Error'
+                properties:
+                  message:
+                    type: string
+                    example: 'Server Error'
+      tags:
+        - Endpoints
+    parameters:
+      -
+        in: path
+        name: property_slug
+        description: 'The slug of the property.'
+        example: culpa
+        required: true
+        schema:
+          type: string
+  /api/v1/properties/compare:
+    post:
+      summary: ''
+      operationId: postApiV1PropertiesCompare
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                slugs:
+                  type: array
+                  description: 'The <code>slug</code> of an existing record in the properties table.'
+                  example:
+                    - culpa
+                  items:
+                    type: string
+              required:
+                - slugs
+  /api/v1/leads:
+    post:
+      summary: ''
+      operationId: postApiV1Leads
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: 'Must not be greater than 255 characters.'
+                  example: pasyzwszwtxpeqq
+                email:
+                  type: string
+                  description: 'Must be a valid email address.'
+                  example: tremayne.kohler@example.net
+                phone:
+                  type: string
+                  description: 'Must not be greater than 20 characters.'
+                  example: kiinfowtzmix
+                  nullable: true
+                whatsapp:
+                  type: string
+                  description: 'Must not be greater than 20 characters.'
+                  example: kolowyuffszf
+                  nullable: true
+                property_id:
+                  type: string
+                  description: 'The <code>id</code> of an existing record in the properties table.'
+                  example: null
+                  nullable: true
+                budget_min:
+                  type: number
+                  description: 'Must be at least 0.'
+                  example: 62
+                  nullable: true
+                budget_max:
+                  type: number
+                  description: 'Must be at least 0.'
+                  example: 8
+                  nullable: true
+                message:
+                  type: string
+                  description: 'Must not be greater than 1000 characters.'
+                  example: snwwxvxezhebdrx
+                  nullable: true
+                source:
+                  type: string
+                  description: ''
+                  example: instagram
+                  enum:
+                    - website
+                    - instagram
+                    - facebook
+                    - whatsapp
+                    - referral
+                    - other
+              required:
+                - name
+                - email
+                - source
+  /api/v1/favorites:
+    get:
+      summary: ''
+      operationId: getApiV1Favorites
+      description: ''
+      parameters: []
+      responses:
+        500:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Server Error'
+                properties:
+                  message:
+                    type: string
+                    example: 'Server Error'
+      tags:
+        - Endpoints
+  '/api/v1/favorites/{property_slug}':
+    post:
+      summary: ''
+      operationId: postApiV1FavoritesProperty_slug
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+    delete:
+      summary: ''
+      operationId: deleteApiV1FavoritesProperty_slug
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+    parameters:
+      -
+        in: path
+        name: property_slug
+        description: 'The slug of the property.'
+        example: culpa
+        required: true
+        schema:
+          type: string
+  /api/v1/admin/agencies:
+    get:
+      summary: ''
+      operationId: getApiV1AdminAgencies
+      description: ''
+      parameters: []
+      responses:
+        500:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Server Error'
+                properties:
+                  message:
+                    type: string
+                    example: 'Server Error'
+      tags:
+        - Endpoints
+    post:
+      summary: ''
+      operationId: postApiV1AdminAgencies
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: 'Must not be greater than 255 characters.'
+                  example: pasyzwszwtxpeqq
+                logo_url:
+                  type: string
+                  description: 'Must be a valid URL. Must not be greater than 2048 characters.'
+                  example: 'http://www.huels.org/nulla-quam-ipsam-voluptatem-cupiditate-sed'
+                  nullable: true
+                contact_email:
+                  type: string
+                  description: 'Must be a valid email address. Must not be greater than 255 characters.'
+                  example: nikki97@example.org
+                  nullable: true
+                phone:
+                  type: string
+                  description: 'Must not be greater than 30 characters.'
+                  example: ixkolowyuffszfr
+                  nullable: true
+                address:
+                  type: string
+                  description: 'Must not be greater than 500 characters.'
+                  example: csnwwxvxezhebdr
+                  nullable: true
+              required:
+                - name
+  '/api/v1/admin/agencies/{agency_id}':
+    get:
+      summary: ''
+      operationId: getApiV1AdminAgenciesAgency_id
+      description: ''
+      parameters: []
+      responses:
+        500:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Server Error'
+                properties:
+                  message:
+                    type: string
+                    example: 'Server Error'
+      tags:
+        - Endpoints
+    put:
+      summary: ''
+      operationId: putApiV1AdminAgenciesAgency_id
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: 'Must not be greater than 255 characters.'
+                  example: pasyzwszwtxpeqq
+                logo_url:
+                  type: string
+                  description: 'Must be a valid URL. Must not be greater than 2048 characters.'
+                  example: 'http://www.huels.org/nulla-quam-ipsam-voluptatem-cupiditate-sed'
+                  nullable: true
+                contact_email:
+                  type: string
+                  description: 'Must be a valid email address. Must not be greater than 255 characters.'
+                  example: nikki97@example.org
+                  nullable: true
+                phone:
+                  type: string
+                  description: 'Must not be greater than 30 characters.'
+                  example: ixkolowyuffszfr
+                  nullable: true
+                address:
+                  type: string
+                  description: 'Must not be greater than 500 characters.'
+                  example: csnwwxvxezhebdr
+                  nullable: true
+    delete:
+      summary: ''
+      operationId: deleteApiV1AdminAgenciesAgency_id
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+    parameters:
+      -
+        in: path
+        name: agency_id
+        description: 'The ID of the agency.'
+        example: 12
+        required: true
+        schema:
+          type: integer
+  /api/v1/admin/agents:
+    get:
+      summary: ''
+      operationId: getApiV1AdminAgents
+      description: ''
+      parameters: []
+      responses:
+        500:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Server Error'
+                properties:
+                  message:
+                    type: string
+                    example: 'Server Error'
+      tags:
+        - Endpoints
+    post:
+      summary: ''
+      operationId: postApiV1AdminAgents
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: 'Must not be greater than 255 characters.'
+                  example: pasyzwszwtxpeqq
+                email:
+                  type: string
+                  description: 'Must be a valid email address. Must not be greater than 255 characters.'
+                  example: tremayne.kohler@example.net
+                password:
+                  type: string
+                  description: 'Must be at least 8 characters.'
+                  example: '>?R4Usi|L@vH'
+                agency_id:
+                  type: string
+                  description: 'The <code>id</code> of an existing record in the agencies table.'
+                  example: null
+                  nullable: true
+                phone:
+                  type: string
+                  description: 'Must not be greater than 30 characters.'
+                  example: olowyuffszfrcsn
+                  nullable: true
+                whatsapp:
+                  type: string
+                  description: 'Must not be greater than 30 characters.'
+                  example: wwxvxezhebdrxkp
+                  nullable: true
+              required:
+                - name
+                - email
+                - password
+  '/api/v1/admin/agents/{agent_id}':
+    get:
+      summary: ''
+      operationId: getApiV1AdminAgentsAgent_id
+      description: ''
+      parameters: []
+      responses:
+        500:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Server Error'
+                properties:
+                  message:
+                    type: string
+                    example: 'Server Error'
+      tags:
+        - Endpoints
+    put:
+      summary: ''
+      operationId: putApiV1AdminAgentsAgent_id
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: 'Must not be greater than 255 characters.'
+                  example: pasyzwszwtxpeqq
+                agency_id:
+                  type: string
+                  description: 'The <code>id</code> of an existing record in the agencies table.'
+                  example: null
+                  nullable: true
+                phone:
+                  type: string
+                  description: 'Must not be greater than 30 characters.'
+                  example: ikymwkiinfowtzm
+                  nullable: true
+                whatsapp:
+                  type: string
+                  description: 'Must not be greater than 30 characters.'
+                  example: ixkolowyuffszfr
+                  nullable: true
+    delete:
+      summary: ''
+      operationId: deleteApiV1AdminAgentsAgent_id
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+    parameters:
+      -
+        in: path
+        name: agent_id
+        description: 'The ID of the agent.'
+        example: 12
+        required: true
+        schema:
+          type: integer
+  /api/v1/admin/dashboard/stats:
+    get:
+      summary: ''
+      operationId: getApiV1AdminDashboardStats
+      description: ''
+      parameters: []
+      responses:
+        500:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Server Error'
+                properties:
+                  message:
+                    type: string
+                    example: 'Server Error'
+      tags:
+        - Endpoints
+  /api/v1/admin/dashboard/agent-performance:
+    get:
+      summary: ''
+      operationId: getApiV1AdminDashboardAgentPerformance
+      description: ''
+      parameters: []
+      responses:
+        500:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Server Error'
+                properties:
+                  message:
+                    type: string
+                    example: 'Server Error'
+      tags:
+        - Endpoints
+  /api/v1/admin/notifications:
+    get:
+      summary: ''
+      operationId: getApiV1AdminNotifications
+      description: ''
+      parameters: []
+      responses:
+        500:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Server Error'
+                properties:
+                  message:
+                    type: string
+                    example: 'Server Error'
+      tags:
+        - Endpoints
+  /api/v1/admin/notifications/unread-count:
+    get:
+      summary: ''
+      operationId: getApiV1AdminNotificationsUnreadCount
+      description: ''
+      parameters: []
+      responses:
+        500:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Server Error'
+                properties:
+                  message:
+                    type: string
+                    example: 'Server Error'
+      tags:
+        - Endpoints
+  '/api/v1/admin/notifications/{id}/read':
+    post:
+      summary: ''
+      operationId: postApiV1AdminNotificationsIdRead
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'The ID of the notification.'
+        example: culpa
+        required: true
+        schema:
+          type: string
+  /api/v1/admin/notifications/read-all:
+    post:
+      summary: ''
+      operationId: postApiV1AdminNotificationsReadAll
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+  /api/v1/admin/reports/lead-funnel:
+    get:
+      summary: ''
+      operationId: getApiV1AdminReportsLeadFunnel
+      description: ''
+      parameters: []
+      responses:
+        500:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Server Error'
+                properties:
+                  message:
+                    type: string
+                    example: 'Server Error'
+      tags:
+        - Endpoints
+  /api/v1/admin/reports/leads-over-time:
+    get:
+      summary: ''
+      operationId: getApiV1AdminReportsLeadsOverTime
+      description: ''
+      parameters: []
+      responses:
+        500:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Server Error'
+                properties:
+                  message:
+                    type: string
+                    example: 'Server Error'
+      tags:
+        - Endpoints
+  /api/v1/admin/reports/property-performance:
+    get:
+      summary: ''
+      operationId: getApiV1AdminReportsPropertyPerformance
+      description: ''
+      parameters: []
+      responses:
+        500:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Server Error'
+                properties:
+                  message:
+                    type: string
+                    example: 'Server Error'
+      tags:
+        - Endpoints
+  /api/v1/admin/reports/agent-leaderboard:
+    get:
+      summary: ''
+      operationId: getApiV1AdminReportsAgentLeaderboard
+      description: ''
+      parameters: []
+      responses:
+        500:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Server Error'
+                properties:
+                  message:
+                    type: string
+                    example: 'Server Error'
+      tags:
+        - Endpoints
+  /api/v1/admin/reports/leads-by-source:
+    get:
+      summary: ''
+      operationId: getApiV1AdminReportsLeadsBySource
+      description: ''
+      parameters: []
+      responses:
+        500:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Server Error'
+                properties:
+                  message:
+                    type: string
+                    example: 'Server Error'
+      tags:
+        - Endpoints
+  '/api/v1/admin/properties/{property_slug}/agents':
+    get:
+      summary: ''
+      operationId: getApiV1AdminPropertiesProperty_slugAgents
+      description: ''
+      parameters: []
+      responses:
+        500:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Server Error'
+                properties:
+                  message:
+                    type: string
+                    example: 'Server Error'
+      tags:
+        - Endpoints
+    parameters:
+      -
+        in: path
+        name: property_slug
+        description: 'The slug of the property.'
+        example: culpa
+        required: true
+        schema:
+          type: string
+  '/api/v1/admin/properties/{property_slug}/amenities':
+    get:
+      summary: ''
+      operationId: getApiV1AdminPropertiesProperty_slugAmenities
+      description: ''
+      parameters: []
+      responses:
+        500:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Server Error'
+                properties:
+                  message:
+                    type: string
+                    example: 'Server Error'
+      tags:
+        - Endpoints
+    post:
+      summary: ''
+      operationId: postApiV1AdminPropertiesProperty_slugAmenities
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                amenity:
+                  type: string
+                  description: 'Must not be greater than 255 characters.'
+                  example: pasyzwszwtxpeqq
+              required:
+                - amenity
+    parameters:
+      -
+        in: path
+        name: property_slug
+        description: 'The slug of the property.'
+        example: culpa
+        required: true
+        schema:
+          type: string
+  /api/v1/admin/leads:
+    get:
+      summary: ''
+      operationId: getApiV1AdminLeads
+      description: ''
+      parameters: []
+      responses:
+        500:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Server Error'
+                properties:
+                  message:
+                    type: string
+                    example: 'Server Error'
+      tags:
+        - Endpoints
+  '/api/v1/admin/leads/{lead_id}':
+    get:
+      summary: ''
+      operationId: getApiV1AdminLeadsLead_id
+      description: ''
+      parameters: []
+      responses:
+        500:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Server Error'
+                properties:
+                  message:
+                    type: string
+                    example: 'Server Error'
+      tags:
+        - Endpoints
+    put:
+      summary: ''
+      operationId: putApiV1AdminLeadsLead_id
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                status:
+                  type: string
+                  description: ''
+                  example: closed
+                  enum:
+                    - new
+                    - contacted
+                    - qualified
+                    - closed
+                    - lost
+                assigned_to:
+                  type: string
+                  description: ''
+                  example: null
+                message:
+                  type: string
+                  description: 'Must not be greater than 1000 characters.'
+                  example: pasyzwszwtxpeqq
+                note:
+                  type: string
+                  description: 'Must not be greater than 2000 characters.'
+                  example: ikymwkiinfowtzm
+    delete:
+      summary: ''
+      operationId: deleteApiV1AdminLeadsLead_id
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+    parameters:
+      -
+        in: path
+        name: lead_id
+        description: 'The ID of the lead.'
+        example: 12
+        required: true
+        schema:
+          type: integer
+  '/api/v1/admin/leads/{lead_id}/notes':
+    post:
+      summary: ''
+      operationId: postApiV1AdminLeadsLead_idNotes
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                note:
+                  type: string
+                  description: 'Must not be greater than 2000 characters.'
+                  example: pasyzwszwtxpeqq
+              required:
+                - note
+    get:
+      summary: ''
+      operationId: getApiV1AdminLeadsLead_idNotes
+      description: ''
+      parameters: []
+      responses:
+        500:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Server Error'
+                properties:
+                  message:
+                    type: string
+                    example: 'Server Error'
+      tags:
+        - Endpoints
+    parameters:
+      -
+        in: path
+        name: lead_id
+        description: 'The ID of the lead.'
+        example: 12
+        required: true
+        schema:
+          type: integer
+  '/api/v1/admin/leads/{lead_id}/notes/{note_id}':
+    delete:
+      summary: ''
+      operationId: deleteApiV1AdminLeadsLead_idNotesNote_id
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+    parameters:
+      -
+        in: path
+        name: lead_id
+        description: 'The ID of the lead.'
+        example: 12
+        required: true
+        schema:
+          type: integer
+      -
+        in: path
+        name: note_id
+        description: 'The ID of the note.'
+        example: 12
+        required: true
+        schema:
+          type: integer
+  '/api/v1/admin/leads/{lead_id}/tasks':
+    get:
+      summary: ''
+      operationId: getApiV1AdminLeadsLead_idTasks
+      description: ''
+      parameters: []
+      responses:
+        500:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Server Error'
+                properties:
+                  message:
+                    type: string
+                    example: 'Server Error'
+      tags:
+        - Endpoints
+    post:
+      summary: ''
+      operationId: postApiV1AdminLeadsLead_idTasks
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                  description: 'Must not be greater than 255 characters.'
+                  example: pasyzwszwtxpeqq
+                notes:
+                  type: string
+                  description: 'Must not be greater than 2000 characters.'
+                  example: ikymwkiinfowtzm
+                  nullable: true
+                due_date:
+                  type: string
+                  description: 'Must be a valid date. Must be a date after or equal to <code>today</code>.'
+                  example: '2084-05-13'
+                  nullable: true
+              required:
+                - title
+    parameters:
+      -
+        in: path
+        name: lead_id
+        description: 'The ID of the lead.'
+        example: 12
+        required: true
+        schema:
+          type: integer
+  '/api/v1/admin/leads/{lead_id}/tasks/{task_id}':
+    put:
+      summary: ''
+      operationId: putApiV1AdminLeadsLead_idTasksTask_id
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                  description: 'Must not be greater than 255 characters.'
+                  example: pasyzwszwtxpeqq
+                notes:
+                  type: string
+                  description: 'Must not be greater than 2000 characters.'
+                  example: ikymwkiinfowtzm
+                  nullable: true
+                due_date:
+                  type: string
+                  description: 'Must be a valid date.'
+                  example: '2026-06-04T22:28:29'
+                  nullable: true
+    delete:
+      summary: ''
+      operationId: deleteApiV1AdminLeadsLead_idTasksTask_id
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+    parameters:
+      -
+        in: path
+        name: lead_id
+        description: 'The ID of the lead.'
+        example: 12
+        required: true
+        schema:
+          type: integer
+      -
+        in: path
+        name: task_id
+        description: 'The ID of the task.'
+        example: 12
+        required: true
+        schema:
+          type: integer
+  '/api/v1/admin/leads/{lead_id}/tasks/{task_id}/complete':
+    post:
+      summary: ''
+      operationId: postApiV1AdminLeadsLead_idTasksTask_idComplete
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+    parameters:
+      -
+        in: path
+        name: lead_id
+        description: 'The ID of the lead.'
+        example: 12
+        required: true
+        schema:
+          type: integer
+      -
+        in: path
+        name: task_id
+        description: 'The ID of the task.'
+        example: 12
+        required: true
+        schema:
+          type: integer
+  /api/v1/admin/leads/bulk/status:
+    post:
+      summary: ''
+      operationId: postApiV1AdminLeadsBulkStatus
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                ids:
+                  type: array
+                  description: 'The <code>id</code> of an existing record in the leads table.'
+                  example:
+                    - 12
+                  items:
+                    type: integer
+                status:
+                  type: string
+                  description: ''
+                  example: qualified
+                  enum:
+                    - new
+                    - contacted
+                    - qualified
+                    - closed
+                    - lost
+                assigned_to:
+                  type: string
+                  description: 'The <code>id</code> of an existing record in the users table.'
+                  example: null
+                  nullable: true
+              required:
+                - ids
+                - status
+  /api/v1/admin/leads/bulk/assign:
+    post:
+      summary: ''
+      operationId: postApiV1AdminLeadsBulkAssign
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                ids:
+                  type: array
+                  description: 'The <code>id</code> of an existing record in the leads table.'
+                  example:
+                    - 12
+                  items:
+                    type: integer
+                status:
+                  type: string
+                  description: ''
+                  example: qualified
+                  enum:
+                    - new
+                    - contacted
+                    - qualified
+                    - closed
+                    - lost
+                assigned_to:
+                  type: string
+                  description: 'The <code>id</code> of an existing record in the users table.'
+                  example: culpa
+              required:
+                - ids
+                - assigned_to
+  /api/v1/admin/leads/bulk/delete:
+    post:
+      summary: ''
+      operationId: postApiV1AdminLeadsBulkDelete
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                ids:
+                  type: array
+                  description: 'The <code>id</code> of an existing record in the leads table.'
+                  example:
+                    - 12
+                  items:
+                    type: integer
+              required:
+                - ids
+  /api/v1/admin/leads/bulk/restore:
+    post:
+      summary: ''
+      operationId: postApiV1AdminLeadsBulkRestore
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                ids:
+                  type: array
+                  description: ''
+                  example:
+                    - 12
+                  items:
+                    type: integer
+              required:
+                - ids
+  '/api/v1/admin/leads/{id}/restore':
+    post:
+      summary: ''
+      operationId: postApiV1AdminLeadsIdRestore
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'The ID of the lead.'
+        example: 12
+        required: true
+        schema:
+          type: integer
+  /api/v1/admin/leads/export/csv:
+    get:
+      summary: ''
+      operationId: getApiV1AdminLeadsExportCsv
+      description: ''
+      parameters: []
+      responses:
+        500:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Server Error'
+                properties:
+                  message:
+                    type: string
+                    example: 'Server Error'
+      tags:
+        - Endpoints
+  /api/v1/admin/activity-logs:
+    get:
+      summary: ''
+      operationId: getApiV1AdminActivityLogs
+      description: ''
+      parameters: []
+      responses:
+        500:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Server Error'
+                properties:
+                  message:
+                    type: string
+                    example: 'Server Error'
+      tags:
+        - Endpoints
+  '/api/v1/admin/agents/{id}/restore':
+    post:
+      summary: ''
+      operationId: postApiV1AdminAgentsIdRestore
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'The ID of the agent.'
+        example: 12
+        required: true
+        schema:
+          type: integer
+  '/api/v1/admin/properties/{property_slug}/agents/{agent_id}':
+    post:
+      summary: ''
+      operationId: postApiV1AdminPropertiesProperty_slugAgentsAgent_id
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+    delete:
+      summary: ''
+      operationId: deleteApiV1AdminPropertiesProperty_slugAgentsAgent_id
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+    parameters:
+      -
+        in: path
+        name: property_slug
+        description: 'The slug of the property.'
+        example: culpa
+        required: true
+        schema:
+          type: string
+      -
+        in: path
+        name: agent_id
+        description: 'The ID of the agent.'
+        example: 12
+        required: true
+        schema:
+          type: integer
+  '/api/v1/admin/properties/{property_slug}/amenities/{amenity_id}':
+    put:
+      summary: ''
+      operationId: putApiV1AdminPropertiesProperty_slugAmenitiesAmenity_id
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                amenity:
+                  type: string
+                  description: 'Must not be greater than 255 characters.'
+                  example: pasyzwszwtxpeqq
+              required:
+                - amenity
+    delete:
+      summary: ''
+      operationId: deleteApiV1AdminPropertiesProperty_slugAmenitiesAmenity_id
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+    parameters:
+      -
+        in: path
+        name: property_slug
+        description: 'The slug of the property.'
+        example: culpa
+        required: true
+        schema:
+          type: string
+      -
+        in: path
+        name: amenity_id
+        description: 'The ID of the amenity.'
+        example: 12
+        required: true
+        schema:
+          type: integer
+  /api/v1/admin/users:
+    get:
+      summary: ''
+      operationId: getApiV1AdminUsers
+      description: ''
+      parameters: []
+      responses:
+        500:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Server Error'
+                properties:
+                  message:
+                    type: string
+                    example: 'Server Error'
+      tags:
+        - Endpoints
+  '/api/v1/admin/users/{user_id}':
+    get:
+      summary: ''
+      operationId: getApiV1AdminUsersUser_id
+      description: ''
+      parameters: []
+      responses:
+        500:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Server Error'
+                properties:
+                  message:
+                    type: string
+                    example: 'Server Error'
+      tags:
+        - Endpoints
+    put:
+      summary: ''
+      operationId: putApiV1AdminUsersUser_id
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                role:
+                  type: string
+                  description: ''
+                  example: agent
+                  enum:
+                    - agent
+                    - manager
+                    - super_admin
+                is_active:
+                  type: boolean
+                  description: ''
+                  example: false
+                name:
+                  type: string
+                  description: 'Must not be greater than 255 characters.'
+                  example: pasyzwszwtxpeqq
+    delete:
+      summary: ''
+      operationId: deleteApiV1AdminUsersUser_id
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+    parameters:
+      -
+        in: path
+        name: user_id
+        description: 'The ID of the user.'
+        example: 12
+        required: true
+        schema:
+          type: integer
+  '/api/v1/admin/users/{id}/restore':
+    post:
+      summary: ''
+      operationId: postApiV1AdminUsersIdRestore
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'The ID of the user.'
+        example: 12
+        required: true
+        schema:
+          type: integer
+  /api/v1/admin/areas:
+    get:
+      summary: ''
+      operationId: getApiV1AdminAreas
+      description: ''
+      parameters: []
+      responses:
+        500:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Server Error'
+                properties:
+                  message:
+                    type: string
+                    example: 'Server Error'
+      tags:
+        - Endpoints
+    post:
+      summary: ''
+      operationId: postApiV1AdminAreas
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: 'Must not be greater than 255 characters.'
+                  example: pasyzwszwtxpeqq
+                description:
+                  type: string
+                  description: ''
+                  example: 'Consequatur quisquam recusandae asperiores accusamus nihil repellat.'
+                  nullable: true
+              required:
+                - name
+  '/api/v1/admin/areas/{id}':
+    get:
+      summary: ''
+      operationId: getApiV1AdminAreasId
+      description: ''
+      parameters: []
+      responses:
+        500:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Server Error'
+                properties:
+                  message:
+                    type: string
+                    example: 'Server Error'
+      tags:
+        - Endpoints
+    put:
+      summary: ''
+      operationId: putApiV1AdminAreasId
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: ''
+                  example: null
+                description:
+                  type: string
+                  description: ''
+                  example: 'Consequatur quisquam recusandae asperiores accusamus nihil repellat.'
+                  nullable: true
+    delete:
+      summary: ''
+      operationId: deleteApiV1AdminAreasId
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'The ID of the area.'
+        example: 12
+        required: true
+        schema:
+          type: integer
+  /api/v1/admin/developers:
+    get:
+      summary: ''
+      operationId: getApiV1AdminDevelopers
+      description: ''
+      parameters: []
+      responses:
+        500:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Server Error'
+                properties:
+                  message:
+                    type: string
+                    example: 'Server Error'
+      tags:
+        - Endpoints
+    post:
+      summary: ''
+      operationId: postApiV1AdminDevelopers
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: 'Must not be greater than 255 characters.'
+                  example: pasyzwszwtxpeqq
+                logo_url:
+                  type: string
+                  description: 'Must be a valid URL.'
+                  example: 'http://www.huels.org/nulla-quam-ipsam-voluptatem-cupiditate-sed'
+                  nullable: true
+                description:
+                  type: string
+                  description: ''
+                  example: 'Consequatur quisquam recusandae asperiores accusamus nihil repellat.'
+                  nullable: true
+              required:
+                - name
+  '/api/v1/admin/developers/{id}':
+    get:
+      summary: ''
+      operationId: getApiV1AdminDevelopersId
+      description: ''
+      parameters: []
+      responses:
+        500:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Server Error'
+                properties:
+                  message:
+                    type: string
+                    example: 'Server Error'
+      tags:
+        - Endpoints
+    put:
+      summary: ''
+      operationId: putApiV1AdminDevelopersId
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: ''
+                  example: null
+                logo_url:
+                  type: string
+                  description: 'Must be a valid URL.'
+                  example: 'http://www.adams.info/asperiores-accusamus-nihil-repellat-vero-omnis-voluptates-id-amet.html'
+                  nullable: true
+                description:
+                  type: string
+                  description: ''
+                  example: 'Consequatur quisquam recusandae asperiores accusamus nihil repellat.'
+                  nullable: true
+    delete:
+      summary: ''
+      operationId: deleteApiV1AdminDevelopersId
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'The ID of the developer.'
+        example: 12
+        required: true
+        schema:
+          type: integer
+  /api/v1/admin/operation-types:
+    get:
+      summary: ''
+      operationId: getApiV1AdminOperationTypes
+      description: ''
+      parameters: []
+      responses:
+        500:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Server Error'
+                properties:
+                  message:
+                    type: string
+                    example: 'Server Error'
+      tags:
+        - Endpoints
+    post:
+      summary: ''
+      operationId: postApiV1AdminOperationTypes
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: ''
+                  example: Buy
+                  enum:
+                    - Buy
+                    - Rent
+                    - Stay
+                    - Off-plan
+              required:
+                - name
+  '/api/v1/admin/operation-types/{id}':
+    get:
+      summary: ''
+      operationId: getApiV1AdminOperationTypesId
+      description: ''
+      parameters: []
+      responses:
+        500:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Server Error'
+                properties:
+                  message:
+                    type: string
+                    example: 'Server Error'
+      tags:
+        - Endpoints
+    put:
+      summary: ''
+      operationId: putApiV1AdminOperationTypesId
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: ''
+                  example: null
+    delete:
+      summary: ''
+      operationId: deleteApiV1AdminOperationTypesId
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'The ID of the operation type.'
+        example: 12
+        required: true
+        schema:
+          type: integer
+  /api/v1/admin/properties:
+    get:
+      summary: ''
+      operationId: getApiV1AdminProperties
+      description: ''
+      parameters: []
+      responses:
+        500:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Server Error'
+                properties:
+                  message:
+                    type: string
+                    example: 'Server Error'
+      tags:
+        - Endpoints
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                search:
+                  type: string
+                  description: 'Must not be greater than 255 characters.'
+                  example: pasyzwszwtxpeqq
+                  nullable: true
+                area_id:
+                  type: integer
+                  description: 'The <code>id</code> of an existing record in the areas table.'
+                  example: 12
+                  nullable: true
+                developer_id:
+                  type: integer
+                  description: 'The <code>id</code> of an existing record in the developers table.'
+                  example: 12
+                  nullable: true
+                operation_type_id:
+                  type: integer
+                  description: 'The <code>id</code> of an existing record in the operation_types table.'
+                  example: 12
+                  nullable: true
+                type:
+                  type: string
+                  description: ''
+                  example: villa
+                  enum:
+                    - villa
+                    - apartment
+                    - penthouse
+                    - townhouse
+                    - commercial
+                  nullable: true
+                featured:
+                  type: boolean
+                  description: ''
+                  example: true
+                  nullable: true
+                min_price:
+                  type: number
+                  description: 'Must be at least 0.'
+                  example: 0
+                  nullable: true
+                max_price:
+                  type: number
+                  description: 'Must be at least 0.'
+                  example: 65
+                  nullable: true
+                bedrooms_min:
+                  type: integer
+                  description: 'Must be at least 0.'
+                  example: 84
+                  nullable: true
+                bedrooms_max:
+                  type: integer
+                  description: 'Must be at least 0.'
+                  example: 90
+                  nullable: true
+                bathrooms_min:
+                  type: integer
+                  description: 'Must be at least 0.'
+                  example: 79
+                  nullable: true
+                sort_by:
+                  type: string
+                  description: ''
+                  example: created_at
+                  enum:
+                    - price
+                    - created_at
+                    - views_count
+                    - area_sqft
+                    - bedrooms
+                  nullable: true
+                sort_direction:
+                  type: string
+                  description: ''
+                  example: desc
+                  enum:
+                    - asc
+                    - desc
+                  nullable: true
+                page:
+                  type: integer
+                  description: 'Must be at least 1.'
+                  example: 64
+                  nullable: true
+                per_page:
+                  type: integer
+                  description: 'Must be at least 1. Must not be greater than 100.'
+                  example: 25
+                  nullable: true
+    post:
+      summary: ''
+      operationId: postApiV1AdminProperties
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                  description: 'Must not be greater than 255 characters.'
+                  example: pasyzwszwtxpeqq
+                description:
+                  type: string
+                  description: ''
+                  example: 'Consequatur quisquam recusandae asperiores accusamus nihil repellat.'
+                  nullable: true
+                type:
+                  type: string
+                  description: ''
+                  example: penthouse
+                  enum:
+                    - villa
+                    - apartment
+                    - penthouse
+                    - townhouse
+                    - commercial
+                price:
+                  type: number
+                  description: 'Must be at least 0.'
+                  example: 77
+                currency:
+                  type: string
+                  description: 'Must be 3 characters.'
+                  example: txp
+                  nullable: true
+                area_id:
+                  type: integer
+                  description: 'The <code>id</code> of an existing record in the areas table.'
+                  example: 12
+                location:
+                  type: string
+                  description: ''
+                  example: culpa
+                  nullable: true
+                area_sqft:
+                  type: number
+                  description: 'Must be at least 0.'
+                  example: 0
+                  nullable: true
+                bedrooms:
+                  type: integer
+                  description: 'Must be at least 0.'
+                  example: 65
+                  nullable: true
+                bathrooms:
+                  type: integer
+                  description: 'Must be at least 0.'
+                  example: 84
+                  nullable: true
+                operation_type_id:
+                  type: integer
+                  description: 'The <code>id</code> of an existing record in the operation_types table.'
+                  example: 12
+                status:
+                  type: string
+                  description: ''
+                  example: sold
+                  enum:
+                    - available
+                    - sold
+                    - rented
+                is_featured:
+                  type: boolean
+                  description: ''
+                  example: true
+                  nullable: true
+                roi_min:
+                  type: number
+                  description: 'Must be at least 0.'
+                  example: 0
+                  nullable: true
+                roi_max:
+                  type: number
+                  description: 'Must be at least 0.'
+                  example: 65
+                  nullable: true
+                developer_id:
+                  type: integer
+                  description: 'The <code>id</code> of an existing record in the developers table.'
+                  example: 12
+                primary_agent_id:
+                  type: integer
+                  description: 'The <code>id</code> of an existing record in the users table.'
+                  example: 12
+                  nullable: true
+                meta_title:
+                  type: string
+                  description: 'Must not be greater than 255 characters.'
+                  example: asyzwszwtxpeqqi
+                  nullable: true
+                meta_description:
+                  type: string
+                  description: 'Must not be greater than 255 characters.'
+                  example: kymwkiinfowtzmi
+                  nullable: true
+                amenities:
+                  type: array
+                  description: ''
+                  example:
+                    - culpa
+                  items:
+                    type: string
+              required:
+                - title
+                - type
+                - price
+                - area_id
+                - operation_type_id
+                - status
+                - developer_id
+  '/api/v1/admin/properties/{property_slug}':
+    get:
+      summary: ''
+      operationId: getApiV1AdminPropertiesProperty_slug
+      description: ''
+      parameters: []
+      responses:
+        500:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Server Error'
+                properties:
+                  message:
+                    type: string
+                    example: 'Server Error'
+      tags:
+        - Endpoints
+    put:
+      summary: ''
+      operationId: putApiV1AdminPropertiesProperty_slug
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                  description: 'Must not be greater than 255 characters.'
+                  example: pasyzwszwtxpeqq
+                description:
+                  type: string
+                  description: ''
+                  example: 'Consequatur quisquam recusandae asperiores accusamus nihil repellat.'
+                  nullable: true
+                type:
+                  type: string
+                  description: ''
+                  example: townhouse
+                  enum:
+                    - villa
+                    - apartment
+                    - penthouse
+                    - townhouse
+                    - commercial
+                price:
+                  type: number
+                  description: 'Must be at least 0.'
+                  example: 77
+                currency:
+                  type: string
+                  description: 'Must be 3 characters.'
+                  example: txp
+                  nullable: true
+                area_id:
+                  type: integer
+                  description: 'The <code>id</code> of an existing record in the areas table.'
+                  example: 12
+                location:
+                  type: string
+                  description: ''
+                  example: culpa
+                  nullable: true
+                area_sqft:
+                  type: number
+                  description: 'Must be at least 0.'
+                  example: 0
+                  nullable: true
+                bedrooms:
+                  type: integer
+                  description: 'Must be at least 0.'
+                  example: 65
+                  nullable: true
+                bathrooms:
+                  type: integer
+                  description: 'Must be at least 0.'
+                  example: 84
+                  nullable: true
+                operation_type_id:
+                  type: integer
+                  description: 'The <code>id</code> of an existing record in the operation_types table.'
+                  example: 12
+                status:
+                  type: string
+                  description: ''
+                  example: available
+                  enum:
+                    - available
+                    - sold
+                    - rented
+                is_featured:
+                  type: boolean
+                  description: ''
+                  example: true
+                  nullable: true
+                roi_min:
+                  type: number
+                  description: 'Must be at least 0.'
+                  example: 0
+                  nullable: true
+                roi_max:
+                  type: number
+                  description: 'Must be at least 0.'
+                  example: 65
+                  nullable: true
+                developer_id:
+                  type: integer
+                  description: 'The <code>id</code> of an existing record in the developers table.'
+                  example: 12
+                primary_agent_id:
+                  type: integer
+                  description: 'The <code>id</code> of an existing record in the users table.'
+                  example: 12
+                  nullable: true
+                meta_title:
+                  type: string
+                  description: 'Must not be greater than 255 characters.'
+                  example: asyzwszwtxpeqqi
+                  nullable: true
+                meta_description:
+                  type: string
+                  description: 'Must not be greater than 255 characters.'
+                  example: kymwkiinfowtzmi
+                  nullable: true
+                amenities:
+                  type: array
+                  description: ''
+                  example:
+                    - culpa
+                  items:
+                    type: string
+    delete:
+      summary: ''
+      operationId: deleteApiV1AdminPropertiesProperty_slug
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+    parameters:
+      -
+        in: path
+        name: property_slug
+        description: 'The slug of the property.'
+        example: culpa
+        required: true
+        schema:
+          type: string
+  '/api/v1/admin/properties/{property_slug}/restore':
+    post:
+      summary: ''
+      operationId: postApiV1AdminPropertiesProperty_slugRestore
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+    parameters:
+      -
+        in: path
+        name: property_slug
+        description: 'The slug of the property.'
+        example: culpa
+        required: true
+        schema:
+          type: string
+  '/api/v1/admin/properties/{property_slug}/images':
+    post:
+      summary: ''
+      operationId: postApiV1AdminPropertiesProperty_slugImages
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                image:
+                  type: string
+                  format: binary
+                  description: 'Must be an image. Must not be greater than 10240 kilobytes.'
+                is_primary:
+                  type: boolean
+                  description: ''
+                  example: false
+                  nullable: true
+                order:
+                  type: integer
+                  description: 'Must be at least 0.'
+                  example: 52
+                  nullable: true
+              required:
+                - image
+    parameters:
+      -
+        in: path
+        name: property_slug
+        description: 'The slug of the property.'
+        example: culpa
+        required: true
+        schema:
+          type: string
+  '/api/v1/admin/properties/{property_slug}/images/{image_id}':
+    put:
+      summary: ''
+      operationId: putApiV1AdminPropertiesProperty_slugImagesImage_id
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                is_primary:
+                  type: boolean
+                  description: ''
+                  example: false
+                  nullable: true
+                order:
+                  type: integer
+                  description: 'Must be at least 0.'
+                  example: 52
+                  nullable: true
+    delete:
+      summary: ''
+      operationId: deleteApiV1AdminPropertiesProperty_slugImagesImage_id
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+    parameters:
+      -
+        in: path
+        name: property_slug
+        description: 'The slug of the property.'
+        example: culpa
+        required: true
+        schema:
+          type: string
+      -
+        in: path
+        name: image_id
+        description: 'The ID of the image.'
+        example: 12
+        required: true
+        schema:
+          type: integer

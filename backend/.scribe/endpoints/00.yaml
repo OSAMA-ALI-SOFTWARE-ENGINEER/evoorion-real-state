@@ -1,0 +1,451 @@
+name: Auth
+description: |-
+
+  Authentication: login, logout, registration, and current user profile.
+endpoints:
+  -
+    custom: []
+    httpMethods:
+      - POST
+    uri: api/v1/auth/login
+    metadata:
+      custom: []
+      groupName: Auth
+      groupDescription: |-
+
+        Authentication: login, logout, registration, and current user profile.
+      subgroup: ''
+      subgroupDescription: ''
+      title: Login
+      description: 'Authenticate with email and password. Returns a Sanctum bearer token valid until revoked.'
+      authenticated: false
+      deprecated: false
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters:
+      email:
+        custom: []
+        name: email
+        description: 'Must be a valid email address.'
+        required: true
+        example: morgan93@example.net
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      password:
+        custom: []
+        name: password
+        description: ''
+        required: true
+        example: culpa
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+    cleanBodyParameters:
+      email: morgan93@example.net
+      password: culpa
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 200
+        content: |-
+          {
+            "success": true,
+            "data": {
+              "user": {
+                "id": 1,
+                "name": "Jane Smith",
+                "email": "jane@evoorion.com",
+                "role": "manager",
+                "is_active": true,
+                "last_login_at": "2025-01-15T10:00:00.000000Z"
+              },
+              "token": "1|abc123defghijklmnopqrstuvwxyz"
+            },
+            "message": "Login successful",
+            "meta": []
+          }
+        headers: []
+        description: ''
+      -
+        custom: []
+        status: 422
+        content: |-
+          {
+            "message": "The provided credentials are incorrect.",
+            "errors": {"email": ["The provided credentials are incorrect."]}
+          }
+        headers: []
+        description: 'Invalid credentials'
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - POST
+    uri: api/v1/auth/register
+    metadata:
+      custom: []
+      groupName: Auth
+      groupDescription: |-
+
+        Authentication: login, logout, registration, and current user profile.
+      subgroup: ''
+      subgroupDescription: ''
+      title: Register
+      description: "Create a new user account. The new user receives the 'user' role."
+      authenticated: false
+      deprecated: false
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters:
+      name:
+        custom: []
+        name: name
+        description: 'Must not be greater than 255 characters.'
+        required: true
+        example: pasyzwszwtxpeqq
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      email:
+        custom: []
+        name: email
+        description: 'Must be a valid email address. Must not be greater than 255 characters.'
+        required: true
+        example: tremayne.kohler@example.net
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      password:
+        custom: []
+        name: password
+        description: 'Must be at least 8 characters.'
+        required: true
+        example: '>?R4Usi|L@vH'
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+    cleanBodyParameters:
+      name: pasyzwszwtxpeqq
+      email: tremayne.kohler@example.net
+      password: '>?R4Usi|L@vH'
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 201
+        content: |-
+          {
+            "success": true,
+            "data": {
+              "user": {"id": 2, "name": "Mark Jones", "email": "mark@example.com", "role": "user", "is_active": true},
+              "token": "2|xyz789abcdefghijklmno"
+            },
+            "message": "Registration successful",
+            "meta": []
+          }
+        headers: []
+        description: ''
+      -
+        custom: []
+        status: 422
+        content: |-
+          {
+            "message": "The email has already been taken.",
+            "errors": {"email": ["The email has already been taken."]}
+          }
+        headers: []
+        description: 'Email taken'
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - POST
+    uri: api/v1/auth/logout
+    metadata:
+      custom: []
+      groupName: Auth
+      groupDescription: |-
+
+        Authentication: login, logout, registration, and current user profile.
+      subgroup: ''
+      subgroupDescription: ''
+      title: Logout
+      description: 'Revokes the current bearer token.'
+      authenticated: true
+      deprecated: false
+    headers:
+      Authorization: 'Bearer {YOUR_BEARER_TOKEN}'
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 200
+        content: |-
+          {
+            "success": true,
+            "data": null,
+            "message": "Logout successful",
+            "meta": []
+          }
+        headers: []
+        description: ''
+      -
+        custom: []
+        status: 401
+        content: '{"message": "Unauthenticated."}'
+        headers: []
+        description: Unauthenticated
+    responseFields: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer cbDae1g3a6EvfdkZh5VP648'
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - GET
+    uri: api/v1/auth/me
+    metadata:
+      custom: []
+      groupName: Auth
+      groupDescription: |-
+
+        Authentication: login, logout, registration, and current user profile.
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Current user'
+      description: "Returns the authenticated user's profile."
+      authenticated: true
+      deprecated: false
+    headers:
+      Authorization: 'Bearer {YOUR_BEARER_TOKEN}'
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 200
+        content: |-
+          {
+            "success": true,
+            "data": {
+              "id": 1,
+              "name": "Jane Smith",
+              "email": "jane@evoorion.com",
+              "role": "manager",
+              "is_active": true,
+              "last_login_at": "2025-01-15T10:00:00.000000Z"
+            },
+            "message": "User profile retrieved",
+            "meta": []
+          }
+        headers: []
+        description: ''
+      -
+        custom: []
+        status: 401
+        content: '{"message": "Unauthenticated."}'
+        headers: []
+        description: Unauthenticated
+    responseFields: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer cbDae1g3a6EvfdkZh5VP648'
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - POST
+    uri: api/v1/auth/forgot-password
+    metadata:
+      custom: []
+      groupName: Auth
+      groupDescription: |-
+
+        Password reset flow: request a reset email, then submit a new password.
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Forgot password'
+      description: |-
+        Sends a password reset email. Response is always 200 regardless of whether
+        the email is registered — prevents user enumeration.
+      authenticated: false
+      deprecated: false
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters:
+      email:
+        custom: []
+        name: email
+        description: 'Must be a valid email address.'
+        required: true
+        example: morgan93@example.net
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+    cleanBodyParameters:
+      email: morgan93@example.net
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 200
+        content: |-
+          {
+            "success": true,
+            "message": "If that email exists, a reset link has been sent"
+          }
+        headers: []
+        description: ''
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - POST
+    uri: api/v1/auth/reset-password
+    metadata:
+      custom: []
+      groupName: Auth
+      groupDescription: |-
+
+        Password reset flow: request a reset email, then submit a new password.
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Reset password'
+      description: 'Resets the password using the token received by email. Revokes all existing Sanctum tokens.'
+      authenticated: false
+      deprecated: false
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters:
+      email:
+        custom: []
+        name: email
+        description: 'Must be a valid email address.'
+        required: true
+        example: morgan93@example.net
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      token:
+        custom: []
+        name: token
+        description: ''
+        required: true
+        example: culpa
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      password:
+        custom: []
+        name: password
+        description: 'Must be at least 8 characters.'
+        required: true
+        example: dx~rc~
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+    cleanBodyParameters:
+      email: morgan93@example.net
+      token: culpa
+      password: dx~rc~
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 200
+        content: |-
+          {
+            "success": true,
+            "message": "Password reset successfully"
+          }
+        headers: []
+        description: ''
+      -
+        custom: []
+        status: 422
+        content: |-
+          {
+            "success": false,
+            "message": "Invalid or expired token"
+          }
+        headers: []
+        description: 'Invalid or expired token'
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null

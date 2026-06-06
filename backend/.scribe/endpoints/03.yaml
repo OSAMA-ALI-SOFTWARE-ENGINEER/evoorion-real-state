@@ -1,0 +1,1124 @@
+name: Leads
+description: |-
+
+  Submit leads (public) and manage them (admin). Agents see only their assigned leads
+  and unassigned leads — not other agents' leads.
+endpoints:
+  -
+    custom: []
+    httpMethods:
+      - POST
+    uri: api/v1/leads
+    metadata:
+      custom: []
+      groupName: Leads
+      groupDescription: |-
+
+        Submit leads (public) and manage them (admin). Agents see only their assigned leads
+        and unassigned leads — not other agents' leads.
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Submit lead'
+      description: 'Public endpoint for visitors to express interest. Rate-limited to 10 requests per minute per IP.'
+      authenticated: false
+      deprecated: false
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters:
+      name:
+        custom: []
+        name: name
+        description: 'Must not be greater than 255 characters.'
+        required: true
+        example: pasyzwszwtxpeqq
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      email:
+        custom: []
+        name: email
+        description: 'Must be a valid email address.'
+        required: true
+        example: tremayne.kohler@example.net
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      phone:
+        custom: []
+        name: phone
+        description: 'Must not be greater than 20 characters.'
+        required: false
+        example: kiinfowtzmix
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+      whatsapp:
+        custom: []
+        name: whatsapp
+        description: 'Must not be greater than 20 characters.'
+        required: false
+        example: kolowyuffszf
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+      property_id:
+        custom: []
+        name: property_id
+        description: 'The <code>id</code> of an existing record in the properties table.'
+        required: false
+        example: null
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+      budget_min:
+        custom: []
+        name: budget_min
+        description: 'Must be at least 0.'
+        required: false
+        example: 62
+        type: number
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+      budget_max:
+        custom: []
+        name: budget_max
+        description: 'Must be at least 0.'
+        required: false
+        example: 8
+        type: number
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+      message:
+        custom: []
+        name: message
+        description: 'Must not be greater than 1000 characters.'
+        required: false
+        example: snwwxvxezhebdrx
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+      source:
+        custom: []
+        name: source
+        description: ''
+        required: true
+        example: referral
+        type: string
+        enumValues:
+          - website
+          - instagram
+          - facebook
+          - whatsapp
+          - referral
+          - other
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+    cleanBodyParameters:
+      name: pasyzwszwtxpeqq
+      email: tremayne.kohler@example.net
+      phone: kiinfowtzmix
+      whatsapp: kolowyuffszf
+      budget_min: 62
+      budget_max: 8
+      message: snwwxvxezhebdrx
+      source: referral
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 201
+        content: |-
+          {
+            "success": true,
+            "data": {
+              "id": 1,
+              "name": "Ahmed Al-Rashid",
+              "email": "ahmed@example.com",
+              "phone": "+971501234567",
+              "whatsapp": "+971501234567",
+              "source": "website",
+              "status": "new",
+              "property_id": null,
+              "budget_min": "500000.00",
+              "budget_max": "1000000.00",
+              "message": "Looking for a 2-bedroom apartment near the metro.",
+              "assigned_to": null,
+              "created_at": "2025-01-15T10:00:00.000000Z",
+              "updated_at": "2025-01-15T10:00:00.000000Z"
+            },
+            "message": "Lead submitted successfully"
+          }
+        headers: []
+        description: ''
+      -
+        custom: []
+        status: 422
+        content: |-
+          {
+            "message": "The source field is required.",
+            "errors": {"source": ["The source field is required."]}
+          }
+        headers: []
+        description: 'Validation error'
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - GET
+    uri: api/v1/admin/leads
+    metadata:
+      custom: []
+      groupName: Leads
+      groupDescription: |-
+
+        Submit leads (public) and manage them (admin). Agents see only their assigned leads
+        and unassigned leads — not other agents' leads.
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'List leads'
+      description: 'Paginated list of leads. Managers see all leads; agents see only their assigned and unassigned leads.'
+      authenticated: true
+      deprecated: false
+    headers:
+      Authorization: 'Bearer {YOUR_BEARER_TOKEN}'
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters:
+      status:
+        custom: []
+        name: status
+        description: 'Filter by status. Allowed: new, contacted, qualified, closed, lost.'
+        required: false
+        example: new
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      search:
+        custom: []
+        name: search
+        description: 'Search by name, email, or phone.'
+        required: false
+        example: Ahmed
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      date_from:
+        custom: []
+        name: date_from
+        description: 'Filter from date (YYYY-MM-DD).'
+        required: false
+        example: '2025-01-01'
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      date_to:
+        custom: []
+        name: date_to
+        description: 'Filter to date (YYYY-MM-DD).'
+        required: false
+        example: '2025-01-31'
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+    cleanQueryParameters:
+      status: new
+      search: Ahmed
+      date_from: '2025-01-01'
+      date_to: '2025-01-31'
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 200
+        content: |-
+          {
+            "success": true,
+            "data": [
+              {
+                "id": 1,
+                "name": "Ahmed Al-Rashid",
+                "email": "ahmed@example.com",
+                "phone": "+971501234567",
+                "status": "new",
+                "source": "website",
+                "assigned_to": null,
+                "created_at": "2025-01-15T10:00:00.000000Z"
+              }
+            ],
+            "meta": {
+              "total": 35,
+              "per_page": 15,
+              "current_page": 1,
+              "last_page": 3
+            }
+          }
+        headers: []
+        description: ''
+      -
+        custom: []
+        status: 401
+        content: '{"message": "Unauthenticated."}'
+        headers: []
+        description: Unauthenticated
+    responseFields: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer cbDae1g3a6EvfdkZh5VP648'
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - GET
+    uri: 'api/v1/admin/leads/{lead_id}'
+    metadata:
+      custom: []
+      groupName: Leads
+      groupDescription: |-
+
+        Submit leads (public) and manage them (admin). Agents see only their assigned leads
+        and unassigned leads — not other agents' leads.
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Get lead'
+      description: 'Returns a single lead with its notes, assigned user, and linked property.'
+      authenticated: true
+      deprecated: false
+    headers:
+      Authorization: 'Bearer {YOUR_BEARER_TOKEN}'
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters:
+      lead_id:
+        custom: []
+        name: lead_id
+        description: 'The ID of the lead.'
+        required: true
+        example: 12
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+    cleanUrlParameters:
+      lead_id: 12
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 200
+        content: |-
+          {
+            "success": true,
+            "data": {
+              "id": 1,
+              "name": "Ahmed Al-Rashid",
+              "email": "ahmed@example.com",
+              "phone": "+971501234567",
+              "whatsapp": "+971501234567",
+              "status": "contacted",
+              "source": "website",
+              "budget_min": "500000.00",
+              "budget_max": "1000000.00",
+              "message": "Looking for a 2-bedroom apartment.",
+              "property": {"id": 1, "title": "Luxury Villa in Palm Jumeirah"},
+              "assigned_user": {"id": 2, "name": "Jane Agent", "email": "jane@evoorion.com"},
+              "notes": [
+                {"id": 1, "note": "Called client, scheduled viewing for 20 Jan.", "created_at": "2025-01-16T09:00:00.000000Z"}
+              ],
+              "created_at": "2025-01-15T10:00:00.000000Z",
+              "updated_at": "2025-01-16T09:00:00.000000Z"
+            }
+          }
+        headers: []
+        description: ''
+      -
+        custom: []
+        status: 403
+        content: '{"message": "This action is unauthorized."}'
+        headers: []
+        description: "Agent accessing another agent's lead"
+      -
+        custom: []
+        status: 404
+        content: '{"message": "No query results for model [App\\Models\\Lead]."}'
+        headers: []
+        description: 'Not found'
+    responseFields: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer cbDae1g3a6EvfdkZh5VP648'
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - PUT
+    uri: 'api/v1/admin/leads/{lead_id}'
+    metadata:
+      custom: []
+      groupName: Leads
+      groupDescription: |-
+
+        Submit leads (public) and manage them (admin). Agents see only their assigned leads
+        and unassigned leads — not other agents' leads.
+      subgroup: ''
+      subgroupDescription: ''
+      title: ''
+      description: ''
+      authenticated: true
+      deprecated: false
+    headers:
+      Authorization: 'Bearer {YOUR_BEARER_TOKEN}'
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters:
+      lead_id:
+        custom: []
+        name: lead_id
+        description: 'The ID of the lead.'
+        required: true
+        example: 12
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+    cleanUrlParameters:
+      lead_id: 12
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters:
+      status:
+        custom: []
+        name: status
+        description: ''
+        required: false
+        example: lost
+        type: string
+        enumValues:
+          - new
+          - contacted
+          - qualified
+          - closed
+          - lost
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      assigned_to:
+        custom: []
+        name: assigned_to
+        description: ''
+        required: false
+        example: null
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      message:
+        custom: []
+        name: message
+        description: 'Must not be greater than 1000 characters.'
+        required: false
+        example: pasyzwszwtxpeqq
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      note:
+        custom: []
+        name: note
+        description: 'Must not be greater than 2000 characters.'
+        required: false
+        example: ikymwkiinfowtzm
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+    cleanBodyParameters:
+      status: lost
+      message: pasyzwszwtxpeqq
+      note: ikymwkiinfowtzm
+    fileParameters: []
+    responses: []
+    responseFields: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer cbDae1g3a6EvfdkZh5VP648'
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - DELETE
+    uri: 'api/v1/admin/leads/{lead_id}'
+    metadata:
+      custom: []
+      groupName: Leads
+      groupDescription: |-
+
+        Submit leads (public) and manage them (admin). Agents see only their assigned leads
+        and unassigned leads — not other agents' leads.
+      subgroup: ''
+      subgroupDescription: ''
+      title: ''
+      description: ''
+      authenticated: true
+      deprecated: false
+    headers:
+      Authorization: 'Bearer {YOUR_BEARER_TOKEN}'
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters:
+      lead_id:
+        custom: []
+        name: lead_id
+        description: 'The ID of the lead.'
+        required: true
+        example: 12
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+    cleanUrlParameters:
+      lead_id: 12
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses: []
+    responseFields: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer cbDae1g3a6EvfdkZh5VP648'
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - POST
+    uri: 'api/v1/admin/leads/{lead_id}/notes'
+    metadata:
+      custom: []
+      groupName: Leads
+      groupDescription: |-
+
+        Submit leads (public) and manage them (admin). Agents see only their assigned leads
+        and unassigned leads — not other agents' leads.
+      subgroup: ''
+      subgroupDescription: ''
+      title: ''
+      description: ''
+      authenticated: true
+      deprecated: false
+    headers:
+      Authorization: 'Bearer {YOUR_BEARER_TOKEN}'
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters:
+      lead_id:
+        custom: []
+        name: lead_id
+        description: 'The ID of the lead.'
+        required: true
+        example: 12
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+    cleanUrlParameters:
+      lead_id: 12
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters:
+      note:
+        custom: []
+        name: note
+        description: 'Must not be greater than 2000 characters.'
+        required: true
+        example: pasyzwszwtxpeqq
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+    cleanBodyParameters:
+      note: pasyzwszwtxpeqq
+    fileParameters: []
+    responses: []
+    responseFields: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer cbDae1g3a6EvfdkZh5VP648'
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - GET
+    uri: 'api/v1/admin/leads/{lead_id}/notes'
+    metadata:
+      custom: []
+      groupName: Leads
+      groupDescription: |-
+
+        Submit leads (public) and manage them (admin). Agents see only their assigned leads
+        and unassigned leads — not other agents' leads.
+      subgroup: ''
+      subgroupDescription: ''
+      title: ''
+      description: ''
+      authenticated: true
+      deprecated: false
+    headers:
+      Authorization: 'Bearer {YOUR_BEARER_TOKEN}'
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters:
+      lead_id:
+        custom: []
+        name: lead_id
+        description: 'The ID of the lead.'
+        required: true
+        example: 12
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+    cleanUrlParameters:
+      lead_id: 12
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 500
+        content: |-
+          {
+              "message": "Server Error"
+          }
+        headers:
+          cache-control: 'no-cache, private'
+          content-type: application/json
+          access-control-allow-origin: '*'
+        description: null
+    responseFields: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer cbDae1g3a6EvfdkZh5VP648'
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - DELETE
+    uri: 'api/v1/admin/leads/{lead_id}/notes/{note_id}'
+    metadata:
+      custom: []
+      groupName: Leads
+      groupDescription: |-
+
+        Submit leads (public) and manage them (admin). Agents see only their assigned leads
+        and unassigned leads — not other agents' leads.
+      subgroup: ''
+      subgroupDescription: ''
+      title: ''
+      description: ''
+      authenticated: true
+      deprecated: false
+    headers:
+      Authorization: 'Bearer {YOUR_BEARER_TOKEN}'
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters:
+      lead_id:
+        custom: []
+        name: lead_id
+        description: 'The ID of the lead.'
+        required: true
+        example: 12
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      note_id:
+        custom: []
+        name: note_id
+        description: 'The ID of the note.'
+        required: true
+        example: 12
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+    cleanUrlParameters:
+      lead_id: 12
+      note_id: 12
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses: []
+    responseFields: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer cbDae1g3a6EvfdkZh5VP648'
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - POST
+    uri: api/v1/admin/leads/bulk/status
+    metadata:
+      custom: []
+      groupName: Leads
+      groupDescription: |-
+
+        Bulk operations on up to 100 leads at a time. All endpoints require manager or super_admin role.
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Bulk update status'
+      description: 'Update the status of multiple leads at once. Accepts up to 100 IDs.'
+      authenticated: true
+      deprecated: false
+    headers:
+      Authorization: 'Bearer {YOUR_BEARER_TOKEN}'
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters:
+      ids:
+        custom: []
+        name: ids
+        description: 'The <code>id</code> of an existing record in the leads table.'
+        required: true
+        example:
+          - 12
+        type: 'integer[]'
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      status:
+        custom: []
+        name: status
+        description: ''
+        required: true
+        example: closed
+        type: string
+        enumValues:
+          - new
+          - contacted
+          - qualified
+          - closed
+          - lost
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      assigned_to:
+        custom: []
+        name: assigned_to
+        description: 'The <code>id</code> of an existing record in the users table.'
+        required: false
+        example: null
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+    cleanBodyParameters:
+      ids:
+        - 12
+      status: closed
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 200
+        content: |-
+          {
+            "success": true,
+            "message": "5 leads updated to status 'contacted'",
+            "updated": 5
+          }
+        headers: []
+        description: ''
+      -
+        custom: []
+        status: 403
+        content: '{"message": "This action is unauthorized."}'
+        headers: []
+        description: 'Agent role (insufficient permissions)'
+      -
+        custom: []
+        status: 422
+        content: |-
+          {
+            "message": "The status field is required.",
+            "errors": {"status": ["The status field is required."]}
+          }
+        headers: []
+        description: 'Validation error'
+    responseFields: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer cbDae1g3a6EvfdkZh5VP648'
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - POST
+    uri: api/v1/admin/leads/bulk/assign
+    metadata:
+      custom: []
+      groupName: Leads
+      groupDescription: |-
+
+        Bulk operations on up to 100 leads at a time. All endpoints require manager or super_admin role.
+      subgroup: ''
+      subgroupDescription: ''
+      title: ''
+      description: ''
+      authenticated: true
+      deprecated: false
+    headers:
+      Authorization: 'Bearer {YOUR_BEARER_TOKEN}'
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters:
+      ids:
+        custom: []
+        name: ids
+        description: 'The <code>id</code> of an existing record in the leads table.'
+        required: true
+        example:
+          - 12
+        type: 'integer[]'
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      status:
+        custom: []
+        name: status
+        description: ''
+        required: false
+        example: qualified
+        type: string
+        enumValues:
+          - new
+          - contacted
+          - qualified
+          - closed
+          - lost
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      assigned_to:
+        custom: []
+        name: assigned_to
+        description: 'The <code>id</code> of an existing record in the users table.'
+        required: true
+        example: culpa
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+    cleanBodyParameters:
+      ids:
+        - 12
+      status: qualified
+      assigned_to: culpa
+    fileParameters: []
+    responses: []
+    responseFields: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer cbDae1g3a6EvfdkZh5VP648'
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - POST
+    uri: api/v1/admin/leads/bulk/delete
+    metadata:
+      custom: []
+      groupName: Leads
+      groupDescription: |-
+
+        Bulk operations on up to 100 leads at a time. All endpoints require manager or super_admin role.
+      subgroup: ''
+      subgroupDescription: ''
+      title: ''
+      description: ''
+      authenticated: true
+      deprecated: false
+    headers:
+      Authorization: 'Bearer {YOUR_BEARER_TOKEN}'
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters:
+      ids:
+        custom: []
+        name: ids
+        description: 'The <code>id</code> of an existing record in the leads table.'
+        required: true
+        example:
+          - 12
+        type: 'integer[]'
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+    cleanBodyParameters:
+      ids:
+        - 12
+    fileParameters: []
+    responses: []
+    responseFields: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer cbDae1g3a6EvfdkZh5VP648'
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - POST
+    uri: api/v1/admin/leads/bulk/restore
+    metadata:
+      custom: []
+      groupName: Leads
+      groupDescription: |-
+
+        Bulk operations on up to 100 leads at a time. All endpoints require manager or super_admin role.
+      subgroup: ''
+      subgroupDescription: ''
+      title: ''
+      description: ''
+      authenticated: true
+      deprecated: false
+    headers:
+      Authorization: 'Bearer {YOUR_BEARER_TOKEN}'
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters:
+      ids:
+        custom: []
+        name: ids
+        description: ''
+        required: true
+        example:
+          - 12
+        type: 'integer[]'
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+    cleanBodyParameters:
+      ids:
+        - 12
+    fileParameters: []
+    responses: []
+    responseFields: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer cbDae1g3a6EvfdkZh5VP648'
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - POST
+    uri: 'api/v1/admin/leads/{id}/restore'
+    metadata:
+      custom: []
+      groupName: Leads
+      groupDescription: |-
+
+        Submit leads (public) and manage them (admin). Agents see only their assigned leads
+        and unassigned leads — not other agents' leads.
+      subgroup: ''
+      subgroupDescription: ''
+      title: ''
+      description: ''
+      authenticated: true
+      deprecated: false
+    headers:
+      Authorization: 'Bearer {YOUR_BEARER_TOKEN}'
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters:
+      id:
+        custom: []
+        name: id
+        description: 'The ID of the lead.'
+        required: true
+        example: 12
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+    cleanUrlParameters:
+      id: 12
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses: []
+    responseFields: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer cbDae1g3a6EvfdkZh5VP648'
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - GET
+    uri: api/v1/admin/leads/export/csv
+    metadata:
+      custom: []
+      groupName: Leads
+      groupDescription: |-
+
+        Submit leads (public) and manage them (admin). Agents see only their assigned leads
+        and unassigned leads — not other agents' leads.
+      subgroup: ''
+      subgroupDescription: ''
+      title: ''
+      description: ''
+      authenticated: true
+      deprecated: false
+    headers:
+      Authorization: 'Bearer {YOUR_BEARER_TOKEN}'
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 500
+        content: |-
+          {
+              "message": "Server Error"
+          }
+        headers:
+          cache-control: 'no-cache, private'
+          content-type: application/json
+          access-control-allow-origin: '*'
+        description: null
+    responseFields: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer cbDae1g3a6EvfdkZh5VP648'
+    controller: null
+    method: null
+    route: null
