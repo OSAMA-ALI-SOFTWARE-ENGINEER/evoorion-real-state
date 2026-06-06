@@ -318,7 +318,7 @@ export default function PropertiesPage() {
             <AnimatePresence mode="popLayout">
               <motion.div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" layout>
                 {properties.map((p, i) => (
-                  <ScrollReveal key={p.id} delay={i * 0.05}>
+                  <ScrollReveal key={p.id} delay={i * 0.05} className="h-full">
                     <PropertyCard
                       property={p}
                       isFavorited={favoriteIds.has(p.id)}

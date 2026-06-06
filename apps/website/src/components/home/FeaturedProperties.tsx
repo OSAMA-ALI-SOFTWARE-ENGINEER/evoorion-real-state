@@ -113,7 +113,7 @@ export function FeaturedProperties() {
           {loading
             ? Array.from({ length: 3 }).map((_, i) => <SkeletonCard key={i} />)
             : properties.map((p, i) => (
-                <ScrollReveal key={p.id} delay={i * 0.1}>
+                <ScrollReveal key={p.id} delay={i * 0.1} className="h-full">
                   <PropertyCard property={p} />
                 </ScrollReveal>
               ))}

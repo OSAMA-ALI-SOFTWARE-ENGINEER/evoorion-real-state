@@ -27,7 +27,7 @@ export function ScrollReveal({
       initial={{ opacity: 0, y: yOffset }}
       animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: yOffset }}
       transition={{ duration, delay, ease: [0.25, 0.1, 0.25, 1] }}
-      className={`h-full${className ? ` ${className}` : ''}`}
+      className={className}
     >
       {children}
     </motion.div>
