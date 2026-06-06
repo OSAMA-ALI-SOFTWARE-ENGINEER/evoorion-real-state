@@ -5,6 +5,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { ArrowLeft, TrendingUp, Home, Clock, Tag, ArrowRight } from 'lucide-react'
 import { getArea, getProperties } from '@/lib/api'
+import { AreaMap } from '@/components/ui/AreaMap'
 import { PropertyCard } from '@/components/ui/PropertyCard'
 import { SkeletonCard } from '@/components/ui/SkeletonCard'
 import { LeadForm } from '@/components/ui/LeadForm'
@@ -166,6 +167,14 @@ export default function LocationDetailPage({ params }: { params: Promise<{ slug:
                 <ScrollReveal>
                   <h2 className="font-serif text-2xl font-bold text-white mb-4">About {area.name}</h2>
                   <p className="text-muted leading-relaxed whitespace-pre-line">{area.description}</p>
+                </ScrollReveal>
+              )}
+
+              {/* Map */}
+              {area.latitude != null && area.longitude != null && (
+                <ScrollReveal>
+                  <h2 className="font-serif text-2xl font-bold text-white mb-4">Location</h2>
+                  <AreaMap lat={area.latitude} lng={area.longitude} name={area.name} />
                 </ScrollReveal>
               )}
 
