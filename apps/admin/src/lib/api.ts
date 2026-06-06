@@ -112,6 +112,10 @@ export async function deleteProperty(slug: string) {
   return request<ApiResponse<null>>(`/admin/properties/${slug}`, { method: 'DELETE' })
 }
 
+export async function restoreProperty(slug: string) {
+  return request<ApiResponse<Property>>(`/admin/properties/${slug}/restore`, { method: 'POST' })
+}
+
 // ── Leads ─────────────────────────────────────────────────────────────────────
 
 export async function getLeads(params?: {

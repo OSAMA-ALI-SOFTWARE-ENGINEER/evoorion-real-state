@@ -43,7 +43,8 @@ export interface AgentPerformance {
 
 // ── Properties ────────────────────────────────────────────────────────────────
 
-export type PropertyStatus = 'available' | 'sold' | 'rented' | 'off_market'
+export type PropertyType   = 'villa' | 'apartment' | 'penthouse' | 'townhouse' | 'commercial'
+export type PropertyStatus = 'available' | 'sold' | 'rented'
 
 export interface Area {
   id: number
@@ -82,20 +83,30 @@ export interface Property {
   slug: string
   title: string
   description?: string
+  type: PropertyType
   status: PropertyStatus
-  price: number
-  bedrooms?: number
-  bathrooms?: number
-  area_sqft?: number
-  floor?: number
-  total_floors?: number
+  price: string | number
+  currency?: string
+  location?: string
+  area_sqft?: string | number | null
+  bedrooms?: number | null
+  bathrooms?: number | null
   is_featured: boolean
+  roi_min?: string | number | null
+  roi_max?: string | number | null
   views_count: number
+  area_id?: number
+  developer_id?: number
+  operation_type_id?: number
+  primary_agent_id?: number | null
+  meta_title?: string | null
+  meta_description?: string | null
   area?: Area
   developer?: Developer
   operation_type?: OperationType
   images?: PropertyImage[]
   amenities?: PropertyAmenity[]
+  deleted_at?: string | null
   created_at: string
   updated_at: string
 }
@@ -113,11 +124,11 @@ export interface Lead {
   whatsapp?: string
   status: LeadStatus
   source: LeadSource
-  budget_min?: number
-  budget_max?: number
+  budget_min?: number | null
+  budget_max?: number | null
   message?: string
-  assigned_to?: number
-  property_id?: number
+  assigned_to?: number | null
+  property_id?: number | null
   property?: Pick<Property, 'id' | 'slug' | 'title'>
   assignee?: Pick<AuthUser, 'id' | 'name' | 'email'>
   created_at: string
@@ -136,9 +147,9 @@ export interface LeadTask {
   id: number
   lead_id: number
   title: string
-  due_date?: string
+  due_date?: string | null
   completed: boolean
-  completed_at?: string
+  completed_at?: string | null
   created_at: string
 }
 
@@ -171,6 +182,7 @@ export interface AdminUser {
   email: string
   role: UserRole
   is_active: boolean
+  deleted_at?: string | null
   created_at: string
 }
 
@@ -194,11 +206,11 @@ export interface BlogPost {
   content?: string
   featured_image_url?: string
   status: BlogStatus
-  published_at?: string
-  meta_title?: string
-  meta_description?: string
+  published_at?: string | null
+  meta_title?: string | null
+  meta_description?: string | null
   view_count: number
-  reading_time?: number
+  reading_time?: number | null
   author?: Pick<AuthUser, 'id' | 'name'>
   tags?: BlogTag[]
   created_at: string
