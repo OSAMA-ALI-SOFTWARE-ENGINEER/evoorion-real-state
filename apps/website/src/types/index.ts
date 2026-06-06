@@ -163,11 +163,27 @@ export const BUDGET_RANGES: Record<BudgetRange, { label: string; min: number; ma
 
 // ── Master data ───────────────────────────────────────────────────────────────
 
+export interface PriceRange {
+  type: string
+  min: number
+  max: number
+}
+
 export interface Area {
   id: number
   name: string
   slug: string
   description?: string | null
+  hero_image_url?: string | null
+  latitude?: number | null
+  longitude?: number | null
+  long_term_roi?: string | null
+  short_term_roi?: string | null
+  appreciation?: string | null
+  off_plan_discount?: string | null
+  price_ranges?: PriceRange[] | null
+  meta_title?: string | null
+  meta_description?: string | null
 }
 
 export interface OperationType {

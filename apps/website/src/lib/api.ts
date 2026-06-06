@@ -139,6 +139,11 @@ export async function getAreas(): Promise<ApiResponse<Area[]>> {
   return res.data
 }
 
+export async function getArea(slug: string): Promise<ApiResponse<Area>> {
+  const res = await api.get<ApiResponse<Area>>(`/areas/${slug}`)
+  return res.data
+}
+
 export async function getOperationTypes(): Promise<ApiResponse<OperationType[]>> {
   const res = await api.get<ApiResponse<OperationType[]>>('/operation-types')
   return res.data

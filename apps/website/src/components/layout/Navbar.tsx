@@ -13,6 +13,7 @@ const NAV_LINKS = [
   { label: 'Home', href: '/' },
   { label: 'Investments', href: '/investments' },
   { label: 'Properties', href: '/properties' },
+  { label: 'Locations', href: '/locations' },
   { label: 'Blog', href: '/blog' },
   { label: 'About', href: '/about' },
   { label: 'Contact', href: '/contact' },
@@ -81,6 +82,7 @@ function UserMenu() {
                 Saved Properties
               </Link>
               <button
+                type="button"
                 onClick={async () => { setOpen(false); await logout() }}
                 className="w-full flex items-center gap-2.5 px-3 py-2 text-sm text-muted hover:text-white hover:bg-white/5 rounded-lg transition-colors"
               >
@@ -219,6 +221,7 @@ export function Navbar() {
               ))}
               {!isLoading && !user && (
                 <button
+                  type="button"
                   onClick={() => { setMobileOpen(false); setAuthModal(true) }}
                   className="flex items-center gap-2 py-3 text-sm text-white/80 border-b border-white/5"
                 >
