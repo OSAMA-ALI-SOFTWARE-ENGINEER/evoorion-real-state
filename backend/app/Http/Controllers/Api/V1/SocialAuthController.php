@@ -9,8 +9,9 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
-use Laravel\Socialite\Contracts\Provider as SocialiteProvider;
+use App\Services\SettingService;
 use Laravel\Socialite\Facades\Socialite;
+use Laravel\Socialite\Two\AbstractProvider;
 
 class SocialAuthController
 {
@@ -22,7 +23,9 @@ class SocialAuthController
     {
         abort_unless(in_array($provider, self::ALLOWED_PROVIDERS), 422, 'Unsupported provider');
 
-        /** @var SocialiteProvider $driver */
+        $this->applyOAuthConfig($provider);
+
+        /** @var AbstractProvider $driver */
         $driver = Socialite::driver($provider);
 
         return $driver->stateless()->redirect();
@@ -40,7 +43,9 @@ class SocialAuthController
         $frontendUrl = config('app.frontend_url', 'http://localhost:3000');
 
         try {
-            /** @var SocialiteProvider $driver */
+            $this->applyOAuthConfig($provider);
+
+            /** @var AbstractProvider $driver */
             $driver     = Socialite::driver($provider);
             $socialUser = $driver->stateless()->user();
 
@@ -138,5 +143,19 @@ class SocialAuthController
         $record->delete();
 
         return $this->success(['token' => $token], 'Token exchanged');
+    }
+
+    private function applyOAuthConfig(string $provider): void
+    {
+        $settings  = app(SettingService::class);
+        $clientId  = $settings->get("{$provider}_client_id");
+        $clientSecret = $settings->get("{$provider}_client_secret");
+
+        if ($clientId && $clientSecret) {
+            config([
+                "services.{$provider}.client_id"     => $clientId,
+                "services.{$provider}.client_secret" => $clientSecret,
+            ]);
+        }
     }
 }

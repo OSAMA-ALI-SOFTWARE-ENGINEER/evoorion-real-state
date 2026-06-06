@@ -3,75 +3,61 @@
 namespace App\Services;
 
 use Cloudinary\Cloudinary;
-use Cloudinary\Uploader;
+use Illuminate\Http\UploadedFile;
 
 class CloudinaryService
 {
-    protected ?Cloudinary $cloudinary = null;
+    protected ?Cloudinary $client = null;
 
-    protected function client(): Cloudinary
+    public function __construct(protected SettingService $settings) {}
+
+    protected function sdk(): Cloudinary
     {
-        if ($this->cloudinary === null) {
-            $this->cloudinary = new Cloudinary([
+        if ($this->client === null) {
+            $this->client = new Cloudinary([
                 'cloud' => [
-                    'cloud_name' => config('services.cloudinary.cloud_name'),
-                    'api_key' => config('services.cloudinary.api_key'),
-                    'api_secret' => config('services.cloudinary.api_secret'),
+                    'cloud_name' => $this->settings->get('cloudinary_cloud_name', config('services.cloudinary.cloud_name')),
+                    'api_key'    => $this->settings->get('cloudinary_api_key',    config('services.cloudinary.api_key')),
+                    'api_secret' => $this->settings->get('cloudinary_api_secret', config('services.cloudinary.api_secret')),
                 ],
             ]);
         }
 
-        return $this->cloudinary;
+        return $this->client;
     }
 
-    public function uploadImage($file, $folder = 'properties')
+    public function uploadImage(UploadedFile $file, string $folder = 'properties'): array
     {
-        $this->client();
-
-        $result = Uploader::upload($file->getRealPath(), [
-            'folder' => $folder,
-            'resource_type' => 'auto',
-        ]);
-
-        return [
-            'url' => $result['secure_url'],
-            'public_id' => $result['public_id'],
-        ];
-    }
-
-    public function uploadVideo($file, $folder = 'videos')
-    {
-        $this->client();
-
-        $result = Uploader::upload($file->getRealPath(), [
-            'folder' => $folder,
-            'resource_type' => 'video',
-        ]);
-
-        return [
-            'url' => $result['secure_url'],
-            'public_id' => $result['public_id'],
-        ];
-    }
-
-    public function uploadDocument($file, $folder = 'leads/documents'): array
-    {
-        $this->client();
-
-        $result = Uploader::upload($file->getRealPath(), [
+        $result = $this->sdk()->uploadApi()->upload($file->getRealPath(), [
             'folder'        => $folder,
             'resource_type' => 'auto',
         ]);
 
-        return [
-            'url'       => $result['secure_url'],
-            'public_id' => $result['public_id'],
-        ];
+        return ['url' => $result['secure_url'], 'public_id' => $result['public_id']];
     }
 
-    public function deleteMedia($publicId): void
+    public function uploadVideo(UploadedFile $file, string $folder = 'videos'): array
     {
-        $this->client();
-        Uploader::destroy($publicId);
+        $result = $this->sdk()->uploadApi()->upload($file->getRealPath(), [
+            'folder'        => $folder,
+            'resource_type' => 'video',
+        ]);
+
+        return ['url' => $result['secure_url'], 'public_id' => $result['public_id']];
+    }
+
+    public function uploadDocument(UploadedFile $file, string $folder = 'leads/documents'): array
+    {
+        $result = $this->sdk()->uploadApi()->upload($file->getRealPath(), [
+            'folder'        => $folder,
+            'resource_type' => 'auto',
+        ]);
+
+        return ['url' => $result['secure_url'], 'public_id' => $result['public_id']];
+    }
+
+    public function deleteMedia(string $publicId): void
+    {
+        $this->sdk()->uploadApi()->destroy($publicId);
     }
 }
