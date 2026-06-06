@@ -45,7 +45,7 @@ export function PropertyCard({
     <motion.div
       whileHover={{ y: -4 }}
       transition={{ duration: 0.3, ease: 'easeOut' }}
-      className="group relative rounded-sm overflow-hidden border border-white/5 hover:border-gold-border bg-[#0d1526] transition-colors duration-300"
+      className="group relative h-full flex flex-col rounded-sm overflow-hidden border border-white/5 hover:border-gold-border bg-[#0d1526] transition-colors duration-300"
     >
       {/* Heart button — sits above the Link so clicks don't navigate */}
       {onToggleFavorite && (
@@ -63,7 +63,7 @@ export function PropertyCard({
         </button>
       )}
 
-      <Link href={`/properties/${property.slug}`} className="block">
+      <Link href={`/properties/${property.slug}`} className="flex-1 flex flex-col">
         {/* Image */}
         <div className="relative h-56 overflow-hidden">
           <Image
@@ -84,7 +84,7 @@ export function PropertyCard({
         </div>
 
         {/* Content */}
-        <div className="p-5">
+        <div className="p-5 flex-1">
           <p className="text-gold text-[10px] tracking-[0.2em] uppercase mb-1 capitalize">{property.type}</p>
           <h3 className="font-serif text-white text-base font-semibold leading-snug mb-2 line-clamp-2 group-hover:text-gold transition-colors duration-300">
             {property.title}
