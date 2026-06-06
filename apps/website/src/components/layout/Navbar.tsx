@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { usePathname } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Menu, X, Phone } from 'lucide-react'
@@ -41,13 +42,15 @@ export function Navbar() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-20">
             {/* Logo */}
-            <Link href="/" className="flex items-center gap-2 group">
-              <span className="font-serif text-2xl font-bold tracking-[0.15em] text-white group-hover:text-gold transition-colors duration-300">
-                EVOORION
-              </span>
-              <span className="text-gold text-xs tracking-[0.3em] font-light hidden sm:block">
-                REAL ESTATE
-              </span>
+            <Link href="/" className="relative block h-10 w-44 shrink-0">
+              <Image
+                src="/logos/primary-logo.png"
+                alt="EVOORION Real Estate"
+                fill
+                className="object-contain object-left"
+                priority
+                sizes="176px"
+              />
             </Link>
 
             {/* Desktop nav */}

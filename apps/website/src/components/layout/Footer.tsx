@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import Image from 'next/image'
 import { MapPin, Mail, Phone } from 'lucide-react'
 import { SocialIcon } from '@/components/ui/SocialIcon'
 
@@ -29,13 +30,14 @@ export function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-12">
           {/* Brand column */}
           <div className="lg:col-span-2">
-            <Link href="/" className="inline-block mb-4">
-              <span className="font-serif text-2xl font-bold tracking-[0.15em] text-white">
-                EVOORION
-              </span>
-              <span className="block text-gold text-xs tracking-[0.3em] font-light mt-0.5">
-                REAL ESTATE
-              </span>
+            <Link href="/" className="relative block h-12 w-52 mb-4">
+              <Image
+                src="/logos/primary-logo.png"
+                alt="EVOORION Real Estate"
+                fill
+                className="object-contain object-left"
+                sizes="208px"
+              />
             </Link>
             <p className="text-muted text-sm leading-relaxed max-w-xs mb-6">
               Your gateway to exclusive Dubai real estate. We connect discerning investors with
