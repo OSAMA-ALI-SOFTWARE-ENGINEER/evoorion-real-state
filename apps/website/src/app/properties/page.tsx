@@ -47,10 +47,8 @@ function getSortParams(key: string): { sort_by?: string; sort_direction?: 'asc' 
 function getPriceParams(key: string): { min_price?: number; max_price?: number } {
   const range = BUDGET_RANGES[key as keyof typeof BUDGET_RANGES]
   if (!range) return {}
-  return {
-    min_price: range.min || undefined,
-    max_price: range.max < 999_999_999 ? range.max : undefined,
-  }
+  // Backend requires both min_price AND max_price to apply the whereBetween filter
+  return { min_price: range.min, max_price: range.max }
 }
 
 const SELECT_CLS =
