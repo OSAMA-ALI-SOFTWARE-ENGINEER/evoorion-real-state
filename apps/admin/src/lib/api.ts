@@ -224,8 +224,9 @@ export async function deleteOperationType(id: number) {
 
 // ── Agencies & Agents ─────────────────────────────────────────────────────────
 
-export async function getAgencies() {
-  return request<PaginatedResponse<Agency>>('/admin/agencies')
+export async function getAgencies(params?: { search?: string }) {
+  const q = new URLSearchParams(params as Record<string, string>).toString()
+  return request<PaginatedResponse<Agency>>(`/admin/agencies${q ? `?${q}` : ''}`)
 }
 
 export async function createAgency(data: Partial<Agency>) {
@@ -240,8 +241,9 @@ export async function deleteAgency(id: number) {
   return request<ApiResponse<null>>(`/admin/agencies/${id}`, { method: 'DELETE' })
 }
 
-export async function getAgents() {
-  return request<PaginatedResponse<Agent>>('/admin/agents')
+export async function getAgents(params?: { search?: string; agency_id?: number }) {
+  const q = new URLSearchParams(params as Record<string, string>).toString()
+  return request<PaginatedResponse<Agent>>(`/admin/agents${q ? `?${q}` : ''}`)
 }
 
 export async function createAgent(data: Partial<Agent>) {
@@ -256,10 +258,15 @@ export async function deleteAgent(id: number) {
   return request<ApiResponse<null>>(`/admin/agents/${id}`, { method: 'DELETE' })
 }
 
+export async function restoreAgent(id: number) {
+  return request<ApiResponse<Agent>>(`/admin/agents/${id}/restore`, { method: 'POST' })
+}
+
 // ── Users ─────────────────────────────────────────────────────────────────────
 
-export async function getUsers() {
-  return request<PaginatedResponse<AdminUser>>('/admin/users')
+export async function getUsers(params?: { search?: string; role?: string }) {
+  const q = new URLSearchParams(params as Record<string, string>).toString()
+  return request<PaginatedResponse<AdminUser>>(`/admin/users${q ? `?${q}` : ''}`)
 }
 
 export async function updateUser(id: number, data: Partial<AdminUser>) {
@@ -294,7 +301,14 @@ export async function markAllNotificationsRead() {
 
 // ── Activity logs ─────────────────────────────────────────────────────────────
 
-export async function getActivityLogs(params?: { page?: number; per_page?: number }) {
+export async function getActivityLogs(params?: {
+  page?: number
+  per_page?: number
+  action?: string
+  model_type?: string
+  date_from?: string
+  date_to?: string
+}) {
   const q = new URLSearchParams(params as Record<string, string>).toString()
   return request<PaginatedResponse<Record<string, unknown>>>(`/admin/activity-logs${q ? `?${q}` : ''}`)
 }

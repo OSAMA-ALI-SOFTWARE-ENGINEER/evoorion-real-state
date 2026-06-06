@@ -158,20 +158,23 @@ export interface LeadTask {
 export interface Agency {
   id: number
   name: string
-  contact_email?: string
-  contact_phone?: string
-  address?: string
+  logo_url?: string | null
+  contact_email?: string | null
+  phone?: string | null
+  address?: string | null
+  agents_count?: number
   created_at: string
 }
 
 export interface Agent {
   id: number
   user_id: number
-  agency_id?: number
-  specialisation?: string
-  bio?: string
+  agency_id?: number | null
+  phone?: string | null
+  whatsapp?: string | null
   user?: AuthUser
   agency?: Agency
+  deleted_at?: string | null
 }
 
 // ── Users ─────────────────────────────────────────────────────────────────────
