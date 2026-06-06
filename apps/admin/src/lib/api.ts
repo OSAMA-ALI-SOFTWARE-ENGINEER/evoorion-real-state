@@ -178,7 +178,7 @@ export async function getAreas() {
   return request<PaginatedResponse<Area>>('/admin/areas')
 }
 
-export async function createArea(data: { name: string; slug: string; description?: string }) {
+export async function createArea(data: Partial<Area>) {
   return request<ApiResponse<Area>>('/admin/areas', { method: 'POST', body: JSON.stringify(data) })
 }
 

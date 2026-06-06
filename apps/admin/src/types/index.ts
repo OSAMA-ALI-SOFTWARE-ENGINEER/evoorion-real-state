@@ -50,7 +50,23 @@ export interface Area {
   id: number
   name: string
   slug: string
-  description?: string
+  description?: string | null
+  hero_image_url?: string | null
+  latitude?: number | null
+  longitude?: number | null
+  long_term_roi?: number | null
+  short_term_roi?: number | null
+  appreciation?: number | null
+  off_plan_discount?: number | null
+  price_ranges?: PriceRange[] | null
+  meta_title?: string | null
+  meta_description?: string | null
+}
+
+export interface PriceRange {
+  type: string
+  min: number
+  max: number
 }
 
 export interface Developer {
