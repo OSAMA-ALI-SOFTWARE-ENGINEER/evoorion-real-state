@@ -5,11 +5,26 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { usePathname } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Menu, X, Phone, ChevronDown, LogOut, User, Heart } from 'lucide-react'
+import { Menu, X, Phone, ChevronDown, LogOut, User, Heart, Building2, MapPin } from 'lucide-react'
 import { useAuth } from '@/context/AuthContext'
 import { AuthModal } from '@/components/ui/AuthModal'
 
+// Top-level nav links (Properties/Locations handled by dropdown)
 const NAV_LINKS = [
+  { label: 'Home', href: '/' },
+  { label: 'Investments', href: '/investments' },
+  { label: 'Blog', href: '/blog' },
+  { label: 'About', href: '/about' },
+  { label: 'Contact', href: '/contact' },
+]
+
+const PROPERTY_DROPDOWN = [
+  { label: 'Browse Properties', href: '/properties', icon: Building2, desc: 'View all listings' },
+  { label: 'Explore Locations', href: '/locations', icon: MapPin, desc: 'Dubai investment hotspots' },
+]
+
+// Mobile menu: all links flat
+const MOBILE_LINKS = [
   { label: 'Home', href: '/' },
   { label: 'Investments', href: '/investments' },
   { label: 'Properties', href: '/properties' },
@@ -18,6 +33,75 @@ const NAV_LINKS = [
   { label: 'About', href: '/about' },
   { label: 'Contact', href: '/contact' },
 ]
+
+function PropertyDropdown({ pathname }: { pathname: string }) {
+  const [open, setOpen] = useState(false)
+  const ref = useRef<HTMLDivElement>(null)
+  const isActive = pathname.startsWith('/properties') || pathname.startsWith('/locations')
+
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false)
+    }
+    document.addEventListener('mousedown', handler)
+    return () => document.removeEventListener('mousedown', handler)
+  }, [])
+
+  return (
+    <div ref={ref} className="relative" onMouseEnter={() => setOpen(true)} onMouseLeave={() => setOpen(false)}>
+      <button
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        className={`flex items-center gap-1 text-sm tracking-widest uppercase transition-colors duration-300 relative group ${
+          isActive ? 'text-gold' : 'text-white/80 hover:text-white'
+        }`}
+      >
+        Portfolio
+        <ChevronDown size={12} className={`transition-transform duration-200 ${open ? 'rotate-180' : ''}`} />
+        <span className={`absolute -bottom-1 left-0 h-px bg-gold transition-all duration-300 ${isActive ? 'w-full' : 'w-0 group-hover:w-full'}`} />
+      </button>
+
+      <AnimatePresence>
+        {open && (
+          <motion.div
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 8 }}
+            transition={{ duration: 0.15 }}
+            className="absolute top-full left-1/2 -translate-x-1/2 pt-3 z-50 min-w-[220px]"
+          >
+            <div className="bg-brand-section border border-gold-border rounded-sm shadow-2xl overflow-hidden">
+              {PROPERTY_DROPDOWN.map((item) => {
+                const Icon = item.icon
+                const active = pathname === item.href || pathname.startsWith(item.href + '/')
+                return (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    onClick={() => setOpen(false)}
+                    className={`flex items-center gap-3 px-4 py-3.5 border-b border-white/5 last:border-0 transition-colors group/item ${
+                      active ? 'bg-gold/5 text-gold' : 'text-muted hover:text-white hover:bg-white/5'
+                    }`}
+                  >
+                    <div className={`w-8 h-8 rounded-sm flex items-center justify-center shrink-0 transition-colors ${
+                      active ? 'bg-gold/10' : 'bg-white/5 group-hover/item:bg-gold/10'
+                    }`}>
+                      <Icon size={14} className={active ? 'text-gold' : 'text-muted group-hover/item:text-gold'} />
+                    </div>
+                    <div>
+                      <p className="text-xs font-semibold tracking-wider uppercase">{item.label}</p>
+                      <p className="text-[11px] text-muted/60 mt-0.5">{item.desc}</p>
+                    </div>
+                  </Link>
+                )
+              })}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  )
+}
 
 function UserMenu() {
   const { user, logout } = useAuth()
@@ -34,12 +118,7 @@ function UserMenu() {
 
   if (!user) return null
 
-  const initials = user.name
-    .split(' ')
-    .map((w) => w[0])
-    .slice(0, 2)
-    .join('')
-    .toUpperCase()
+  const initials = user.name.split(' ').map((w) => w[0]).slice(0, 2).join('').toUpperCase()
 
   return (
     <div ref={ref} className="relative">
@@ -55,7 +134,7 @@ function UserMenu() {
             {initials}
           </div>
         )}
-        <span className="text-white text-sm max-w-[120px] truncate hidden lg:block">{user.name}</span>
+        <span className="text-white text-sm max-w-[100px] truncate hidden xl:block">{user.name}</span>
         <ChevronDown size={14} className={`text-muted transition-transform ${open ? 'rotate-180' : ''}`} />
       </button>
 
@@ -98,10 +177,10 @@ function UserMenu() {
 }
 
 export function Navbar() {
-  const [scrolled, setScrolled]       = useState(false)
-  const [mobileOpen, setMobileOpen]   = useState(false)
-  const [authModal, setAuthModal]     = useState(false)
-  const { user, isLoading }           = useAuth()
+  const [scrolled, setScrolled]     = useState(false)
+  const [mobileOpen, setMobileOpen] = useState(false)
+  const [authModal, setAuthModal]   = useState(false)
+  const { user, isLoading }         = useAuth()
   const pathname = usePathname()
 
   useEffect(() => {
@@ -110,9 +189,7 @@ export function Navbar() {
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
 
-  useEffect(() => {
-    setMobileOpen(false)
-  }, [pathname])
+  useEffect(() => { setMobileOpen(false) }, [pathname])
 
   return (
     <>
@@ -138,37 +215,58 @@ export function Navbar() {
             </Link>
 
             {/* Desktop nav */}
-            <nav className="hidden lg:flex items-center gap-8">
-              {NAV_LINKS.map((link) => (
+            <nav className="hidden lg:flex items-center gap-6">
+              {/* Home */}
+              <Link
+                href="/"
+                className={`text-sm tracking-widest uppercase transition-colors duration-300 relative group ${
+                  pathname === '/' ? 'text-gold' : 'text-white/80 hover:text-white'
+                }`}
+              >
+                Home
+                <span className={`absolute -bottom-1 left-0 h-px bg-gold transition-all duration-300 ${pathname === '/' ? 'w-full' : 'w-0 group-hover:w-full'}`} />
+              </Link>
+
+              {/* Investments */}
+              <Link
+                href="/investments"
+                className={`text-sm tracking-widest uppercase transition-colors duration-300 relative group ${
+                  pathname.startsWith('/investments') ? 'text-gold' : 'text-white/80 hover:text-white'
+                }`}
+              >
+                Investments
+                <span className={`absolute -bottom-1 left-0 h-px bg-gold transition-all duration-300 ${pathname.startsWith('/investments') ? 'w-full' : 'w-0 group-hover:w-full'}`} />
+              </Link>
+
+              {/* Properties + Locations dropdown */}
+              <PropertyDropdown pathname={pathname} />
+
+              {/* Blog, About, Contact */}
+              {NAV_LINKS.slice(2).map((link) => (
                 <Link
                   key={link.href}
                   href={link.href}
                   className={`text-sm tracking-widest uppercase transition-colors duration-300 relative group ${
-                    pathname === link.href || pathname.startsWith(link.href + '/')
-                      ? 'text-gold'
-                      : 'text-white/80 hover:text-white'
+                    pathname === link.href || pathname.startsWith(link.href + '/') ? 'text-gold' : 'text-white/80 hover:text-white'
                   }`}
                 >
                   {link.label}
-                  <span
-                    className={`absolute -bottom-1 left-0 h-px bg-gold transition-all duration-300 ${
-                      pathname === link.href || pathname.startsWith(link.href + '/') ? 'w-full' : 'w-0 group-hover:w-full'
-                    }`}
-                  />
+                  <span className={`absolute -bottom-1 left-0 h-px bg-gold transition-all duration-300 ${
+                    pathname === link.href || pathname.startsWith(link.href + '/') ? 'w-full' : 'w-0 group-hover:w-full'
+                  }`} />
                 </Link>
               ))}
             </nav>
 
-            {/* Right side: CTA + Auth + Hamburger */}
+            {/* Right: auth + CTA + hamburger */}
             <div className="flex items-center gap-3">
-              {/* Auth */}
               {!isLoading && (
                 user ? (
                   <UserMenu />
                 ) : (
                   <button
                     type="button"
-                  onClick={() => setAuthModal(true)}
+                    onClick={() => setAuthModal(true)}
                     className="hidden lg:flex items-center gap-1.5 py-2 px-4 rounded-full border border-gold-border text-white/80 hover:text-white hover:border-gold/50 text-sm transition-colors"
                   >
                     <User size={14} />
@@ -176,13 +274,12 @@ export function Navbar() {
                   </button>
                 )
               )}
-
               <Link
                 href="/contact"
                 className="hidden lg:flex items-center gap-2 px-5 py-2.5 bg-gold text-brand text-sm font-semibold tracking-wider uppercase rounded-sm hover:bg-gold-light transition-colors duration-300"
               >
                 <Phone size={14} />
-                Book Private Call
+                Book Call
               </Link>
               <button
                 type="button"
@@ -207,13 +304,13 @@ export function Navbar() {
             transition={{ duration: 0.25 }}
             className="fixed top-20 left-0 right-0 z-40 bg-brand/98 backdrop-blur-md border-b border-gold-border lg:hidden"
           >
-            <nav className="max-w-7xl mx-auto px-6 py-6 flex flex-col gap-4">
-              {NAV_LINKS.map((link) => (
+            <nav className="max-w-7xl mx-auto px-6 py-6 flex flex-col gap-1">
+              {MOBILE_LINKS.map((link) => (
                 <Link
                   key={link.href}
                   href={link.href}
-                  className={`text-sm tracking-widest uppercase py-3 border-b border-white/5 transition-colors ${
-                    pathname === link.href ? 'text-gold' : 'text-white/80'
+                  className={`text-sm tracking-widest uppercase py-3.5 border-b border-white/5 transition-colors ${
+                    pathname === link.href || pathname.startsWith(link.href + '/') ? 'text-gold' : 'text-white/80'
                   }`}
                 >
                   {link.label}
@@ -223,7 +320,7 @@ export function Navbar() {
                 <button
                   type="button"
                   onClick={() => { setMobileOpen(false); setAuthModal(true) }}
-                  className="flex items-center gap-2 py-3 text-sm text-white/80 border-b border-white/5"
+                  className="flex items-center gap-2 py-3.5 text-sm text-white/80 border-b border-white/5"
                 >
                   <User size={15} />
                   Sign In / Register
@@ -231,7 +328,7 @@ export function Navbar() {
               )}
               <Link
                 href="/contact"
-                className="mt-2 flex items-center justify-center gap-2 px-5 py-3 bg-gold text-brand text-sm font-semibold tracking-wider uppercase rounded-sm"
+                className="mt-3 flex items-center justify-center gap-2 px-5 py-3 bg-gold text-brand text-sm font-semibold tracking-wider uppercase rounded-sm"
               >
                 <Phone size={14} />
                 Book Private Call
@@ -241,7 +338,6 @@ export function Navbar() {
         )}
       </AnimatePresence>
 
-      {/* Auth Modal */}
       {authModal && <AuthModal onClose={() => setAuthModal(false)} />}
     </>
   )

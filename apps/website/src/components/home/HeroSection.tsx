@@ -42,8 +42,8 @@ export function HeroSection() {
         <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[600px] rounded-full bg-gold/5 blur-[120px]" />
       </div>
 
-      {/* Content */}
-      <div className="relative z-10 max-w-5xl mx-auto px-6 text-center">
+      {/* Content — pt-24 clears the 80px fixed navbar */}
+      <div className="relative z-10 max-w-5xl mx-auto px-6 text-center pt-24">
         {/* Eyebrow */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -125,8 +125,8 @@ export function HeroSection() {
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ delay: 2 }}
-        className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1 text-white/30"
+        transition={{ delay: 1.5 }}
+        className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1 text-white/40 z-20"
       >
         <span className="text-[10px] tracking-widest uppercase">Scroll</span>
         <motion.div

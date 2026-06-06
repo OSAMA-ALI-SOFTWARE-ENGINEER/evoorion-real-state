@@ -23,6 +23,11 @@ class Area extends Model
         'longitude'    => 'float',
     ];
 
+    public function getRouteKeyName(): string
+    {
+        return 'slug';
+    }
+
     public function properties(): HasMany
     {
         return $this->hasMany(Property::class);
