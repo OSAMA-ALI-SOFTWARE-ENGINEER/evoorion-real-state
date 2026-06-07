@@ -301,7 +301,7 @@ function ImageManager({ slug, initial }: { slug: string; initial: PropertyImage[
         </div>
       )}
       <p className="text-[11px] text-slate-400">
-        Star (★) = set as primary. Images require Cloudinary credentials in backend <code className="font-mono">.env</code>.
+        Hover an image to set it as primary (★) or delete (✕). Storage driver and credentials are configured in <strong>Settings → Storage & Media</strong>.
       </p>
     </div>
   )
@@ -315,7 +315,8 @@ interface PropertyFormProps {
 
 export function PropertyForm({ property }: PropertyFormProps) {
   const router = useRouter()
-  const isEdit = !!property
+  const isEdit  = !!property
+  const formRef = useRef<HTMLFormElement>(null)
 
   const [form,    setForm]    = useState<FormState>(isEdit ? fromProperty(property!) : blank)
   const [areas,   setAreas]   = useState<Area[]>([])
@@ -360,7 +361,7 @@ export function PropertyForm({ property }: PropertyFormProps) {
 
   return (
     <div className="max-w-5xl space-y-6">
-    <form onSubmit={handleSubmit} className="space-y-6">
+    <form ref={formRef} onSubmit={handleSubmit} className="space-y-6">
       {error && (
         <div className="px-4 py-3 rounded-lg bg-red-50 border border-red-200 text-red-600 text-sm">{error}</div>
       )}
@@ -532,7 +533,28 @@ export function PropertyForm({ property }: PropertyFormProps) {
     </form>
 
     {isEdit && property && (
-      <ImageManager slug={property.slug} initial={property.images ?? []} />
+      <>
+        <ImageManager slug={property.slug} initial={property.images ?? []} />
+
+        {/* Bottom save bar — visible after scrolling past images */}
+        <div className="flex items-center gap-3 pt-2 pb-6">
+          <button
+            type="button"
+            onClick={() => formRef.current?.requestSubmit()}
+            disabled={saving}
+            className="px-5 py-2.5 rounded-lg bg-[#C9A84C] hover:bg-[#D4B668] disabled:opacity-60 text-slate-900 font-semibold text-sm transition-colors"
+          >
+            {saving ? 'Saving…' : 'Save Changes'}
+          </button>
+          <button
+            type="button"
+            onClick={() => router.push('/properties')}
+            className="px-5 py-2.5 rounded-lg border border-slate-200 text-slate-600 text-sm font-medium hover:bg-slate-50 transition-colors"
+          >
+            Cancel
+          </button>
+        </div>
+      </>
     )}
     </div>
   )
