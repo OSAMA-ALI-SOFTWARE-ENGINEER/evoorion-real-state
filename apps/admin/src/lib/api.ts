@@ -8,8 +8,10 @@ import type {
   AuthUser,
   BlogPost,
   BlogTag,
+  Currency,
   DashboardStats,
   Developer,
+  Language,
   Lead,
   LeadNote,
   LeadTask,
@@ -79,6 +81,24 @@ export async function getMe(token?: string) {
   return request<ApiResponse<AuthUser>>('/auth/me', {}, token)
 }
 
+export async function updateProfile(data: { name: string; email: string }) {
+  return request<ApiResponse<AuthUser>>('/auth/profile', {
+    method: 'PUT',
+    body: JSON.stringify(data),
+  })
+}
+
+export async function changePassword(data: {
+  current_password: string
+  new_password: string
+  new_password_confirmation: string
+}) {
+  return request<ApiResponse<null>>('/auth/change-password', {
+    method: 'POST',
+    body: JSON.stringify(data),
+  })
+}
+
 // ── Dashboard ─────────────────────────────────────────────────────────────────
 
 export async function getDashboardStats() {
@@ -96,6 +116,10 @@ export async function getAdminProperties(params?: {
   per_page?: number
   search?: string
   status?: string
+  type?: string
+  area_id?: number
+  developer_id?: number
+  featured?: string
 }) {
   return request<PaginatedResponse<Property>>(`/admin/properties${qs(params)}`)
 }
@@ -161,6 +185,27 @@ export async function deletePropertyImage(slug: string, imageId: number) {
   return request<ApiResponse<null>>(`/admin/properties/${slug}/images/${imageId}`, { method: 'DELETE' })
 }
 
+export async function uploadMedia(file: File, folder = 'misc'): Promise<{ url: string; public_id: string }> {
+  const tok = getToken()
+  const fd  = new FormData()
+  fd.append('file', file)
+  fd.append('folder', folder)
+  const res = await fetch(`${BASE_URL}/admin/media/upload`, {
+    method: 'POST',
+    headers: {
+      Accept: 'application/json',
+      ...(tok ? { Authorization: `Bearer ${tok}` } : {}),
+    },
+    body: fd,
+  })
+  if (!res.ok) {
+    const body = await res.json().catch(() => ({}))
+    throw new Error((body as { message?: string }).message ?? `HTTP ${res.status}`)
+  }
+  const data = await res.json() as ApiResponse<{ url: string; public_id: string }>
+  return data.data!
+}
+
 // ── Leads ─────────────────────────────────────────────────────────────────────
 
 export async function getLeads(params?: {
@@ -207,6 +252,21 @@ export async function getLeadTasks(leadId: number) {
   return request<ApiResponse<LeadTask[]>>(`/admin/leads/${leadId}/tasks`)
 }
 
+export async function addLeadTask(leadId: number, data: { title: string; due_date?: string | null }) {
+  return request<ApiResponse<LeadTask>>(`/admin/leads/${leadId}/tasks`, {
+    method: 'POST',
+    body: JSON.stringify(data),
+  })
+}
+
+export async function completeLeadTask(leadId: number, taskId: number) {
+  return request<ApiResponse<LeadTask>>(`/admin/leads/${leadId}/tasks/${taskId}/complete`, { method: 'POST' })
+}
+
+export async function deleteLeadTask(leadId: number, taskId: number) {
+  return request<ApiResponse<null>>(`/admin/leads/${leadId}/tasks/${taskId}`, { method: 'DELETE' })
+}
+
 export async function exportLeadsCSV(): Promise<Blob> {
   const tok = getToken()
   const res = await fetch(`${BASE_URL}/admin/leads/export/csv`, {
@@ -232,6 +292,46 @@ export async function updateArea(id: number, data: Partial<Area>) {
 
 export async function deleteArea(id: number) {
   return request<ApiResponse<null>>(`/admin/areas/${id}`, { method: 'DELETE' })
+}
+
+export async function updateAreaStatus(id: number, status: 'active' | 'inactive') {
+  return request<ApiResponse<Area>>(`/admin/areas/${id}`, { method: 'PUT', body: JSON.stringify({ status }) })
+}
+
+// ── Currencies ────────────────────────────────────────────────────────────────
+
+export async function getCurrencies() {
+  return request<ApiResponse<Currency[]>>('/admin/currencies')
+}
+
+export async function createCurrency(data: Partial<Currency>) {
+  return request<ApiResponse<Currency>>('/admin/currencies', { method: 'POST', body: JSON.stringify(data) })
+}
+
+export async function updateCurrency(id: number, data: Partial<Currency>) {
+  return request<ApiResponse<Currency>>(`/admin/currencies/${id}`, { method: 'PUT', body: JSON.stringify(data) })
+}
+
+export async function deleteCurrency(id: number) {
+  return request<ApiResponse<null>>(`/admin/currencies/${id}`, { method: 'DELETE' })
+}
+
+// ── Languages ─────────────────────────────────────────────────────────────────
+
+export async function getLanguages() {
+  return request<ApiResponse<Language[]>>('/admin/languages')
+}
+
+export async function createLanguage(data: Partial<Language>) {
+  return request<ApiResponse<Language>>('/admin/languages', { method: 'POST', body: JSON.stringify(data) })
+}
+
+export async function updateLanguage(id: number, data: Partial<Language>) {
+  return request<ApiResponse<Language>>(`/admin/languages/${id}`, { method: 'PUT', body: JSON.stringify(data) })
+}
+
+export async function deleteLanguage(id: number) {
+  return request<ApiResponse<null>>(`/admin/languages/${id}`, { method: 'DELETE' })
 }
 
 export async function getDevelopers() {
@@ -288,7 +388,11 @@ export async function getAgents(params?: { search?: string; agency_id?: number }
   return request<PaginatedResponse<Agent>>(`/admin/agents${qs(params)}`)
 }
 
-export async function createAgent(data: Partial<Agent>) {
+export type CreateAgentPayload = Partial<Agent> & {
+  name?: string; email?: string; password?: string; password_confirmation?: string; avatar_url?: string
+}
+
+export async function createAgent(data: CreateAgentPayload) {
   return request<ApiResponse<Agent>>('/admin/agents', { method: 'POST', body: JSON.stringify(data) })
 }
 
@@ -377,6 +481,21 @@ export async function deleteBlogPost(id: number) {
 
 export async function restoreBlogPost(id: number) {
   return request<ApiResponse<BlogPost>>(`/admin/blog/${id}/restore`, { method: 'POST' })
+}
+
+export async function approveBlogPost(id: number) {
+  return request<ApiResponse<BlogPost>>(`/admin/blog/${id}/approve`, { method: 'POST' })
+}
+
+export async function checkBlogTitleUnique(title: string, excludeId?: number): Promise<boolean> {
+  const params = new URLSearchParams({ title })
+  if (excludeId) params.set('exclude_id', String(excludeId))
+  try {
+    const res = await request<ApiResponse<{ unique: boolean }>>(`/admin/blog/check-title?${params}`)
+    return res.data.unique
+  } catch {
+    return true
+  }
 }
 
 export async function getAdminBlogTags() {

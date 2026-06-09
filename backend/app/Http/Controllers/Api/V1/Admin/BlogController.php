@@ -4,18 +4,26 @@ namespace App\Http\Controllers\Api\V1\Admin;
 
 use App\Models\BlogPost;
 use App\Models\BlogTag;
+use App\Models\User;
+use App\Notifications\BlogPostPendingReview;
 use App\Traits\ApiResponse;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Str;
 
 class BlogController
 {
     use ApiResponse;
 
+    private function isSuperAdmin(): bool
+    {
+        return auth()->user()?->hasRole('super_admin') ?? false;
+    }
+
     public function index(Request $request): JsonResponse
     {
-        $perPage = min((int) $request->get('per_page', 15), 50);
+        $perPage = min($request->integer('per_page', 15), 50);
 
         $posts = BlogPost::withTrashed()
             ->with(['author:id,name', 'tags:id,name,slug'])
@@ -36,12 +44,12 @@ class BlogController
     public function store(Request $request): JsonResponse
     {
         $data = $request->validate([
-            'title'              => 'required|string|max:255',
+            'title'              => "required|string|max:255|unique:blog_posts,title",
             'slug'               => 'nullable|string|unique:blog_posts,slug',
             'excerpt'            => 'nullable|string',
             'content'            => 'required|string',
-            'featured_image_url' => 'nullable|url|max:500',
-            'status'             => 'required|in:draft,published',
+            'featured_image_url' => 'nullable|string|max:500',
+            'status'             => 'required|in:draft,published,pending',
             'published_at'       => 'nullable|date',
             'meta_title'         => 'nullable|string|max:60',
             'meta_description'   => 'nullable|string|max:160',
@@ -52,6 +60,11 @@ class BlogController
 
         $data['slug']      = $data['slug'] ?? Str::slug($data['title']);
         $data['author_id'] = auth()->id();
+
+        // Non-super-admin posts must go through approval
+        if (!$this->isSuperAdmin()) {
+            $data['status'] = 'pending';
+        }
 
         if ($data['status'] === 'published' && empty($data['published_at'])) {
             $data['published_at'] = now();
@@ -65,7 +78,17 @@ class BlogController
             $post->tags()->sync($tagIds);
         }
 
-        return $this->success($post->load('tags:id,name,slug'), 'Post created', 201);
+        $post->load(['author:id,name', 'tags:id,name,slug']);
+
+        // Notify all super admins when a post needs review
+        if ($post->status === 'pending') {
+            $superAdmins = User::where('role', 'super_admin')->get();
+            if ($superAdmins->isNotEmpty()) {
+                Notification::send($superAdmins, new BlogPostPendingReview($post));
+            }
+        }
+
+        return $this->success($post, 'Post created', 201);
     }
 
     public function show(int $id): JsonResponse
@@ -82,12 +105,12 @@ class BlogController
         $post = BlogPost::withTrashed()->findOrFail($id);
 
         $data = $request->validate([
-            'title'              => 'sometimes|string|max:255',
+            'title'              => "sometimes|string|max:255|unique:blog_posts,title,{$id}",
             'slug'               => "sometimes|string|unique:blog_posts,slug,{$id}",
             'excerpt'            => 'nullable|string',
             'content'            => 'sometimes|string',
-            'featured_image_url' => 'nullable|url|max:500',
-            'status'             => 'sometimes|in:draft,published',
+            'featured_image_url' => 'nullable|string|max:500',
+            'status'             => 'sometimes|in:draft,published,pending',
             'published_at'       => 'nullable|date',
             'meta_title'         => 'nullable|string|max:60',
             'meta_description'   => 'nullable|string|max:160',
@@ -98,6 +121,11 @@ class BlogController
 
         if (isset($data['title']) && !isset($data['slug'])) {
             $data['slug'] = Str::slug($data['title']);
+        }
+
+        // Non-super-admin cannot self-publish
+        if (isset($data['status']) && !$this->isSuperAdmin() && $data['status'] === 'published') {
+            $data['status'] = 'pending';
         }
 
         if (isset($data['status']) && $data['status'] === 'published' && empty($post->published_at)) {
@@ -112,7 +140,20 @@ class BlogController
             $post->tags()->sync($tagIds);
         }
 
-        return $this->success($post->fresh()->load('tags:id,name,slug'), 'Post updated');
+        return $this->success($post->fresh()->load(['author:id,name', 'tags:id,name,slug']), 'Post updated');
+    }
+
+    public function approve(int $id): JsonResponse
+    {
+        abort_unless($this->isSuperAdmin(), 403, 'Only super admins can approve posts');
+
+        $post = BlogPost::findOrFail($id);
+        $post->update([
+            'status'       => 'published',
+            'published_at' => $post->published_at ?? now(),
+        ]);
+
+        return $this->success($post->fresh()->load(['author:id,name', 'tags:id,name,slug']), 'Post approved');
     }
 
     public function destroy(int $id): JsonResponse

@@ -1,197 +1,233 @@
 'use client'
 
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
+import Link from 'next/link'
 import {
-  getAdminBlogPosts, getAdminBlogPost, createBlogPost, updateBlogPost,
-  deleteBlogPost, restoreBlogPost, getAdminBlogTags, createBlogTag, deleteBlogTag,
+  getAdminBlogPosts, updateBlogPost, deleteBlogPost, restoreBlogPost,
+  getAdminBlogTags, createBlogTag, deleteBlogTag, approveBlogPost,
 } from '@/lib/api'
 import type { BlogPost, BlogTag } from '@/types'
+import { useAuth } from '@/context/AuthContext'
 import { ConfirmModal } from '@/components/ui/ConfirmModal'
+import { CustomSelect } from '@/components/ui/CustomSelect'
 import { Pagination } from '@/components/ui/Pagination'
+import {
+  IconGrid, IconList, IconPencil, IconTrash, IconRotateCcw,
+  IconExternalLink, IconCalendar, IconEye, IconCheck, IconClock,
+  IconSearch, IconTag,
+} from '@/components/ui/icons'
 
 type Tab = 'posts' | 'tags'
 
+const WEBSITE_URL = process.env.NEXT_PUBLIC_WEBSITE_URL ?? 'http://localhost:3000'
+const VIEW_KEY = 'evoorion_blog_view'
+
 const STATUS_COLORS: Record<string, string> = {
-  published: 'bg-emerald-50 text-emerald-700',
-  draft:     'bg-amber-50 text-amber-700',
+  published: 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400',
+  draft:     'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400',
+  scheduled: 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400',
+  pending:   'bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-400',
 }
+
+const STATUS_OPTIONS = [
+  { value: '',          label: 'All statuses' },
+  { value: 'published', label: 'Published', icon: <IconCheck size={13} /> },
+  { value: 'draft',     label: 'Draft',     icon: <IconPencil size={13} /> },
+  { value: 'scheduled', label: 'Scheduled', icon: <IconClock size={13} /> },
+  { value: 'pending',   label: 'Pending',   icon: <IconClock size={13} /> },
+]
 
 function fmtDate(d: string | null | undefined) {
   if (!d) return '—'
   return new Date(d).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })
 }
 
-function slugify(s: string) {
-  return s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
+function effectiveStatus(post: BlogPost): string {
+  if (post.status === 'published' && post.published_at && new Date(post.published_at) > new Date()) {
+    return 'scheduled'
+  }
+  return post.status
 }
 
-// ── Post Modal ────────────────────────────────────────────────────────────────
+// ── Quick status changer ───────────────────────────────────────────────────────
 
-interface PostModalProps {
-  post?: BlogPost | null
-  tags: BlogTag[]
-  onSave: (data: Partial<BlogPost> & { tag_ids?: number[] }) => Promise<void>
-  onClose: () => void
-}
+function QuickStatus({ post, onChanged, isSuperAdmin }: { post: BlogPost; onChanged: () => void; isSuperAdmin: boolean }) {
+  const [open,   setOpen]   = useState(false)
+  const [saving, setSaving] = useState(false)
+  const ref = useRef<HTMLDivElement>(null)
 
-function PostModal({ post, tags, onSave, onClose }: PostModalProps) {
-  const [title,       setTitle]       = useState(post?.title ?? '')
-  const [slug,        setSlug]        = useState(post?.slug ?? '')
-  const [excerpt,     setExcerpt]     = useState(post?.excerpt ?? '')
-  const [content,     setContent]     = useState(post?.content ?? '')
-  const [imageUrl,    setImageUrl]    = useState(post?.featured_image_url ?? '')
-  const [status,      setStatus]      = useState<'draft' | 'published'>(post?.status ?? 'draft')
-  const [publishedAt, setPublishedAt] = useState(post?.published_at ? post.published_at.slice(0, 10) : '')
-  const [metaTitle,   setMetaTitle]   = useState(post?.meta_title ?? '')
-  const [metaDesc,    setMetaDesc]    = useState(post?.meta_description ?? '')
-  const [selectedTags,setSelectedTags]= useState<number[]>(post?.tags?.map(t => t.id) ?? [])
-  const [autoSlug,    setAutoSlug]    = useState(!post)
-  const [error,       setError]       = useState('')
-  const [saving,      setSaving]      = useState(false)
+  useEffect(() => {
+    function close(e: MouseEvent) {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false)
+    }
+    document.addEventListener('mousedown', close)
+    return () => document.removeEventListener('mousedown', close)
+  }, [])
 
-  function handleTitle(v: string) {
-    setTitle(v)
-    if (autoSlug) setSlug(slugify(v))
-  }
+  const status = effectiveStatus(post)
+  const isDeleted = !!post.deleted_at
+  if (isDeleted) return (
+    <span className="inline-flex px-2 py-0.5 rounded-full text-[11px] font-semibold bg-slate-100 dark:bg-slate-700 text-slate-500">Deleted</span>
+  )
 
-  function toggleTag(id: number) {
-    setSelectedTags(prev =>
-      prev.includes(id) ? prev.filter(t => t !== id) : [...prev, id]
-    )
-  }
+  const canPublish = isSuperAdmin || post.status !== 'draft'
 
-  async function submit() {
-    setError('')
-    if (!title.trim()) { setError('Title is required'); return }
-    if (!content.trim()) { setError('Content is required'); return }
+  async function changeStatus(s: string) {
+    setOpen(false)
     setSaving(true)
     try {
-      await onSave({
-        title:              title.trim(),
-        slug:               slug.trim() || undefined,
-        excerpt:            excerpt.trim() || undefined,
-        content:            content.trim(),
-        featured_image_url: imageUrl.trim() || undefined,
-        status,
-        published_at:       publishedAt || undefined,
-        meta_title:         metaTitle.trim() || undefined,
-        meta_description:   metaDesc.trim() || undefined,
-        tag_ids:            selectedTags,
-      })
-      onClose()
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Save failed')
-    } finally { setSaving(false) }
+      await updateBlogPost(post.id, { status: s as 'draft' | 'published' })
+      onChanged()
+    } catch { /* silent */ }
+    finally { setSaving(false) }
   }
 
-  const inp  = 'w-full px-3.5 py-2.5 rounded-lg border border-slate-200 text-sm focus:outline-none focus:border-[#C9A84C] focus:ring-1 focus:ring-[#C9A84C] bg-white'
-  const sect = 'text-[11px] font-semibold uppercase tracking-widest text-slate-400 mt-5 mb-3 border-b border-slate-100 pb-1'
+  const options = isSuperAdmin
+    ? [{ value: 'draft', label: 'Draft' }, { value: 'published', label: 'Published' }]
+    : [{ value: 'draft', label: 'Draft' }]
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
-      <div className="absolute inset-0 bg-black/50" onClick={onClose} />
-      <div className="relative bg-white rounded-xl shadow-2xl w-full max-w-2xl flex flex-col max-h-[90vh]">
-        <div className="px-6 pt-6 pb-3 border-b border-slate-100">
-          <h3 className="text-base font-semibold text-slate-800">{post ? 'Edit Post' : 'New Post'}</h3>
+    <div ref={ref} className="relative inline-block">
+      <button
+        type="button"
+        onClick={() => canPublish && setOpen(o => !o)}
+        disabled={saving}
+        title={canPublish ? 'Click to change status' : 'Only super admins can publish'}
+        className={`focus:outline-none disabled:opacity-50 ${!canPublish ? 'cursor-default' : ''}`}
+      >
+        <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-semibold capitalize ${STATUS_COLORS[status] ?? 'bg-slate-100 text-slate-600'}`}>
+          {status}
+          {canPublish && <span className="text-[8px] opacity-60">▾</span>}
+        </span>
+      </button>
+      {open && (
+        <div className="absolute z-20 top-full left-0 mt-1 bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-600 shadow-lg overflow-hidden min-w-[120px]">
+          {options.map(o => (
+            <button
+              key={o.value}
+              type="button"
+              onClick={() => changeStatus(o.value)}
+              className={`w-full text-left px-3 py-2 text-xs font-medium transition-colors hover:bg-slate-50 dark:hover:bg-slate-700 ${o.value === post.status ? 'text-[#C9A84C]' : 'text-slate-700 dark:text-slate-200'}`}
+            >
+              {o.label}
+            </button>
+          ))}
         </div>
+      )}
+    </div>
+  )
+}
 
-        <div className="overflow-y-auto px-6 py-4 flex-1 space-y-0">
-          {error && <p className="text-red-500 text-sm mb-3">{error}</p>}
+// ── Post card ─────────────────────────────────────────────────────────────────
 
-          <p className={sect}>Content</p>
-          <div className="space-y-4">
-            <div>
-              <label htmlFor="post-title" className="block text-sm font-medium text-slate-700 mb-1.5">Title <span className="text-red-400">*</span></label>
-              <input id="post-title" type="text" required value={title} onChange={e => handleTitle(e.target.value)} className={inp} />
-            </div>
-            <div>
-              <label htmlFor="post-slug" className="block text-sm font-medium text-slate-700 mb-1.5">Slug</label>
-              <input id="post-slug" type="text" value={slug} onChange={e => { setAutoSlug(false); setSlug(e.target.value) }} className={inp + ' font-mono'} />
-            </div>
-            <div>
-              <label htmlFor="post-excerpt" className="block text-sm font-medium text-slate-700 mb-1.5">Excerpt</label>
-              <textarea id="post-excerpt" rows={2} value={excerpt} onChange={e => setExcerpt(e.target.value)} className={inp + ' resize-none'} />
-            </div>
-            <div>
-              <label htmlFor="post-content" className="block text-sm font-medium text-slate-700 mb-1.5">Content <span className="text-red-400">*</span></label>
-              <textarea id="post-content" rows={10} value={content} onChange={e => setContent(e.target.value)} className={inp + ' resize-none font-mono text-xs'} />
-            </div>
+function PostCard({
+  post, onDelete, onRestore, onRefresh, isSuperAdmin,
+}: {
+  post: BlogPost; onDelete: () => void; onRestore: () => void; onRefresh: () => void; isSuperAdmin: boolean
+}) {
+  const [approving, setApproving] = useState(false)
+  const isDeleted = !!post.deleted_at
+  const status = effectiveStatus(post)
+
+  async function approve() {
+    setApproving(true)
+    try { await approveBlogPost(post.id); onRefresh() }
+    catch { /* silent */ }
+    finally { setApproving(false) }
+  }
+
+  return (
+    <div className={`bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden flex flex-col ${isDeleted ? 'opacity-60' : ''}`}>
+      <div className="h-36 bg-slate-100 dark:bg-slate-700 shrink-0 relative overflow-hidden">
+        {post.featured_image_url ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={post.featured_image_url} alt={post.title} className="w-full h-full object-cover" />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center">
+            <IconFileText size={32} className="text-slate-300 dark:text-slate-600" />
           </div>
-
-          <p className={sect}>Media &amp; Publishing</p>
-          <div className="space-y-4">
-            <div>
-              <label htmlFor="post-image" className="block text-sm font-medium text-slate-700 mb-1.5">Featured Image URL</label>
-              <input id="post-image" type="url" value={imageUrl} onChange={e => setImageUrl(e.target.value)} placeholder="https://…" className={inp} />
-            </div>
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <label htmlFor="post-status" className="block text-sm font-medium text-slate-700 mb-1.5">Status</label>
-                <select id="post-status" value={status} onChange={e => setStatus(e.target.value as 'draft' | 'published')} className={inp}>
-                  <option value="draft">Draft</option>
-                  <option value="published">Published</option>
-                </select>
-              </div>
-              <div>
-                <label htmlFor="post-pub-date" className="block text-sm font-medium text-slate-700 mb-1.5">Publish Date</label>
-                <input id="post-pub-date" type="date" value={publishedAt} onChange={e => setPublishedAt(e.target.value)} className={inp} />
-              </div>
-            </div>
+        )}
+        <div className="absolute top-2 left-2">
+          <QuickStatus post={post} onChanged={onRefresh} isSuperAdmin={isSuperAdmin} />
+        </div>
+        {status === 'scheduled' && (
+          <div className="absolute bottom-2 right-2 bg-blue-600/90 text-white text-[10px] px-2 py-0.5 rounded-full font-medium flex items-center gap-1">
+            <IconCalendar size={10} /> {fmtDate(post.published_at)}
           </div>
-
-          <p className={sect}>Tags</p>
-          <div className="flex flex-wrap gap-2">
-            {tags.length === 0 && <span className="text-slate-400 text-sm">No tags yet.</span>}
-            {tags.map(t => (
-              <button
-                key={t.id}
-                type="button"
-                onClick={() => toggleTag(t.id)}
-                className={`px-3 py-1 rounded-full text-xs font-medium border transition-colors ${
-                  selectedTags.includes(t.id)
-                    ? 'bg-[#C9A84C] border-[#C9A84C] text-slate-900'
-                    : 'border-slate-200 text-slate-600 hover:border-[#C9A84C]'
-                }`}
+        )}
+      </div>
+      <div className="p-4 flex flex-col flex-1">
+        <p className="font-semibold text-slate-800 dark:text-slate-100 line-clamp-2 leading-snug mb-1 text-sm">{post.title}</p>
+        <p className="text-[11px] text-slate-400 font-mono mb-2 truncate">{post.slug}</p>
+        {post.author && <p className="text-xs text-slate-400 dark:text-slate-500 mb-1">by {post.author.name}</p>}
+        <div className="flex items-center gap-2 text-xs text-slate-400 dark:text-slate-500 mt-auto pt-3 border-t border-slate-100 dark:border-slate-700">
+          <IconEye size={12} /> {post.view_count}
+          <span className="ml-auto">{fmtDate(post.published_at)}</span>
+        </div>
+        <div className="flex items-center gap-1 mt-2">
+          {!isDeleted ? (
+            <>
+              {isSuperAdmin && status === 'pending' && (
+                <button
+                  type="button"
+                  onClick={approve}
+                  disabled={approving}
+                  title="Approve post"
+                  className="flex items-center justify-center gap-1 text-xs font-medium text-emerald-600 hover:text-emerald-700 px-2.5 py-1.5 rounded-md hover:bg-emerald-50 dark:hover:bg-emerald-900/20 transition-colors disabled:opacity-50"
+                >
+                  <IconCheck size={12} /> {approving ? '…' : 'Approve'}
+                </button>
+              )}
+              <Link
+                href={`/blog/${post.id}/edit`}
+                title="Edit post"
+                className="flex-1 flex items-center justify-center gap-1 text-xs font-medium text-blue-600 hover:text-blue-700 py-1.5 rounded-md hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors"
               >
-                {t.name}
+                <IconPencil size={12} /> Edit
+              </Link>
+              <a
+                href={`${WEBSITE_URL}/blog/${post.slug}`}
+                target="_blank"
+                rel="noreferrer"
+                title="Live preview"
+                className="p-1.5 rounded-md text-slate-400 hover:text-[#C9A84C] hover:bg-[#C9A84C]/10 transition-colors"
+              >
+                <IconExternalLink size={13} />
+              </a>
+              <button type="button" onClick={onDelete} title="Delete post" className="p-1.5 rounded-md text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors">
+                <IconTrash size={13} />
               </button>
-            ))}
-          </div>
-
-          <p className={sect}>SEO</p>
-          <div className="space-y-4">
-            <div>
-              <label htmlFor="post-meta-title" className="block text-sm font-medium text-slate-700 mb-1.5">Meta Title</label>
-              <input id="post-meta-title" type="text" value={metaTitle} onChange={e => setMetaTitle(e.target.value)} maxLength={60} className={inp} />
-            </div>
-            <div>
-              <label htmlFor="post-meta-desc" className="block text-sm font-medium text-slate-700 mb-1.5">Meta Description</label>
-              <textarea id="post-meta-desc" rows={2} value={metaDesc} onChange={e => setMetaDesc(e.target.value)} maxLength={160} className={inp + ' resize-none'} />
-            </div>
-          </div>
-          <div className="h-4" />
-        </div>
-
-        <div className="flex justify-end gap-3 px-6 py-4 border-t border-slate-100">
-          <button type="button" onClick={onClose} className="px-4 py-2 rounded-lg border border-slate-200 text-slate-700 text-sm font-medium hover:bg-slate-50">Cancel</button>
-          <button type="button" onClick={submit} disabled={saving} className="px-4 py-2 rounded-lg bg-[#C9A84C] hover:bg-[#D4B668] text-slate-900 text-sm font-semibold disabled:opacity-50">
-            {saving ? 'Saving…' : 'Save'}
-          </button>
+            </>
+          ) : (
+            <button type="button" onClick={onRestore} title="Restore post" className="flex-1 flex items-center justify-center gap-1 text-xs font-medium text-emerald-600 py-1.5 rounded-md hover:bg-emerald-50 dark:hover:bg-emerald-900/20 transition-colors">
+              <IconRotateCcw size={12} /> Restore
+            </button>
+          )}
         </div>
       </div>
     </div>
   )
 }
 
+// ── Need this icon ────────────────────────────────────────────────────────────
+function IconFileText(p: { size?: number; className?: string }) {
+  return (
+    <svg width={p.size ?? 18} height={p.size ?? 18} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.75} strokeLinecap="round" strokeLinejoin="round" className={p.className}>
+      <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/>
+      <line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/>
+    </svg>
+  )
+}
+
 // ── Tags Tab ──────────────────────────────────────────────────────────────────
 
 function TagsTab() {
-  const [tags,      setTags]      = useState<BlogTag[]>([])
-  const [loading,   setLoading]   = useState(true)
-  const [newName,   setNewName]   = useState('')
-  const [adding,    setAdding]    = useState(false)
-  const [toDelete,  setToDelete]  = useState<BlogTag | null>(null)
-  const [acting,    setActing]    = useState(false)
+  const [tags,     setTags]     = useState<BlogTag[]>([])
+  const [loading,  setLoading]  = useState(true)
+  const [newName,  setNewName]  = useState('')
+  const [adding,   setAdding]   = useState(false)
+  const [toDelete, setToDelete] = useState<BlogTag | null>(null)
+  const [acting,   setActing]   = useState(false)
 
   function load() {
     setLoading(true)
@@ -202,7 +238,9 @@ function TagsTab() {
   async function addTag() {
     if (!newName.trim()) return
     setAdding(true)
-    try { await createBlogTag({ name: newName.trim() }); setNewName(''); load() }
+    try {
+      await createBlogTag({ name: newName.trim() }); setNewName(''); load()
+    }
     catch (err) { alert(err instanceof Error ? err.message : 'Failed') }
     finally { setAdding(false) }
   }
@@ -218,47 +256,57 @@ function TagsTab() {
   return (
     <div className="space-y-4">
       <div className="flex gap-3">
-        <input
-          type="text"
-          placeholder="New tag name…"
-          value={newName}
-          onChange={e => setNewName(e.target.value)}
-          onKeyDown={e => e.key === 'Enter' && addTag()}
-          className="px-3.5 py-2 rounded-lg border border-slate-200 text-sm w-64 focus:outline-none focus:border-[#C9A84C]"
-        />
+        <div className="relative flex-1 max-w-xs">
+          <IconTag size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+          <input
+            type="text"
+            placeholder="New tag name…"
+            value={newName}
+            onChange={e => setNewName(e.target.value)}
+            onKeyDown={e => e.key === 'Enter' && addTag()}
+            className="w-full pl-8 pr-3.5 py-2 rounded-lg border border-slate-200 dark:border-slate-600 text-sm focus:outline-none focus:border-[#C9A84C] bg-white dark:bg-slate-800 dark:text-slate-100 placeholder-slate-400"
+          />
+        </div>
         <button type="button" onClick={addTag} disabled={adding || !newName.trim()} className="px-4 py-2 rounded-lg bg-[#C9A84C] hover:bg-[#D4B668] text-slate-900 text-sm font-semibold disabled:opacity-50">
           {adding ? 'Adding…' : 'Add Tag'}
         </button>
       </div>
 
-      <div className="bg-white rounded-xl border border-slate-200 overflow-hidden">
+      <div className="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden">
         <table className="w-full text-sm">
           <thead>
-            <tr className="bg-slate-50 border-b border-slate-100">
-              <th className="px-5 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Name</th>
-              <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Slug</th>
-              <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Posts</th>
-              <th className="px-5 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Actions</th>
+            <tr className="bg-slate-50 dark:bg-slate-700/50 border-b border-slate-100 dark:border-slate-700">
+              <th className="px-5 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Name</th>
+              <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Slug</th>
+              <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Posts</th>
+              <th className="px-5 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Actions</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-slate-100">
+          <tbody className="divide-y divide-slate-100 dark:divide-slate-700">
             {loading ? (
               Array.from({ length: 4 }).map((_, i) => (
                 <tr key={i} className="animate-pulse">
                   {Array.from({ length: 4 }).map((__, j) => (
-                    <td key={j} className="px-5 py-3.5"><div className="h-3.5 bg-slate-100 rounded w-24" /></td>
+                    <td key={j} className="px-5 py-3.5"><div className="h-3.5 bg-slate-100 dark:bg-slate-700 rounded w-24" /></td>
                   ))}
                 </tr>
               ))
             ) : tags.length === 0 ? (
               <tr><td colSpan={4} className="px-5 py-8 text-center text-slate-400">No tags yet.</td></tr>
             ) : tags.map(t => (
-              <tr key={t.id} className="hover:bg-slate-50">
-                <td className="px-5 py-3.5 font-medium text-slate-800">{t.name}</td>
-                <td className="px-4 py-3.5 text-slate-400 font-mono text-xs">{t.slug}</td>
-                <td className="px-4 py-3.5 text-slate-500 text-xs">{t.posts_count ?? 0}</td>
+              <tr key={t.id} className="hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors">
                 <td className="px-5 py-3.5">
-                  <button type="button" onClick={() => setToDelete(t)} className="text-xs text-red-500 hover:text-red-600 font-medium">Delete</button>
+                  <div className="flex items-center gap-2">
+                    <IconTag size={13} className="text-slate-400 dark:text-slate-500" />
+                    <span className="font-medium text-slate-800 dark:text-slate-100">{t.name}</span>
+                  </div>
+                </td>
+                <td className="px-4 py-3.5 text-slate-400 dark:text-slate-500 font-mono text-xs">{t.slug}</td>
+                <td className="px-4 py-3.5 text-slate-500 dark:text-slate-400 text-xs">{t.posts_count ?? 0}</td>
+                <td className="px-5 py-3.5">
+                  <button type="button" onClick={() => setToDelete(t)} title="Delete tag" className="p-1.5 rounded-md text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors">
+                    <IconTrash size={14} />
+                  </button>
                 </td>
               </tr>
             ))}
@@ -281,51 +329,45 @@ function TagsTab() {
 
 // ── Posts Tab ─────────────────────────────────────────────────────────────────
 
-function PostsTab({ tags }: { tags: BlogTag[] }) {
+function PostsTab({ isSuperAdmin }: { isSuperAdmin: boolean }) {
   const [posts,     setPosts]     = useState<BlogPost[]>([])
   const [loading,   setLoading]   = useState(true)
   const [page,      setPage]      = useState(1)
   const [lastPage,  setLastPage]  = useState(1)
+  const [total,     setTotal]     = useState(0)
   const [search,    setSearch]    = useState('')
   const [statusF,   setStatusF]   = useState('')
-  const [editing,   setEditing]   = useState<BlogPost | null | undefined>(undefined)
-  const [loadingPost, setLoadingPost] = useState(false)
+  const [view,      setView]      = useState<'table' | 'cards'>('table')
   const [toDelete,  setToDelete]  = useState<BlogPost | null>(null)
   const [toRestore, setToRestore] = useState<BlogPost | null>(null)
   const [acting,    setActing]    = useState(false)
 
+  useEffect(() => {
+    const stored = localStorage.getItem(VIEW_KEY)
+    if (stored === 'table' || stored === 'cards') setView(stored as 'table' | 'cards')
+  }, [])
+
+  function toggleView(v: 'table' | 'cards') { setView(v); localStorage.setItem(VIEW_KEY, v) }
+
   const load = useCallback(() => {
     setLoading(true)
     const params: Parameters<typeof getAdminBlogPosts>[0] = { page, per_page: 15 }
-    if (search)  params.search  = search
-    if (statusF) params.status  = statusF
+    if (search)  params.search = search
+    if (statusF) params.status = statusF
     getAdminBlogPosts(params)
       .then(res => {
         setPosts(res.data ?? [])
         const meta = res.meta?.pagination
-        if (meta) setLastPage(meta.last_page)
+        if (meta) { setLastPage(meta.last_page); setTotal(meta.total) }
       })
       .finally(() => setLoading(false))
   }, [page, search, statusF])
 
   useEffect(load, [load])
 
-  async function openEdit(post: BlogPost) {
-    setLoadingPost(true)
-    try {
-      const res = await getAdminBlogPost(post.id)
-      setEditing(res.data)
-    } catch { setEditing(post) }
-    finally { setLoadingPost(false) }
-  }
-
-  async function handleSave(data: Partial<BlogPost> & { tag_ids?: number[] }) {
-    if (editing && editing.id) {
-      await updateBlogPost(editing.id, data)
-    } else {
-      await createBlogPost(data)
-    }
-    load()
+  async function handleApprove(post: BlogPost) {
+    try { await approveBlogPost(post.id); load() }
+    catch (err) { alert(err instanceof Error ? err.message : 'Approve failed') }
   }
 
   async function confirmDelete() {
@@ -346,112 +388,165 @@ function PostsTab({ tags }: { tags: BlogTag[] }) {
 
   return (
     <div className="space-y-4">
+      {/* Toolbar */}
       <div className="flex items-center gap-3 flex-wrap">
-        <input
-          type="search"
-          placeholder="Search posts…"
-          value={search}
-          onChange={e => { setSearch(e.target.value); setPage(1) }}
-          className="px-3.5 py-2 rounded-lg border border-slate-200 text-sm w-64 focus:outline-none focus:border-[#C9A84C]"
-        />
-        <select
-          value={statusF}
-          onChange={e => { setStatusF(e.target.value); setPage(1) }}
-          className="px-3.5 py-2 rounded-lg border border-slate-200 text-sm bg-white focus:outline-none focus:border-[#C9A84C]"
-        >
-          <option value="">All statuses</option>
-          <option value="published">Published</option>
-          <option value="draft">Draft</option>
-        </select>
-        <button
-          type="button"
-          onClick={() => setEditing(null)}
-          disabled={loadingPost}
-          className="ml-auto px-4 py-2 rounded-lg bg-[#C9A84C] hover:bg-[#D4B668] text-slate-900 font-semibold text-sm disabled:opacity-50"
+        <div className="relative">
+          <IconSearch size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+          <input
+            type="search"
+            placeholder="Search posts…"
+            value={search}
+            onChange={e => { setSearch(e.target.value); setPage(1) }}
+            className="pl-8 pr-3.5 py-2 rounded-lg border border-slate-200 dark:border-slate-600 text-sm w-56 focus:outline-none focus:border-[#C9A84C] bg-white dark:bg-slate-800 dark:text-slate-100 placeholder-slate-400"
+          />
+        </div>
+        <div className="w-44">
+          <CustomSelect value={statusF} onChange={v => { setStatusF(v); setPage(1) }} options={STATUS_OPTIONS} placeholder="All statuses" />
+        </div>
+
+        {/* View toggle */}
+        <div className="flex items-center gap-1 p-1 bg-slate-100 dark:bg-slate-700 rounded-lg">
+          <button type="button" onClick={() => toggleView('table')} title="Table view"
+            className={`p-1.5 rounded-md transition-colors ${view === 'table' ? 'bg-white dark:bg-slate-600 text-slate-800 dark:text-slate-100 shadow-sm' : 'text-slate-400'}`}>
+            <IconList size={15} />
+          </button>
+          <button type="button" onClick={() => toggleView('cards')} title="Cards view"
+            className={`p-1.5 rounded-md transition-colors ${view === 'cards' ? 'bg-white dark:bg-slate-600 text-slate-800 dark:text-slate-100 shadow-sm' : 'text-slate-400'}`}>
+            <IconGrid size={15} />
+          </button>
+        </div>
+
+        <Link
+          href="/blog/new"
+          className="ml-auto px-4 py-2 rounded-lg bg-[#C9A84C] hover:bg-[#D4B668] text-slate-900 font-semibold text-sm transition-colors"
         >
           + New Post
-        </button>
+        </Link>
       </div>
 
-      <div className="bg-white rounded-xl border border-slate-200 overflow-hidden">
-        <table className="w-full text-sm">
-          <thead>
-            <tr className="bg-slate-50 border-b border-slate-100">
-              <th className="px-5 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Title</th>
-              <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Status</th>
-              <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Published</th>
-              <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Views</th>
-              <th className="px-5 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Actions</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-slate-100">
-            {loading ? (
-              Array.from({ length: 6 }).map((_, i) => (
-                <tr key={i} className="animate-pulse">
-                  {Array.from({ length: 5 }).map((__, j) => (
-                    <td key={j} className="px-5 py-3.5"><div className="h-3.5 bg-slate-100 rounded w-28" /></td>
-                  ))}
-                </tr>
-              ))
-            ) : posts.length === 0 ? (
-              <tr><td colSpan={5} className="px-5 py-8 text-center text-slate-400">No posts found.</td></tr>
-            ) : posts.map(p => {
-              const isDeleted = !!p.deleted_at
-              return (
-                <tr key={p.id} className={`hover:bg-slate-50 ${isDeleted ? 'opacity-60' : ''}`}>
-                  <td className="px-5 py-3.5">
-                    <p className="font-medium text-slate-800 truncate max-w-xs">{p.title}</p>
-                    <p className="text-xs text-slate-400 font-mono">{p.slug}</p>
-                  </td>
-                  <td className="px-4 py-3.5">
-                    <span className={`inline-flex px-2 py-0.5 rounded-full text-[11px] font-semibold capitalize ${STATUS_COLORS[p.status] ?? 'bg-slate-100 text-slate-600'}`}>
-                      {isDeleted ? 'Deleted' : p.status}
-                    </span>
-                  </td>
-                  <td className="px-4 py-3.5 text-slate-500 text-xs">{fmtDate(p.published_at)}</td>
-                  <td className="px-4 py-3.5 text-slate-500 text-xs">{p.view_count.toLocaleString()}</td>
-                  <td className="px-5 py-3.5">
-                    <div className="flex gap-2">
-                      {!isDeleted ? (
-                        <>
-                          <button type="button" onClick={() => openEdit(p)} disabled={loadingPost} className="text-xs text-blue-600 hover:text-blue-700 font-medium disabled:opacity-50">Edit</button>
-                          <span className="text-slate-200">|</span>
-                          <button type="button" onClick={() => setToDelete(p)} className="text-xs text-red-500 hover:text-red-600 font-medium">Delete</button>
-                        </>
-                      ) : (
-                        <button type="button" onClick={() => setToRestore(p)} className="text-xs text-emerald-600 hover:text-emerald-700 font-medium">Restore</button>
-                      )}
-                    </div>
-                  </td>
-                </tr>
-              )
-            })}
-          </tbody>
-        </table>
-      </div>
-
-      {lastPage > 1 && <Pagination page={page} lastPage={lastPage} onPage={setPage} />}
-
-      {editing !== undefined && (
-        <PostModal post={editing} tags={tags} onSave={handleSave} onClose={() => setEditing(undefined)} />
+      {/* ── Table view ── */}
+      {view === 'table' && (
+        <div className="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="bg-slate-50 dark:bg-slate-700/50 border-b border-slate-100 dark:border-slate-700">
+                <th className="px-5 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Title</th>
+                <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Status</th>
+                <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Published</th>
+                <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Views</th>
+                <th className="px-5 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Actions</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-100 dark:divide-slate-700">
+              {loading ? (
+                Array.from({ length: 6 }).map((_, i) => (
+                  <tr key={i} className="animate-pulse">
+                    {Array.from({ length: 5 }).map((__, j) => (
+                      <td key={j} className="px-5 py-3.5"><div className="h-3.5 bg-slate-100 dark:bg-slate-700 rounded w-28" /></td>
+                    ))}
+                  </tr>
+                ))
+              ) : posts.length === 0 ? (
+                <tr><td colSpan={5} className="px-5 py-8 text-center text-slate-400">No posts found.</td></tr>
+              ) : posts.map(p => {
+                const isDeleted = !!p.deleted_at
+                const pStatus = effectiveStatus(p)
+                return (
+                  <tr key={p.id} className={`hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors ${isDeleted ? 'opacity-60' : ''}`}>
+                    <td className="px-5 py-3.5">
+                      <p className="font-medium text-slate-800 dark:text-slate-100 truncate max-w-xs">{p.title}</p>
+                      <p className="text-xs text-slate-400 font-mono">{p.slug}</p>
+                    </td>
+                    <td className="px-4 py-3.5">
+                      <QuickStatus post={p} onChanged={load} isSuperAdmin={isSuperAdmin} />
+                    </td>
+                    <td className="px-4 py-3.5 text-slate-500 dark:text-slate-400 text-xs">{fmtDate(p.published_at)}</td>
+                    <td className="px-4 py-3.5 text-slate-500 dark:text-slate-400 text-xs">{p.view_count.toLocaleString()}</td>
+                    <td className="px-5 py-3.5">
+                      <div className="flex items-center gap-1">
+                        {!isDeleted ? (
+                          <>
+                            {isSuperAdmin && pStatus === 'pending' && (
+                              <button
+                                type="button"
+                                onClick={() => handleApprove(p)}
+                                title="Approve post"
+                                className="p-1.5 rounded-md text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 transition-colors"
+                              >
+                                <IconCheck size={14} />
+                              </button>
+                            )}
+                            <Link
+                              href={`/blog/${p.id}/edit`}
+                              title="Edit post"
+                              className="p-1.5 rounded-md text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors"
+                            >
+                              <IconPencil size={14} />
+                            </Link>
+                            <a href={`${WEBSITE_URL}/blog/${p.slug}`} target="_blank" rel="noreferrer" title="Live preview"
+                              className="p-1.5 rounded-md text-slate-400 hover:text-[#C9A84C] hover:bg-[#C9A84C]/10 transition-colors">
+                              <IconExternalLink size={14} />
+                            </a>
+                            <button type="button" onClick={() => setToDelete(p)} title="Delete post"
+                              className="p-1.5 rounded-md text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors">
+                              <IconTrash size={14} />
+                            </button>
+                          </>
+                        ) : (
+                          <button type="button" onClick={() => setToRestore(p)} title="Restore post"
+                            className="p-1.5 rounded-md text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 transition-colors">
+                            <IconRotateCcw size={14} />
+                          </button>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                )
+              })}
+            </tbody>
+          </table>
+        </div>
       )}
+
+      {/* ── Cards view ── */}
+      {view === 'cards' && (
+        loading ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+            {Array.from({ length: 8 }).map((_, i) => (
+              <div key={i} className="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 animate-pulse">
+                <div className="h-36 bg-slate-100 dark:bg-slate-700 rounded-t-xl" />
+                <div className="p-4 space-y-2">
+                  <div className="h-4 bg-slate-100 dark:bg-slate-700 rounded w-3/4" />
+                  <div className="h-3 bg-slate-100 dark:bg-slate-700 rounded w-full" />
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : posts.length === 0 ? (
+          <div className="py-16 text-center text-slate-400">No posts found.</div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+            {posts.map(p => (
+              <PostCard
+                key={p.id}
+                post={p}
+                isSuperAdmin={isSuperAdmin}
+                onDelete={() => setToDelete(p)}
+                onRestore={() => setToRestore(p)}
+                onRefresh={load}
+              />
+            ))}
+          </div>
+        )
+      )}
+
+      {lastPage > 1 && <Pagination currentPage={page} lastPage={lastPage} total={total} perPage={15} onPage={setPage} />}
+
       {toDelete && (
-        <ConfirmModal
-          title="Delete post"
-          message={`Delete "${toDelete.title}"?`}
-          onConfirm={confirmDelete}
-          onCancel={() => setToDelete(null)}
-          loading={acting}
-        />
+        <ConfirmModal title="Delete post" message={`Delete "${toDelete.title}"?`} onConfirm={confirmDelete} onCancel={() => setToDelete(null)} loading={acting} />
       )}
       {toRestore && (
-        <ConfirmModal
-          title="Restore post"
-          message={`Restore "${toRestore.title}"?`}
-          onConfirm={confirmRestore}
-          onCancel={() => setToRestore(null)}
-          loading={acting}
-        />
+        <ConfirmModal title="Restore post" message={`Restore "${toRestore.title}"?`} onConfirm={confirmRestore} onCancel={() => setToRestore(null)} loading={acting} danger={false} />
       )}
     </div>
   )
@@ -460,28 +555,25 @@ function PostsTab({ tags }: { tags: BlogTag[] }) {
 // ── Page ──────────────────────────────────────────────────────────────────────
 
 export default function BlogPage() {
-  const [tab,  setTab]  = useState<Tab>('posts')
-  const [tags, setTags] = useState<BlogTag[]>([])
-
-  useEffect(() => {
-    getAdminBlogTags().then(res => setTags(res.data ?? []))
-  }, [])
+  const { user: me } = useAuth()
+  const [tab, setTab] = useState<Tab>('posts')
+  const isSuperAdmin = me?.role === 'super_admin'
 
   const tabCls = (t: Tab) =>
     `px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
       tab === t
         ? 'bg-[#C9A84C] text-slate-900'
-        : 'text-slate-600 hover:bg-slate-100'
+        : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700'
     }`
 
   return (
-    <div className="space-y-4 max-w-5xl">
+    <div className="space-y-4">
       <div className="flex gap-2">
         <button type="button" className={tabCls('posts')} onClick={() => setTab('posts')}>Posts</button>
         <button type="button" className={tabCls('tags')}  onClick={() => setTab('tags')}>Tags</button>
       </div>
 
-      {tab === 'posts' && <PostsTab tags={tags} />}
+      {tab === 'posts' && <PostsTab isSuperAdmin={isSuperAdmin} />}
       {tab === 'tags'  && <TagsTab />}
     </div>
   )

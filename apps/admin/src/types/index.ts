@@ -46,12 +46,25 @@ export interface AgentPerformance {
 export type PropertyType   = 'villa' | 'apartment' | 'penthouse' | 'townhouse' | 'commercial'
 export type PropertyStatus = 'available' | 'sold' | 'rented'
 
+export type AreaStatus = 'active' | 'inactive'
+
+export interface AreaMediaItem {
+  url: string
+  type: 'image' | 'video' | 'file'
+  caption?: string
+  order?: number
+  is_primary?: boolean
+  file_name?: string
+}
+
 export interface Area {
   id: number
   name: string
   slug: string
+  status?: AreaStatus
   description?: string | null
   hero_image_url?: string | null
+  gallery?: AreaMediaItem[] | null
   latitude?: number | null
   longitude?: number | null
   long_term_roi?: number | null
@@ -69,10 +82,34 @@ export interface PriceRange {
   max: number
 }
 
+// ── Currencies / Languages ─────────────────────────────────────────────────────
+
+export interface Currency {
+  id: number
+  code: string
+  name: string
+  symbol: string
+  is_active: boolean
+  is_default: boolean
+  sort_order: number
+}
+
+export interface Language {
+  id: number
+  code: string
+  name: string
+  native_name: string
+  direction: 'ltr' | 'rtl'
+  is_active: boolean
+  is_default: boolean
+  sort_order: number
+}
+
 export interface Developer {
   id: number
   name: string
   slug: string
+  email?: string | null
   logo_url?: string
 }
 
@@ -108,6 +145,7 @@ export interface Property {
   bedrooms?: number | null
   bathrooms?: number | null
   is_featured: boolean
+  is_active: boolean
   roi_min?: string | number | null
   roi_max?: string | number | null
   views_count: number
@@ -145,8 +183,8 @@ export interface Lead {
   message?: string
   assigned_to?: number | null
   property_id?: number | null
-  property?: Pick<Property, 'id' | 'slug' | 'title'>
-  assignee?: Pick<AuthUser, 'id' | 'name' | 'email'>
+  property?: Pick<Property, 'id' | 'slug' | 'title' | 'type' | 'status' | 'price' | 'currency' | 'bedrooms' | 'bathrooms' | 'location' | 'area_sqft'> & { images?: PropertyImage[]; area?: Area }
+  assigned_user?: Pick<AuthUser, 'id' | 'name' | 'email'>
   created_at: string
   updated_at: string
 }
@@ -154,8 +192,8 @@ export interface Lead {
 export interface LeadNote {
   id: number
   note: string
-  created_by: number
-  author?: Pick<AuthUser, 'id' | 'name'>
+  user_id: number
+  user?: Pick<AuthUser, 'id' | 'name'>
   created_at: string
 }
 
@@ -163,10 +201,12 @@ export interface LeadTask {
   id: number
   lead_id: number
   title: string
+  notes?: string | null
   due_date?: string | null
   completed: boolean
   completed_at?: string | null
   created_at: string
+  user?: Pick<AuthUser, 'id' | 'name'>
 }
 
 // ── Agencies / Agents ─────────────────────────────────────────────────────────
@@ -188,6 +228,7 @@ export interface Agent {
   agency_id?: number | null
   phone?: string | null
   whatsapp?: string | null
+  avatar_url?: string | null
   user?: AuthUser
   agency?: Agency
   deleted_at?: string | null
@@ -207,7 +248,7 @@ export interface AdminUser {
 
 // ── Blog ──────────────────────────────────────────────────────────────────────
 
-export type BlogStatus = 'draft' | 'published'
+export type BlogStatus = 'draft' | 'published' | 'pending'
 
 export interface BlogTag {
   id: number

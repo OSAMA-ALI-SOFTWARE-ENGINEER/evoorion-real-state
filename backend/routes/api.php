@@ -14,7 +14,10 @@ use App\Http\Controllers\Api\V1\Admin\UserController;
 use App\Http\Controllers\Api\V1\Admin\PropertyController as AdminPropertyController;
 use App\Http\Controllers\Api\V1\Admin\PropertyImageController;
 use App\Http\Controllers\Api\V1\Admin\AreaController as AdminAreaController;
+use App\Http\Controllers\Api\V1\Admin\CurrencyController;
+use App\Http\Controllers\Api\V1\Admin\LanguageController;
 use App\Http\Controllers\Api\V1\Admin\DeveloperController as AdminDeveloperController;
+use App\Http\Controllers\Api\V1\Admin\MediaController;
 use App\Http\Controllers\Api\V1\Admin\OperationTypeController as AdminOperationTypeController;
 use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\BlogController;
@@ -30,6 +33,7 @@ use App\Http\Controllers\Api\V1\PropertyController;
 use App\Http\Controllers\Api\V1\AreaController;
 use App\Http\Controllers\Api\V1\DeveloperController;
 use App\Http\Controllers\Api\V1\OperationTypeController;
+use App\Http\Controllers\Api\V1\PublicSettingController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')->group(function () {
@@ -40,6 +44,8 @@ Route::prefix('v1')->group(function () {
         Route::middleware('auth:sanctum')->group(function () {
             Route::post('logout', [AuthController::class, 'logout']);
             Route::get('me', [AuthController::class, 'me']);
+            Route::put('profile', [AuthController::class, 'updateProfile']);
+            Route::post('change-password', [AuthController::class, 'changePassword']);
         });
 
         Route::post('forgot-password', [PasswordResetController::class, 'forgotPassword']);
@@ -51,6 +57,9 @@ Route::prefix('v1')->group(function () {
         // Exchange a one-time 30s code (from OAuth redirect) for the actual bearer token
         Route::post('social/exchange', [SocialAuthController::class, 'exchange']);
     });
+
+    // Public settings (contact info, social links, hours)
+    Route::middleware('throttle:60,1')->get('settings', [PublicSettingController::class, 'index']);
 
     // Public master data endpoints (rate-limited)
     Route::middleware('throttle:120,1')->group(function () {
@@ -175,8 +184,13 @@ Route::prefix('v1')->group(function () {
             Route::delete('users/{user}', [UserController::class, 'destroy']);
             Route::post('users/{id}/restore', [UserController::class, 'restore']);
 
+            // Media upload
+            Route::post('media/upload', [MediaController::class, 'upload']);
+
             // Master data endpoints
             Route::resource('areas', AdminAreaController::class);
+            Route::apiResource('currencies', CurrencyController::class)->except(['show']);
+            Route::apiResource('languages', LanguageController::class)->except(['show']);
             Route::resource('developers', AdminDeveloperController::class);
             Route::resource('operation-types', AdminOperationTypeController::class);
 
@@ -200,6 +214,7 @@ Route::prefix('v1')->group(function () {
             Route::put('blog/{id}',            [AdminBlogController::class, 'update']);
             Route::delete('blog/{id}',         [AdminBlogController::class, 'destroy']);
             Route::post('blog/{id}/restore',   [AdminBlogController::class, 'restore']);
+            Route::post('blog/{id}/approve',   [AdminBlogController::class, 'approve']);
             Route::get('blog-tags',            [AdminBlogController::class, 'tags']);
             Route::post('blog-tags',           [AdminBlogController::class, 'storeTag']);
             Route::put('blog-tags/{tag}',      [AdminBlogController::class, 'updateTag']);
