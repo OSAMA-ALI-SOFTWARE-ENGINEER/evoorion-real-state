@@ -49,7 +49,7 @@ class BlogController
             'excerpt'            => 'nullable|string',
             'content'            => 'required|string',
             'featured_image_url' => 'nullable|string|max:500',
-            'status'             => 'required|in:draft,published,pending',
+            'status'             => 'required|in:draft,published,pending,archived',
             'published_at'       => 'nullable|date',
             'meta_title'         => 'nullable|string|max:60',
             'meta_description'   => 'nullable|string|max:160',
@@ -110,7 +110,7 @@ class BlogController
             'excerpt'            => 'nullable|string',
             'content'            => 'sometimes|string',
             'featured_image_url' => 'nullable|string|max:500',
-            'status'             => 'sometimes|in:draft,published,pending',
+            'status'             => 'sometimes|in:draft,published,pending,archived',
             'published_at'       => 'nullable|date',
             'meta_title'         => 'nullable|string|max:60',
             'meta_description'   => 'nullable|string|max:160',
@@ -123,8 +123,8 @@ class BlogController
             $data['slug'] = Str::slug($data['title']);
         }
 
-        // Non-super-admin cannot self-publish
-        if (isset($data['status']) && !$this->isSuperAdmin() && $data['status'] === 'published') {
+        // Non-super-admin cannot self-publish or restore archived posts; archiving is allowed
+        if (isset($data['status']) && !$this->isSuperAdmin() && in_array($data['status'], ['published', 'draft'])) {
             $data['status'] = 'pending';
         }
 

@@ -6,7 +6,7 @@ import {
   getAdminBlogPosts, updateBlogPost, deleteBlogPost, restoreBlogPost,
   getAdminBlogTags, createBlogTag, deleteBlogTag, approveBlogPost,
 } from '@/lib/api'
-import type { BlogPost, BlogTag } from '@/types'
+import type { BlogPost, BlogTag, BlogStatus } from '@/types'
 import { useAuth } from '@/context/AuthContext'
 import { ConfirmModal } from '@/components/ui/ConfirmModal'
 import { CustomSelect } from '@/components/ui/CustomSelect'
@@ -27,6 +27,7 @@ const STATUS_COLORS: Record<string, string> = {
   draft:     'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400',
   scheduled: 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400',
   pending:   'bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-400',
+  archived:  'bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-400',
 }
 
 const STATUS_OPTIONS = [
@@ -35,6 +36,7 @@ const STATUS_OPTIONS = [
   { value: 'draft',     label: 'Draft',     icon: <IconPencil size={13} /> },
   { value: 'scheduled', label: 'Scheduled', icon: <IconClock size={13} /> },
   { value: 'pending',   label: 'Pending',   icon: <IconClock size={13} /> },
+  { value: 'archived',  label: 'Archived',  icon: <IconTrash size={13} /> },
 ]
 
 function fmtDate(d: string | null | undefined) {
@@ -70,34 +72,58 @@ function QuickStatus({ post, onChanged, isSuperAdmin }: { post: BlogPost; onChan
     <span className="inline-flex px-2 py-0.5 rounded-full text-[11px] font-semibold bg-slate-100 dark:bg-slate-700 text-slate-500">Deleted</span>
   )
 
-  const canPublish = isSuperAdmin || post.status !== 'draft'
+  // Status transition rules:
+  //   published  → archived only (no unpublishing to draft)
+  //   archived   → published or draft (super_admin only)
+  //   pending    → published or draft (super_admin only)
+  //   draft      → published (super_admin only)
+  const options: { value: string; label: string }[] = (() => {
+    if (status === 'published') {
+      return [{ value: 'archived', label: 'Archive' }]
+    }
+    if (status === 'archived') {
+      if (!isSuperAdmin) return []
+      return [
+        { value: 'published', label: 'Re-publish' },
+        { value: 'draft',     label: 'Restore to Draft' },
+      ]
+    }
+    if (status === 'pending') {
+      if (!isSuperAdmin) return []
+      return [
+        { value: 'published', label: 'Publish' },
+        { value: 'draft',     label: 'Move to Draft' },
+      ]
+    }
+    // draft
+    if (!isSuperAdmin) return []
+    return [{ value: 'published', label: 'Publish' }]
+  })()
+
+  const canChange = options.length > 0
 
   async function changeStatus(s: string) {
     setOpen(false)
     setSaving(true)
     try {
-      await updateBlogPost(post.id, { status: s as 'draft' | 'published' })
+      await updateBlogPost(post.id, { status: s as BlogStatus })
       onChanged()
     } catch { /* silent */ }
     finally { setSaving(false) }
   }
 
-  const options = isSuperAdmin
-    ? [{ value: 'draft', label: 'Draft' }, { value: 'published', label: 'Published' }]
-    : [{ value: 'draft', label: 'Draft' }]
-
   return (
     <div ref={ref} className="relative inline-block">
       <button
         type="button"
-        onClick={() => canPublish && setOpen(o => !o)}
+        onClick={() => canChange && setOpen(o => !o)}
         disabled={saving}
-        title={canPublish ? 'Click to change status' : 'Only super admins can publish'}
-        className={`focus:outline-none disabled:opacity-50 ${!canPublish ? 'cursor-default' : ''}`}
+        title={canChange ? 'Click to change status' : undefined}
+        className={`focus:outline-none disabled:opacity-50 ${!canChange ? 'cursor-default' : ''}`}
       >
         <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-semibold capitalize ${STATUS_COLORS[status] ?? 'bg-slate-100 text-slate-600'}`}>
           {status}
-          {canPublish && <span className="text-[8px] opacity-60">▾</span>}
+          {canChange && <span className="text-[8px] opacity-60">▾</span>}
         </span>
       </button>
       {open && (

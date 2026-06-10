@@ -248,7 +248,7 @@ export interface AdminUser {
 
 // ── Blog ──────────────────────────────────────────────────────────────────────
 
-export type BlogStatus = 'draft' | 'published' | 'pending'
+export type BlogStatus = 'draft' | 'published' | 'pending' | 'archived'
 
 export interface BlogTag {
   id: number

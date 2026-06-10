@@ -29,6 +29,8 @@ export function BlogPostForm({ post, initialTags }: Props) {
   const [content,     setContent]     = useState(post?.content ?? '')
   const [imageUrl,    setImageUrl]    = useState(post?.featured_image_url ?? '')
   const [status,      setStatus]      = useState<BlogStatus>(post?.status ?? 'draft')
+  // Sync status if post loads after initial render (edit mode)
+  useEffect(() => { if (post?.status) setStatus(post.status) }, [post?.status])
   const [publishedAt, setPublishedAt] = useState(
     post?.published_at ? post.published_at.slice(0, 10) : ''
   )
@@ -82,7 +84,17 @@ export function BlogPostForm({ post, initialTags }: Props) {
     } finally { setAddingTag(false) }
   }
 
-  const effectiveStatus: BlogStatus = isSuperAdmin ? status : 'draft'
+  // Non-super-admin can archive a published post but cannot self-publish or restore
+  const effectiveStatus: BlogStatus = isSuperAdmin
+    ? status
+    : status === 'archived' ? 'archived' : 'draft'
+
+  // Status options depend on the current saved post status
+  const statusOptions: BlogStatus[] = (() => {
+    const saved = post?.status
+    if (saved === 'published' || saved === 'archived') return ['published', 'archived']
+    return ['draft', 'published']
+  })()
 
   // Determine if post will be scheduled
   const willSchedule = effectiveStatus === 'published' && publishedAt
@@ -161,7 +173,9 @@ export function BlogPostForm({ post, initialTags }: Props) {
             disabled={saving}
             className="px-5 py-2 rounded-lg bg-[#C9A84C] hover:bg-[#D4B668] text-slate-900 text-sm font-semibold disabled:opacity-50 transition-colors"
           >
-            {saving ? 'Saving…' : post ? 'Update Post' : (isSuperAdmin ? 'Publish' : 'Submit for Review')}
+            {saving ? 'Saving…' : post
+              ? (effectiveStatus === 'archived' && post.status !== 'archived' ? 'Archive Post' : 'Update Post')
+              : (isSuperAdmin ? 'Publish' : 'Submit for Review')}
           </button>
         </div>
       </div>
@@ -251,8 +265,8 @@ export function BlogPostForm({ post, initialTags }: Props) {
               <p className={lbl}>Publishing</p>
               <div>
                 <label className={lbl}>Status</label>
-                <div className="grid grid-cols-3 gap-1.5">
-                  {(['draft', 'published'] as BlogStatus[]).map(s => (
+                <div className="grid grid-cols-2 gap-1.5">
+                  {statusOptions.map(s => (
                     <button
                       key={s}
                       type="button"
@@ -263,7 +277,7 @@ export function BlogPostForm({ post, initialTags }: Props) {
                           : 'border-slate-200 dark:border-slate-600 text-slate-600 dark:text-slate-300 hover:border-slate-300'
                       }`}
                     >
-                      {s}
+                      {s === 'archived' ? 'Archive' : s}
                     </button>
                   ))}
                 </div>
@@ -346,7 +360,9 @@ export function BlogPostForm({ post, initialTags }: Props) {
             disabled={saving}
             className="lg:hidden w-full py-3 rounded-xl bg-[#C9A84C] hover:bg-[#D4B668] text-slate-900 font-semibold disabled:opacity-50 transition-colors"
           >
-            {saving ? 'Saving…' : post ? 'Update Post' : (isSuperAdmin ? 'Publish' : 'Submit for Review')}
+            {saving ? 'Saving…' : post
+              ? (effectiveStatus === 'archived' && post.status !== 'archived' ? 'Archive Post' : 'Update Post')
+              : (isSuperAdmin ? 'Publish' : 'Submit for Review')}
           </button>
         </div>
       </div>
