@@ -43,13 +43,17 @@ class AgentController extends Controller
     public function store(StoreAgentRequest $request): JsonResponse
     {
         $agent = DB::transaction(function () use ($request) {
-            $user = User::create([
-                'name'     => $request->name,
-                'email'    => $request->email,
-                'password' => Hash::make($request->password),
-                'role'     => 'agent',
+            $userData = [
+                'name'      => $request->name,
+                'email'     => $request->email,
+                'password'  => Hash::make($request->password),
+                'role'      => 'agent',
                 'is_active' => true,
-            ]);
+            ];
+            if ($request->filled('avatar_url')) {
+                $userData['avatar_url'] = $request->avatar_url;
+            }
+            $user = User::create($userData);
 
             return Agent::create([
                 'user_id'   => $user->id,
@@ -76,9 +80,10 @@ class AgentController extends Controller
     public function update(Agent $agent, UpdateAgentRequest $request): JsonResponse
     {
         DB::transaction(function () use ($agent, $request) {
-            if ($request->has('name')) {
-                $agent->user->update(['name' => $request->name]);
-            }
+            $userChanges = [];
+            if ($request->has('name'))       $userChanges['name']       = $request->name;
+            if ($request->has('avatar_url')) $userChanges['avatar_url'] = $request->avatar_url;
+            if ($userChanges) $agent->user->update($userChanges);
 
             $agent->update($request->only(['agency_id', 'phone', 'whatsapp']));
         });

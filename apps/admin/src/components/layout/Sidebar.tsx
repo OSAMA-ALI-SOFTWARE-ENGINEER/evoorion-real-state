@@ -9,8 +9,10 @@ import {
   IconBell,
   IconBriefcase,
   IconBuilding,
+  IconCoin,
   IconDashboard,
   IconFileText,
+  IconGlobe,
   IconLayers,
   IconLogOut,
   IconMapPin,
@@ -41,6 +43,8 @@ const NAV: Array<{ group?: string; items: NavItem[] }> = [
       { label: 'Areas',            href: '/areas',            icon: <IconMapPin />,  roles: ['manager', 'super_admin'] },
       { label: 'Developers',       href: '/developers',       icon: <IconLayers />,  roles: ['manager', 'super_admin'] },
       { label: 'Operation Types',  href: '/operation-types',  icon: <IconTag />,     roles: ['manager', 'super_admin'] },
+      { label: 'Currencies',       href: '/currencies',       icon: <IconCoin />,    roles: ['manager', 'super_admin'] },
+      { label: 'Languages',        href: '/languages',        icon: <IconGlobe />,   roles: ['manager', 'super_admin'] },
     ],
   },
   {
@@ -63,6 +67,12 @@ const NAV: Array<{ group?: string; items: NavItem[] }> = [
     items: [
       { label: 'Blog',     href: '/blog',     icon: <IconFileText />,  roles: ['manager', 'super_admin'] },
       { label: 'Settings', href: '/settings', icon: <IconSettings />, roles: ['super_admin'] },
+    ],
+  },
+  {
+    group: 'Account',
+    items: [
+      { label: 'My Profile', href: '/profile', icon: <IconUser /> },
     ],
   },
 ]

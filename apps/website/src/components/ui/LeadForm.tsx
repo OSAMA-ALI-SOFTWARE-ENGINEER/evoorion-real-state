@@ -1,9 +1,11 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { CheckCircle2, Loader2, AlertCircle } from 'lucide-react'
 import { submitLead } from '@/lib/api'
 import { BUDGET_RANGES, type BudgetRange } from '@/types'
+import { PhoneInput } from '@/components/ui/PhoneInput'
+import { useAuth } from '@/context/AuthContext'
 
 interface LeadFormProps {
   propertyId?: number
@@ -30,15 +32,97 @@ const INITIAL: FormState = {
   message: '',
 }
 
+// ── Custom budget dropdown ─────────────────────────────────────────────────────
+
+function BudgetSelect({
+  value,
+  onChange,
+}: {
+  value: BudgetRange | ''
+  onChange: (v: BudgetRange | '') => void
+}) {
+  const [open, setOpen] = useState(false)
+  const ref = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    function onOutside(e: MouseEvent) {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false)
+    }
+    document.addEventListener('mousedown', onOutside)
+    return () => document.removeEventListener('mousedown', onOutside)
+  }, [])
+
+  const base =
+    'w-full bg-white/5 border border-white/10 text-sm px-4 py-3 outline-none transition-colors duration-200 rounded-sm'
+
+  return (
+    <div ref={ref} className="relative">
+      <button
+        type="button"
+        onClick={() => setOpen(v => !v)}
+        className={`${base} flex items-center justify-between hover:bg-white/10 focus:border-gold`}
+      >
+        <span className={value ? 'text-white' : 'text-white/40'}>
+          {value ? BUDGET_RANGES[value].label : 'Budget Range'}
+        </span>
+        <svg
+          className={`w-4 h-4 text-white/40 shrink-0 transition-transform ${open ? 'rotate-180' : ''}`}
+          fill="none"
+          viewBox="0 0 16 16"
+        >
+          <path d="M4 6l4 4 4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+        </svg>
+      </button>
+
+      {open && (
+        <div className="absolute top-full left-0 right-0 z-50 mt-1 bg-[#0c1118] border border-white/10 rounded-sm shadow-2xl overflow-hidden">
+          {value && (
+            <button
+              type="button"
+              onClick={() => { onChange(''); setOpen(false) }}
+              className="w-full px-4 py-2.5 text-left text-xs text-white/30 hover:bg-white/5 transition-colors border-b border-white/5"
+            >
+              Clear selection
+            </button>
+          )}
+          {(Object.keys(BUDGET_RANGES) as BudgetRange[]).map(key => (
+            <button
+              key={key}
+              type="button"
+              onClick={() => { onChange(key); setOpen(false) }}
+              className={`w-full px-4 py-2.5 text-left text-sm hover:bg-white/10 transition-colors ${value === key ? 'text-gold' : 'text-white/80'}`}
+            >
+              {BUDGET_RANGES[key].label}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
+
+// ── Main form ─────────────────────────────────────────────────────────────────
+
 export function LeadForm({
   propertyId,
   variant = 'default',
   title = 'Get in Touch',
   subtitle = 'Our investment advisors will reach out within 24 hours.',
 }: LeadFormProps) {
+  const { user } = useAuth()
   const [form, setForm] = useState<FormState>(INITIAL)
   const [status, setStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle')
   const [errorMessage, setErrorMessage] = useState('')
+
+  // Pre-fill name & email from logged-in user, only if the fields are still empty
+  useEffect(() => {
+    if (!user) return
+    setForm(prev => ({
+      ...prev,
+      name:  prev.name  || user.name  || '',
+      email: prev.email || user.email || '',
+    }))
+  }, [user])
 
   const set = (field: keyof FormState) => (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>,
@@ -80,7 +164,15 @@ export function LeadForm({
           Your inquiry has been received. One of our investment advisors will be in touch shortly.
         </p>
         <button
-          onClick={() => setStatus('idle')}
+          type="button"
+          onClick={() => {
+            setStatus('idle')
+            setForm({
+              ...INITIAL,
+              name:  user?.name  ?? '',
+              email: user?.email ?? '',
+            })
+          }}
           className="text-gold text-sm underline underline-offset-4 mt-2"
         >
           Send another message
@@ -102,7 +194,7 @@ export function LeadForm({
       )}
 
       <form onSubmit={handleSubmit} className="space-y-4">
-        <div className={variant === 'default' ? 'grid grid-cols-1 sm:grid-cols-2 gap-4' : ''}>
+        <div className="space-y-4">
           <input
             type="text"
             placeholder="Full Name *"
@@ -121,31 +213,21 @@ export function LeadForm({
           />
         </div>
 
-        <div className={variant === 'default' ? 'grid grid-cols-1 sm:grid-cols-2 gap-4' : ''}>
-          <input
-            type="tel"
-            placeholder="Phone Number"
-            value={form.phone}
-            onChange={set('phone')}
-            className={inputCls}
-          />
-          <input
-            type="tel"
-            placeholder="WhatsApp Number"
-            value={form.whatsapp}
-            onChange={set('whatsapp')}
-            className={inputCls}
-          />
-        </div>
+        <PhoneInput
+          value={form.phone}
+          onChange={v => setForm(prev => ({ ...prev, phone: v }))}
+          placeholder="Phone number"
+        />
+        <PhoneInput
+          value={form.whatsapp}
+          onChange={v => setForm(prev => ({ ...prev, whatsapp: v }))}
+          placeholder="WhatsApp number"
+        />
 
-        <select value={form.budget} onChange={set('budget')} className={`${inputCls} appearance-none cursor-pointer`}>
-          <option value="">Budget Range</option>
-          {(Object.keys(BUDGET_RANGES) as BudgetRange[]).map((key) => (
-            <option key={key} value={key} className="bg-brand text-white">
-              {BUDGET_RANGES[key].label}
-            </option>
-          ))}
-        </select>
+        <BudgetSelect
+          value={form.budget}
+          onChange={v => setForm(prev => ({ ...prev, budget: v }))}
+        />
 
         <textarea
           placeholder="Your Message or Enquiry"

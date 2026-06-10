@@ -25,8 +25,9 @@ class DeveloperController
     public function store(Request $request): JsonResponse
     {
         $validated = $request->validate([
-            'name' => 'required|string|max:255|unique:developers',
-            'logo_url' => 'nullable|url',
+            'name'        => 'required|string|max:255|unique:developers',
+            'email'       => 'nullable|email|max:255',
+            'logo_url'    => 'nullable|url',
             'description' => 'nullable|string',
         ]);
 
@@ -43,8 +44,9 @@ class DeveloperController
     public function update(Request $request, Developer $developer): JsonResponse
     {
         $validated = $request->validate([
-            'name' => 'sometimes|string|max:255|unique:developers,name,' . $developer->id,
-            'logo_url' => 'nullable|url',
+            'name'        => 'sometimes|string|max:255|unique:developers,name,' . $developer->id,
+            'email'       => 'nullable|email|max:255',
+            'logo_url'    => 'nullable|url',
             'description' => 'nullable|string',
         ]);
 

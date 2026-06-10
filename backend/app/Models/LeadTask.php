@@ -24,6 +24,13 @@ class LeadTask extends Model
         'completed_at' => 'datetime',
     ];
 
+    protected $appends = ['completed'];
+
+    public function getCompletedAttribute(): bool
+    {
+        return $this->completed_at !== null;
+    }
+
     public function lead(): BelongsTo
     {
         return $this->belongsTo(Lead::class);

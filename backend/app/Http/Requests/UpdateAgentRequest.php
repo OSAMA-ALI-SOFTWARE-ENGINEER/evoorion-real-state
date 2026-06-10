@@ -14,10 +14,11 @@ class UpdateAgentRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name'      => 'sometimes|string|max:255',
-            'agency_id' => 'sometimes|nullable|exists:agencies,id',
-            'phone'     => 'sometimes|nullable|string|max:30',
-            'whatsapp'  => 'sometimes|nullable|string|max:30',
+            'name'       => 'sometimes|string|max:255',
+            'agency_id'  => 'sometimes|nullable|exists:agencies,id',
+            'phone'      => 'sometimes|nullable|string|max:30',
+            'whatsapp'   => 'sometimes|nullable|string|max:30',
+            'avatar_url' => 'sometimes|nullable|url|max:2048',
         ];
     }
 }

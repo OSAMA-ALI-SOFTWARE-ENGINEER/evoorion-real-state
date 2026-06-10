@@ -3,6 +3,7 @@ import { MapPin, Phone, Mail, Clock } from 'lucide-react'
 import { SocialIcon } from '@/components/ui/SocialIcon'
 import { LeadForm } from '@/components/ui/LeadForm'
 import { ScrollReveal } from '@/components/ui/ScrollReveal'
+import { ContactAddressMap } from '@/components/ui/ContactAddressMap'
 
 export const metadata: Metadata = {
   title: 'Contact Us',
@@ -10,32 +11,48 @@ export const metadata: Metadata = {
     'Get in touch with EVOORION\'s investment advisors. Book a private consultation or send an enquiry.',
 }
 
-const CONTACT_INFO = [
-  {
-    icon: MapPin,
-    label: 'Office Address',
-    lines: ['Office 2402, Burj Al Salam Tower', 'Sheikh Zayed Road, Dubai, UAE'],
-  },
-  {
-    icon: Phone,
-    label: 'Phone',
-    lines: ['+971 00 000 0000'],
-    href: 'tel:+971000000000',
-  },
-  {
-    icon: Mail,
-    label: 'Email',
-    lines: ['invest@evoorion.com'],
-    href: 'mailto:invest@evoorion.com',
-  },
-  {
-    icon: Clock,
-    label: 'Office Hours',
-    lines: ['Monday – Saturday: 9:00 AM – 7:00 PM', 'Sunday: By Appointment'],
-  },
-]
+type ContactSettings = {
+  contact_address?: string | null
+  contact_phone?: string | null
+  contact_email?: string | null
+  contact_whatsapp?: string | null
+  contact_hours_weekdays?: string | null
+  contact_hours_sunday?: string | null
+  social_facebook?: string | null
+  social_instagram?: string | null
+  social_twitter?: string | null
+  social_linkedin?: string | null
+  social_youtube?: string | null
+}
 
-export default function ContactPage() {
+async function getContactSettings(): Promise<ContactSettings> {
+  const api = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000/api/v1'
+  try {
+    const res = await fetch(`${api}/settings`, { next: { revalidate: 60 } })
+    if (!res.ok) return {}
+    const json = await res.json()
+    return (json.data ?? {}) as ContactSettings
+  } catch {
+    return {}
+  }
+}
+
+export default async function ContactPage() {
+  const s = await getContactSettings()
+
+  const address     = s.contact_address        ?? 'Office 2402, Burj Al Salam Tower, Sheikh Zayed Road, Dubai, UAE'
+  const phone       = s.contact_phone          ?? '+971 00 000 0000'
+  const email       = s.contact_email          ?? 'invest@evoorion.com'
+  const hoursWeek   = s.contact_hours_weekdays ?? 'Monday – Saturday: 9:00 AM – 7:00 PM'
+  const hoursSun    = s.contact_hours_sunday   ?? 'Sunday: By Appointment'
+
+  const socials = [
+    { name: 'instagram' as const, label: 'Instagram', href: s.social_instagram ?? '#' },
+    { name: 'linkedin'  as const, label: 'LinkedIn',  href: s.social_linkedin  ?? '#' },
+    ...(s.social_facebook ? [{ name: 'facebook' as const, label: 'Facebook', href: s.social_facebook }] : []),
+    ...(s.social_twitter  ? [{ name: 'twitter'  as const, label: 'Twitter',  href: s.social_twitter  }] : []),
+  ]
+
   return (
     <>
       {/* Hero */}
@@ -62,77 +79,81 @@ export default function ContactPage() {
       <section className="py-16 bg-brand">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-5 gap-12">
-            {/* Left: Contact info */}
+            {/* Left: Contact info + map */}
             <div className="lg:col-span-2">
               <ScrollReveal>
                 <div className="space-y-8">
-                  {CONTACT_INFO.map((item) => {
-                    const Icon = item.icon
-                    return (
-                      <div key={item.label} className="flex gap-4">
-                        <div className="w-10 h-10 rounded-sm border border-gold-border bg-gold/5 flex items-center justify-center shrink-0">
-                          <Icon size={16} className="text-gold" />
-                        </div>
-                        <div>
-                          <p className="text-white/40 text-xs tracking-wider uppercase mb-1">
-                            {item.label}
-                          </p>
-                          {item.lines.map((line) =>
-                            item.href ? (
-                              <a
-                                key={line}
-                                href={item.href}
-                                className="block text-white hover:text-gold transition-colors text-sm"
-                              >
-                                {line}
-                              </a>
-                            ) : (
-                              <p key={line} className="text-muted text-sm">
-                                {line}
-                              </p>
-                            ),
-                          )}
-                        </div>
-                      </div>
-                    )
-                  })}
+                  {/* Address */}
+                  <div className="flex gap-4">
+                    <div className="w-10 h-10 rounded-sm border border-gold-border bg-gold/5 flex items-center justify-center shrink-0">
+                      <MapPin size={16} className="text-gold" />
+                    </div>
+                    <div>
+                      <p className="text-white/40 text-xs tracking-wider uppercase mb-1">Office Address</p>
+                      <p className="text-muted text-sm">{address}</p>
+                    </div>
+                  </div>
+
+                  {/* Phone */}
+                  <div className="flex gap-4">
+                    <div className="w-10 h-10 rounded-sm border border-gold-border bg-gold/5 flex items-center justify-center shrink-0">
+                      <Phone size={16} className="text-gold" />
+                    </div>
+                    <div>
+                      <p className="text-white/40 text-xs tracking-wider uppercase mb-1">Phone</p>
+                      <a href={`tel:${phone.replace(/\s/g, '')}`} className="block text-white hover:text-gold transition-colors text-sm">
+                        {phone}
+                      </a>
+                    </div>
+                  </div>
+
+                  {/* Email */}
+                  <div className="flex gap-4">
+                    <div className="w-10 h-10 rounded-sm border border-gold-border bg-gold/5 flex items-center justify-center shrink-0">
+                      <Mail size={16} className="text-gold" />
+                    </div>
+                    <div>
+                      <p className="text-white/40 text-xs tracking-wider uppercase mb-1">Email</p>
+                      <a href={`mailto:${email}`} className="block text-white hover:text-gold transition-colors text-sm">
+                        {email}
+                      </a>
+                    </div>
+                  </div>
+
+                  {/* Working hours */}
+                  <div className="flex gap-4">
+                    <div className="w-10 h-10 rounded-sm border border-gold-border bg-gold/5 flex items-center justify-center shrink-0">
+                      <Clock size={16} className="text-gold" />
+                    </div>
+                    <div>
+                      <p className="text-white/40 text-xs tracking-wider uppercase mb-1">Office Hours</p>
+                      <p className="text-muted text-sm">{hoursWeek}</p>
+                      {hoursSun && <p className="text-muted text-sm">{hoursSun}</p>}
+                    </div>
+                  </div>
 
                   {/* Social */}
                   <div>
-                    <p className="text-white/40 text-xs tracking-wider uppercase mb-3">
-                      Follow Us
-                    </p>
+                    <p className="text-white/40 text-xs tracking-wider uppercase mb-3">Follow Us</p>
                     <div className="flex gap-3">
-                      {(
-                      [
-                        { name: 'instagram' as const, label: 'Instagram', href: '#' },
-                        { name: 'linkedin' as const, label: 'LinkedIn', href: '#' },
-                      ] as const
-                    ).map(({ name, label, href }) => (
-                      <a
-                        key={label}
-                        href={href}
-                        aria-label={label}
-                        className="w-9 h-9 flex items-center justify-center border border-gold-border rounded-sm text-muted hover:text-gold hover:border-gold transition-colors"
-                      >
-                        <SocialIcon name={name} size={15} />
-                      </a>
-                    ))}
+                      {socials.map(({ name, label, href }) => (
+                        <a
+                          key={label}
+                          href={href}
+                          aria-label={label}
+                          className="w-9 h-9 flex items-center justify-center border border-gold-border rounded-sm text-muted hover:text-gold hover:border-gold transition-colors"
+                        >
+                          <SocialIcon name={name} size={15} />
+                        </a>
+                      ))}
                     </div>
                   </div>
                 </div>
               </ScrollReveal>
 
-              {/* Map placeholder */}
+              {/* Map */}
               <ScrollReveal delay={0.2}>
-                <div className="mt-10 aspect-[4/3] rounded-sm overflow-hidden border border-white/5 bg-brand-section/50 flex items-center justify-center">
-                  <div className="text-center text-muted/40">
-                    <MapPin size={32} className="mx-auto mb-2 text-gold/20" />
-                    <p className="text-xs tracking-wider uppercase">Burj Al Salam Tower</p>
-                    <p className="text-xs">Sheikh Zayed Road, Dubai</p>
-                    <p className="text-xs mt-2 text-muted/30">Map integration coming soon</p>
-                  </div>
-                </div>
+                <ContactAddressMap address={address} />
               </ScrollReveal>
             </div>
 

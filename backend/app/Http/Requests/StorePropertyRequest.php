@@ -27,6 +27,7 @@ class StorePropertyRequest extends FormRequest
             'operation_type_id' => 'required|integer|exists:operation_types,id',
             'status' => 'required|in:available,sold,rented',
             'is_featured' => 'nullable|boolean',
+            'is_active'   => 'nullable|boolean',
             'roi_min' => 'nullable|numeric|min:0',
             'roi_max' => 'nullable|numeric|min:0',
             'developer_id' => 'required|integer|exists:developers,id',

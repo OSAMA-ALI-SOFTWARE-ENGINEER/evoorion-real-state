@@ -10,7 +10,7 @@ class Developer extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['name', 'logo_url', 'description'];
+    protected $fillable = ['name', 'email', 'logo_url', 'description'];
 
     public function properties(): HasMany
     {

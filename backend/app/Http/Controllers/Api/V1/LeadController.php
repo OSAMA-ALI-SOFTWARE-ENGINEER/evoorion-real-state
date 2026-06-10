@@ -158,7 +158,7 @@ class LeadController extends Controller
 
         return response()->json([
             'success' => true,
-            'data' => $lead->load('notes', 'assignedUser', 'property'),
+            'data' => $lead->load('notes', 'assignedUser', 'property.area', 'property.images'),
         ]);
     }
 
@@ -171,16 +171,15 @@ class LeadController extends Controller
             $this->leadService->changeStatus($lead->id, $validated['status']);
         }
 
-        if (isset($validated['assigned_to'])) {
-            $agent = \App\Models\Agent::where('user_id', $validated['assigned_to'])->firstOrFail();
-            $this->leadService->assignLead($lead->id, $agent->id);
+        if (array_key_exists('assigned_to', $validated)) {
+            $lead->update(['assigned_to' => $validated['assigned_to']]);
         }
 
         if (isset($validated['note'])) {
             $this->leadService->addNote($lead->id, $validated['note']);
         }
 
-        $lead = $lead->fresh()->load('notes', 'assignedUser', 'property');
+        $lead = $lead->fresh()->load('notes', 'assignedUser', 'property.area', 'property.images');
 
         return response()->json(['success' => true, 'data' => $lead]);
     }
@@ -208,24 +207,15 @@ class LeadController extends Controller
         $request->validate(['note' => 'required|string|max:2000']);
         $note = $this->leadService->addNote($lead->id, $request->note);
 
-        return response()->json(['success' => true, 'data' => $note], 201);
+        return response()->json(['success' => true, 'data' => $note->load('user')], 201);
     }
 
     public function getNotes(Lead $lead): JsonResponse
     {
         $this->authorize('view', $lead);
-        $notes = $lead->notes()->latest()->paginate(10);
+        $notes = $lead->notes()->with('user')->latest()->get();
 
-        return response()->json([
-            'success' => true,
-            'data' => $notes->items(),
-            'meta' => [
-                'total' => $notes->total(),
-                'per_page' => $notes->perPage(),
-                'current_page' => $notes->currentPage(),
-                'last_page' => $notes->lastPage(),
-            ],
-        ]);
+        return response()->json(['success' => true, 'data' => $notes]);
     }
 
     public function deleteNote(Lead $lead, LeadNote $note): JsonResponse

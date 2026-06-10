@@ -1,10 +1,23 @@
 'use client'
 
 import { useCallback, useEffect, useRef, useState } from 'react'
+import Image from 'next/image'
+import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { getUnreadCount, getNotifications, markNotificationRead, markAllNotificationsRead } from '@/lib/api'
 import type { Notification } from '@/types'
-import { IconBell, IconMenu } from '@/components/ui/icons'
+import { useAuth } from '@/context/AuthContext'
+import { useTheme, type Theme } from '@/context/ThemeContext'
+import {
+  IconBell,
+  IconMenu,
+  IconSun,
+  IconMoon,
+  IconMonitor,
+  IconLogOut,
+  IconSettings,
+  IconUser,
+} from '@/components/ui/icons'
 
 const PAGE_TITLES: Record<string, string> = {
   '/dashboard':       'Dashboard',
@@ -20,6 +33,7 @@ const PAGE_TITLES: Record<string, string> = {
   '/activity-logs':   'Activity Logs',
   '/blog':            'Blog',
   '/settings':        'Settings',
+  '/profile':         'My Profile',
 }
 
 function getTitle(pathname: string): string {
@@ -40,9 +54,9 @@ function fmtNotifTime(d: string) {
 }
 
 function NotifPanel({ onClose }: { onClose: () => void }) {
-  const [notifs,   setNotifs]   = useState<Notification[]>([])
-  const [loading,  setLoading]  = useState(true)
-  const [marking,  setMarking]  = useState(false)
+  const [notifs,  setNotifs]  = useState<Notification[]>([])
+  const [loading, setLoading] = useState(true)
+  const [marking, setMarking] = useState(false)
 
   useEffect(() => {
     getNotifications()
@@ -66,9 +80,9 @@ function NotifPanel({ onClose }: { onClose: () => void }) {
   const unread = notifs.filter(n => !n.read_at).length
 
   return (
-    <div className="absolute right-0 top-full mt-2 w-80 bg-white rounded-xl shadow-2xl border border-slate-200 z-50 overflow-hidden">
-      <div className="flex items-center justify-between px-4 py-3 border-b border-slate-100">
-        <p className="text-sm font-semibold text-slate-800">
+    <div className="absolute right-0 top-full mt-2 w-80 bg-white dark:bg-slate-800 rounded-xl shadow-2xl border border-slate-200 dark:border-slate-700 z-50 overflow-hidden">
+      <div className="flex items-center justify-between px-4 py-3 border-b border-slate-100 dark:border-slate-700">
+        <p className="text-sm font-semibold text-slate-800 dark:text-slate-100">
           Notifications {unread > 0 && <span className="text-[#C9A84C]">({unread})</span>}
         </p>
         {unread > 0 && (
@@ -83,7 +97,7 @@ function NotifPanel({ onClose }: { onClose: () => void }) {
         )}
       </div>
 
-      <div className="max-h-[400px] overflow-y-auto divide-y divide-slate-50">
+      <div className="max-h-[400px] overflow-y-auto divide-y divide-slate-50 dark:divide-slate-700">
         {loading ? (
           <div className="py-8 flex justify-center">
             <div className="w-5 h-5 border-2 border-[#C9A84C] border-t-transparent rounded-full animate-spin" />
@@ -97,12 +111,12 @@ function NotifPanel({ onClose }: { onClose: () => void }) {
             <div
               key={n.id}
               onClick={() => { if (isUnread) markRead(n.id) }}
-              className={`px-4 py-3 cursor-pointer transition-colors ${isUnread ? 'bg-amber-50/50 hover:bg-amber-50' : 'hover:bg-slate-50'}`}
+              className={`px-4 py-3 cursor-pointer transition-colors ${isUnread ? 'bg-amber-50/50 dark:bg-amber-900/10 hover:bg-amber-50 dark:hover:bg-amber-900/20' : 'hover:bg-slate-50 dark:hover:bg-slate-700'}`}
             >
               <div className="flex items-start gap-2">
                 {isUnread && <span className="w-1.5 h-1.5 rounded-full bg-[#C9A84C] mt-1.5 shrink-0" />}
                 <div className={isUnread ? '' : 'pl-3.5'}>
-                  <p className="text-sm text-slate-800 font-medium leading-snug">
+                  <p className="text-sm text-slate-800 dark:text-slate-100 font-medium leading-snug">
                     {data.message ?? n.type.split('\\').pop()}
                   </p>
                   <p className="text-xs text-slate-400 mt-0.5">{fmtNotifTime(n.created_at)}</p>
@@ -116,6 +130,146 @@ function NotifPanel({ onClose }: { onClose: () => void }) {
   )
 }
 
+// ── Theme toggle ──────────────────────────────────────────────────────────────
+
+const THEME_OPTIONS: { value: Theme; icon: React.ReactNode; label: string }[] = [
+  { value: 'light',  icon: <IconSun size={14} />,     label: 'Light'  },
+  { value: 'dark',   icon: <IconMoon size={14} />,    label: 'Dark'   },
+  { value: 'system', icon: <IconMonitor size={14} />, label: 'System' },
+]
+
+function ThemeToggle() {
+  const { theme, setTheme } = useTheme()
+  const [open, setOpen]     = useState(false)
+  const ref                 = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false)
+    }
+    document.addEventListener('mousedown', handler)
+    return () => document.removeEventListener('mousedown', handler)
+  }, [])
+
+  const current = THEME_OPTIONS.find(o => o.value === theme) ?? THEME_OPTIONS[2]
+
+  return (
+    <div ref={ref} className="relative">
+      <button
+        type="button"
+        onClick={() => setOpen(v => !v)}
+        className="p-2 text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-colors"
+        aria-label="Toggle theme"
+        title="Toggle theme"
+      >
+        {current.icon}
+      </button>
+
+      {open && (
+        <div className="absolute right-0 top-full mt-2 w-36 bg-white dark:bg-slate-800 rounded-xl shadow-xl border border-slate-200 dark:border-slate-700 z-50 overflow-hidden py-1">
+          {THEME_OPTIONS.map(o => (
+            <button
+              key={o.value}
+              type="button"
+              onClick={() => { setTheme(o.value); setOpen(false) }}
+              className={`w-full flex items-center gap-2.5 px-3 py-2 text-sm transition-colors ${
+                theme === o.value
+                  ? 'text-[#C9A84C] bg-amber-50 dark:bg-amber-900/20'
+                  : 'text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700'
+              }`}
+            >
+              <span className={theme === o.value ? 'text-[#C9A84C]' : ''}>{o.icon}</span>
+              {o.label}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
+
+// ── User menu ─────────────────────────────────────────────────────────────────
+
+function UserMenu() {
+  const { user, logout } = useAuth()
+  const [open, setOpen]  = useState(false)
+  const ref              = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false)
+    }
+    document.addEventListener('mousedown', handler)
+    return () => document.removeEventListener('mousedown', handler)
+  }, [])
+
+  if (!user) return null
+
+  const initials = user.name.split(' ').map(w => w[0]).slice(0, 2).join('').toUpperCase()
+
+  return (
+    <div ref={ref} className="relative">
+      <button
+        type="button"
+        onClick={() => setOpen(v => !v)}
+        className="flex items-center gap-2 py-1.5 px-2.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
+        aria-label="User menu"
+      >
+        {user.avatar_url ? (
+          <Image src={user.avatar_url} alt={user.name} width={28} height={28} className="rounded-full object-cover" />
+        ) : (
+          <div className="w-7 h-7 rounded-full bg-[#C9A84C]/20 border border-[#C9A84C]/40 flex items-center justify-center text-[#C9A84C] text-xs font-semibold">
+            {initials}
+          </div>
+        )}
+        <div className="hidden sm:block text-left">
+          <p className="text-xs font-semibold text-slate-800 dark:text-slate-100 leading-tight truncate max-w-[120px]">{user.name}</p>
+          <p className="text-[10px] text-slate-400 capitalize leading-tight">{user.role.replace('_', ' ')}</p>
+        </div>
+      </button>
+
+      {open && (
+        <div className="absolute right-0 top-full mt-2 w-52 bg-white dark:bg-slate-800 rounded-xl shadow-xl border border-slate-200 dark:border-slate-700 z-50 overflow-hidden">
+          <div className="px-4 py-3 border-b border-slate-100 dark:border-slate-700">
+            <p className="text-sm font-semibold text-slate-800 dark:text-slate-100 truncate">{user.name}</p>
+            <p className="text-xs text-slate-400 truncate">{user.email}</p>
+          </div>
+          <div className="p-1">
+            <Link
+              href="/profile"
+              onClick={() => setOpen(false)}
+              className="flex items-center gap-2.5 px-3 py-2 text-sm text-slate-600 dark:text-slate-300 hover:text-slate-800 dark:hover:text-slate-100 hover:bg-slate-50 dark:hover:bg-slate-700 rounded-lg transition-colors"
+            >
+              <IconUser size={15} />
+              My Profile
+            </Link>
+            {user.role === 'super_admin' && (
+              <Link
+                href="/settings"
+                onClick={() => setOpen(false)}
+                className="flex items-center gap-2.5 px-3 py-2 text-sm text-slate-600 dark:text-slate-300 hover:text-slate-800 dark:hover:text-slate-100 hover:bg-slate-50 dark:hover:bg-slate-700 rounded-lg transition-colors"
+              >
+                <IconSettings size={15} />
+                Settings
+              </Link>
+            )}
+            <button
+              type="button"
+              onClick={async () => { setOpen(false); await logout() }}
+              className="w-full flex items-center gap-2.5 px-3 py-2 text-sm text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
+            >
+              <IconLogOut size={15} />
+              Sign Out
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
+
+// ── Topbar ────────────────────────────────────────────────────────────────────
+
 interface TopbarProps {
   onMenuClick: () => void
 }
@@ -124,8 +278,8 @@ export function Topbar({ onMenuClick }: TopbarProps) {
   const pathname = usePathname()
   const title    = getTitle(pathname)
 
-  const [open,      setOpen]      = useState(false)
-  const [unread,    setUnread]    = useState(0)
+  const [open,   setOpen]   = useState(false)
+  const [unread, setUnread] = useState(0)
   const panelRef = useRef<HTMLDivElement>(null)
 
   const fetchUnread = useCallback(() => {
@@ -149,36 +303,48 @@ export function Topbar({ onMenuClick }: TopbarProps) {
   }, [])
 
   return (
-    <header className="h-16 flex items-center gap-4 px-6 bg-white border-b border-slate-200 shrink-0">
+    <header className="h-16 flex items-center gap-4 px-6 bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 shrink-0">
       {/* Mobile menu */}
       <button
         type="button"
         onClick={onMenuClick}
-        className="lg:hidden p-2 -ml-2 text-slate-500 hover:text-slate-700"
+        className="lg:hidden p-2 -ml-2 text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200"
         aria-label="Open menu"
       >
         <IconMenu size={20} />
       </button>
 
       {/* Page title */}
-      <h1 className="text-base font-semibold text-slate-800 flex-1">{title}</h1>
+      <h1 className="text-base font-semibold text-slate-800 dark:text-slate-100 flex-1">{title}</h1>
 
-      {/* Notification bell */}
-      <div ref={panelRef} className="relative">
-        <button
-          type="button"
-          onClick={() => setOpen(v => !v)}
-          className="relative p-2 text-slate-500 hover:text-slate-700 hover:bg-slate-100 rounded-lg transition-colors"
-          aria-label="Notifications"
-        >
-          <IconBell size={20} />
-          {unread > 0 && (
-            <span className="absolute top-1 right-1 w-4 h-4 rounded-full bg-[#C9A84C] text-slate-900 text-[10px] font-bold flex items-center justify-center leading-none">
-              {unread > 9 ? '9+' : unread}
-            </span>
-          )}
-        </button>
-        {open && <NotifPanel onClose={() => setOpen(false)} />}
+      {/* Right controls */}
+      <div className="flex items-center gap-1">
+        {/* Theme toggle */}
+        <ThemeToggle />
+
+        {/* Notification bell */}
+        <div ref={panelRef} className="relative">
+          <button
+            type="button"
+            onClick={() => setOpen(v => !v)}
+            className="relative p-2 text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-colors"
+            aria-label="Notifications"
+          >
+            <IconBell size={20} />
+            {unread > 0 && (
+              <span className="absolute top-1 right-1 w-4 h-4 rounded-full bg-[#C9A84C] text-slate-900 text-[10px] font-bold flex items-center justify-center leading-none">
+                {unread > 9 ? '9+' : unread}
+              </span>
+            )}
+          </button>
+          {open && <NotifPanel onClose={() => setOpen(false)} />}
+        </div>
+
+        {/* Divider */}
+        <div className="w-px h-6 bg-slate-200 dark:bg-slate-600 mx-1" />
+
+        {/* User menu */}
+        <UserMenu />
       </div>
     </header>
   )

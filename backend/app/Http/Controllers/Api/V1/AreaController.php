@@ -17,11 +17,14 @@ class AreaController
 
     public function index(): JsonResponse
     {
-        return $this->success(Area::all());
+        return $this->success(Area::where('status', 'active')->get());
     }
 
     public function show(Area $area): JsonResponse
     {
+        if (($area->status ?? 'active') !== 'active') {
+            abort(404);
+        }
         return $this->success($area);
     }
 }

@@ -128,6 +128,9 @@ class PropertyController
      */
     public function show(Property $property): JsonResponse
     {
+        if (!$property->is_active) {
+            abort(404);
+        }
         $this->propertyService->incrementViews($property->id);
         $property->load('images', 'amenities', 'area', 'developer', 'operationType');
 

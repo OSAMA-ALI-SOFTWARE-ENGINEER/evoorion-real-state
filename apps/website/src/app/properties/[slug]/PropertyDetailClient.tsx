@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -255,6 +255,42 @@ interface Props {
   property: Property
 }
 
+// Parse admin-authored rich-text HTML and reconstruct it using only
+// allowlisted tags — no innerHTML on any rendered element, no script execution.
+// DOMParser.parseFromString never runs scripts in the parsed document.
+const SAFE_TAGS = new Set(['p','br','strong','b','em','i','h2','h3','ul','ol','li','div','span'])
+
+function buildSafe(source: Node, target: Node) {
+  for (const child of Array.from(source.childNodes)) {
+    if (child.nodeType === Node.TEXT_NODE) {
+      target.appendChild(document.createTextNode(child.textContent ?? ''))
+    } else if (child.nodeType === Node.ELEMENT_NODE) {
+      const tag = (child as Element).tagName.toLowerCase()
+      if (SAFE_TAGS.has(tag)) {
+        const el = document.createElement(tag)
+        buildSafe(child, el)
+        target.appendChild(el)
+      } else {
+        buildSafe(child, target) // unwrap disallowed tag, keep its children
+      }
+    }
+    // comments, processing instructions, etc. are silently dropped
+  }
+}
+
+function useSafeHtml(html: string | undefined) {
+  const ref = useRef<HTMLDivElement>(null)
+  useEffect(() => {
+    const el = ref.current
+    if (!el) return
+    el.replaceChildren()
+    if (!html) return
+    const parsed = new DOMParser().parseFromString(html, 'text/html')
+    buildSafe(parsed.body, el)
+  }, [html])
+  return ref
+}
+
 export function PropertyDetailClient({ property }: Props) {
   const allMedia   = property.images ?? []
   const imageMedia = allMedia.filter((m) => !m.type || m.type === 'image')
@@ -262,6 +298,7 @@ export function PropertyDetailClient({ property }: Props) {
   const fileMedia  = allMedia.filter((m) => m.type === 'file')
 
   const [lightboxIdx, setLightboxIdx] = useState<number | null>(null)
+  const descRef = useSafeHtml(property.description)
 
   const wa = `https://wa.me/971000000000?text=${encodeURIComponent(
     `Hi, I'm interested in: ${property.title}`,
@@ -348,11 +385,20 @@ export function PropertyDetailClient({ property }: Props) {
                   <span className="text-muted text-sm">Starting Price</span>
                 </div>
 
-                {/* Description */}
+                {/* Description — safe DOM reconstruction from admin-authored rich text */}
                 {property.description && (
                   <div>
                     <h2 className="text-white font-semibold mb-3 tracking-wide">About This Property</h2>
-                    <p className="text-muted leading-relaxed whitespace-pre-line">{property.description}</p>
+                    <div
+                      ref={descRef}
+                      className="text-muted leading-relaxed
+                        [&_h2]:text-white [&_h2]:font-semibold [&_h2]:text-lg [&_h2]:mt-5 [&_h2]:mb-2
+                        [&_h3]:text-white/80 [&_h3]:font-medium [&_h3]:mt-4 [&_h3]:mb-1.5
+                        [&_ul]:list-disc [&_ul]:pl-5 [&_ul]:my-2 [&_ul]:space-y-1
+                        [&_ol]:list-decimal [&_ol]:pl-5 [&_ol]:my-2 [&_ol]:space-y-1
+                        [&_strong]:text-white/90 [&_strong]:font-semibold
+                        [&_em]:italic [&_p]:mb-2 last:[&_p]:mb-0"
+                    />
                   </div>
                 )}
               </ScrollReveal>

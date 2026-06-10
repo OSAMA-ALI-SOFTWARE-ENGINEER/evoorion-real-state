@@ -2,16 +2,95 @@
 
 namespace App\Services;
 
+use App\Mail\LeadConfirmation;
+use App\Mail\LeadNotification;
 use App\Models\Agent;
 use App\Models\Lead;
 use App\Models\LeadNote;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class LeadService
 {
+    public function __construct(private SettingService $settings) {}
+
     public function createLead(array $data): Lead
     {
-        return Lead::create($data);
+        $lead = Lead::create($data);
+
+        // Eagerly load property with developer and primary agent for email templates
+        if ($lead->property_id) {
+            $lead->load(['property.developer', 'property.primaryAgent']);
+        }
+
+        $this->sendEmails($lead);
+
+        return $lead;
+    }
+
+    private function sendEmails(Lead $lead): void
+    {
+        // 1. Confirmation to the lead submitter
+        if ($lead->email && filter_var($lead->email, FILTER_VALIDATE_EMAIL)) {
+            try {
+                Mail::to($lead->email)->send(new LeadConfirmation($lead));
+            } catch (\Throwable $e) {
+                Log::warning('LeadConfirmation email failed', [
+                    'lead_id' => $lead->id,
+                    'error'   => $e->getMessage(),
+                ]);
+            }
+        }
+
+        // 2. Internal notification to configured staff recipients
+        $recipients = $this->collectNotificationRecipients($lead);
+
+        if (!empty($recipients)) {
+            try {
+                Mail::to($recipients)->send(new LeadNotification($lead));
+            } catch (\Throwable $e) {
+                Log::warning('LeadNotification email failed', [
+                    'lead_id'    => $lead->id,
+                    'recipients' => $recipients,
+                    'error'      => $e->getMessage(),
+                ]);
+            }
+        }
+    }
+
+    private function collectNotificationRecipients(Lead $lead): array
+    {
+        $recipients = [];
+
+        // a) Always-on list from settings (comma-separated)
+        $rawList = $this->settings->get('lead_notify_recipients');
+        if ($rawList) {
+            foreach (explode(',', $rawList) as $email) {
+                $email = trim($email);
+                if (filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                    $recipients[] = $email;
+                }
+            }
+        }
+
+        // b) Primary agent of the property (if toggle is on)
+        if ($this->settings->get('lead_notify_agent') === '1' && $lead->property_id) {
+            $agentUser = optional($lead->property)->primaryAgent;
+            if ($agentUser && filter_var($agentUser->email, FILTER_VALIDATE_EMAIL)) {
+                $recipients[] = $agentUser->email;
+            }
+        }
+
+        // c) Developer of the property (if toggle is on and developer has email)
+        if ($this->settings->get('lead_notify_developer') === '1' && $lead->property_id) {
+            $developer = optional($lead->property)->developer;
+            if ($developer && filter_var($developer->email ?? '', FILTER_VALIDATE_EMAIL)) {
+                $recipients[] = $developer->email;
+            }
+        }
+
+        return array_values(array_unique(array_filter($recipients)));
     }
 
     public function assignLead(int $leadId, int $agentId): Lead
@@ -37,7 +116,7 @@ class LeadService
         return LeadNote::create([
             'lead_id' => $leadId,
             'user_id' => auth()->id(),
-            'note' => $noteText,
+            'note'    => $noteText,
         ]);
     }
 
@@ -46,7 +125,6 @@ class LeadService
         if ($value === null) {
             return '';
         }
-        // Prefix with single-quote if value starts with a spreadsheet formula trigger character
         return preg_match('/^[=+\-@\t\r]/', $value) ? "'" . $value : $value;
     }
 

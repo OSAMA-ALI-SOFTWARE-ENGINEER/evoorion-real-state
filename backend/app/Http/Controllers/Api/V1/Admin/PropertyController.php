@@ -36,7 +36,10 @@ class PropertyController
         $sortBy    = $request->input('sort_by', 'created_at');
         $sortDir   = $request->input('sort_direction', 'desc');
         $perPage   = $request->input('per_page', 15);
-        $properties = $query->orderBy($sortBy, $sortDir)->paginate($perPage);
+        $properties = $query
+            ->with(['images' => fn ($q) => $q->where('is_primary', true)->orderBy('order'), 'area'])
+            ->orderBy($sortBy, $sortDir)
+            ->paginate($perPage);
 
         return $this->paginated($properties->items(), $properties->total(), $perPage, $properties->currentPage());
     }

@@ -458,8 +458,8 @@ function PostsTab({ isSuperAdmin }: { isSuperAdmin: boolean }) {
               <tr className="bg-slate-50 dark:bg-slate-700/50 border-b border-slate-100 dark:border-slate-700">
                 <th className="px-5 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Title</th>
                 <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Status</th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Published</th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Views</th>
+                <th className="hidden sm:table-cell px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Published</th>
+                <th className="hidden sm:table-cell px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Views</th>
                 <th className="px-5 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Actions</th>
               </tr>
             </thead>
@@ -468,7 +468,7 @@ function PostsTab({ isSuperAdmin }: { isSuperAdmin: boolean }) {
                 Array.from({ length: 6 }).map((_, i) => (
                   <tr key={i} className="animate-pulse">
                     {Array.from({ length: 5 }).map((__, j) => (
-                      <td key={j} className="px-5 py-3.5"><div className="h-3.5 bg-slate-100 dark:bg-slate-700 rounded w-28" /></td>
+                      <td key={j} className={`px-5 py-3.5${[2,3].includes(j) ? ' hidden sm:table-cell' : ''}`}><div className="h-3.5 bg-slate-100 dark:bg-slate-700 rounded w-28" /></td>
                     ))}
                   </tr>
                 ))
@@ -486,8 +486,8 @@ function PostsTab({ isSuperAdmin }: { isSuperAdmin: boolean }) {
                     <td className="px-4 py-3.5">
                       <QuickStatus post={p} onChanged={load} isSuperAdmin={isSuperAdmin} />
                     </td>
-                    <td className="px-4 py-3.5 text-slate-500 dark:text-slate-400 text-xs">{fmtDate(p.published_at)}</td>
-                    <td className="px-4 py-3.5 text-slate-500 dark:text-slate-400 text-xs">{p.view_count.toLocaleString()}</td>
+                    <td className="hidden sm:table-cell px-4 py-3.5 text-slate-500 dark:text-slate-400 text-xs">{fmtDate(p.published_at)}</td>
+                    <td className="hidden sm:table-cell px-4 py-3.5 text-slate-500 dark:text-slate-400 text-xs">{p.view_count.toLocaleString()}</td>
                     <td className="px-5 py-3.5">
                       <div className="flex items-center gap-1">
                         {!isDeleted ? (

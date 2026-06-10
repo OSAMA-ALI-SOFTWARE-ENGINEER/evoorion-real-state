@@ -8,32 +8,31 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
-/**
- * @group Master Data
- *
- * Admin: full CRUD for geographic areas. Requires manager or super_admin role.
- */
 class AreaController
 {
     use ApiResponse;
 
     public function index(): JsonResponse
     {
-        $areas = Area::paginate(15);
-        return $this->paginated($areas->items(), $areas->total(), 15, $areas->currentPage());
+        $areas = Area::paginate(50);
+        return $this->paginated($areas->items(), $areas->total(), 50, $areas->currentPage());
     }
 
     private function rules(bool $creating, ?int $ignoreId = null): array
     {
-        $uniqueName = $creating
-            ? 'required|string|max:255|unique:areas'
-            : "sometimes|string|max:255|unique:areas,name,{$ignoreId}";
-
         return [
-            'name'             => $uniqueName,
-            'slug'             => $creating ? 'nullable|string' : 'sometimes|nullable|string',
+            'name'             => $creating
+                ? 'required|string|max:255|unique:areas'
+                : "sometimes|string|max:255|unique:areas,name,{$ignoreId}",
+            'status'           => 'sometimes|in:active,inactive',
             'description'      => 'nullable|string',
             'hero_image_url'   => 'nullable|url|max:500',
+            'gallery'          => 'nullable|array',
+            'gallery.*.url'    => 'required_with:gallery|string|max:500',
+            'gallery.*.type'   => 'required_with:gallery|in:image,video,file',
+            'gallery.*.caption'=> 'nullable|string|max:255',
+            'gallery.*.order'  => 'nullable|integer|min:0',
+            'gallery.*.is_primary' => 'nullable|boolean',
             'latitude'         => 'nullable|numeric|between:-90,90',
             'longitude'        => 'nullable|numeric|between:-180,180',
             'long_term_roi'    => 'nullable|numeric|min:0|max:100',
@@ -52,38 +51,33 @@ class AreaController
     public function store(Request $request): JsonResponse
     {
         $validated = $request->validate($this->rules(true));
-
-        if (empty($validated['slug'])) {
-            $validated['slug'] = Str::slug($validated['name']);
-        }
+        $validated['slug'] = Str::slug($validated['name']);
 
         $area = Area::create($validated);
-
         return $this->success($area, 'Area created successfully', 201);
     }
 
-    public function show(Area $area): JsonResponse
+    public function show(int $id): JsonResponse
     {
-        return $this->success($area);
+        return $this->success(Area::findOrFail($id));
     }
 
-    public function update(Request $request, Area $area): JsonResponse
+    public function update(Request $request, int $id): JsonResponse
     {
+        $area = Area::findOrFail($id);
         $validated = $request->validate($this->rules(false, $area->id));
 
-        if (isset($validated['name']) && empty($validated['slug'])) {
+        if (isset($validated['name'])) {
             $validated['slug'] = Str::slug($validated['name']);
         }
 
         $area->update($validated);
-
         return $this->success($area->fresh(), 'Area updated successfully');
     }
 
-    public function destroy(Area $area): JsonResponse
+    public function destroy(int $id): JsonResponse
     {
-        $area->delete();
-
+        Area::findOrFail($id)->delete();
         return $this->success(null, 'Area deleted successfully');
     }
 }

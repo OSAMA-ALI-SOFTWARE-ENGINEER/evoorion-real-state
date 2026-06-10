@@ -66,16 +66,24 @@ class SocialAuthController
             }
 
             // ── 2. Guard against account-takeover via email matching ────────
-            $existing = User::where('email', $email)->first();
+            // withTrashed() so soft-deleted users are found and restored rather
+            // than hitting a unique-key violation on INSERT.
+            $existing = User::withTrashed()->where('email', $email)->first();
 
             if ($existing) {
-                // User registered with email + password and has NOT linked this provider before
+                // User registered with email + password and has NOT linked this provider before.
+                // Guard applies even to soft-deleted accounts — prevents account takeover via
+                // social login against a deleted password account.
                 $alreadyLinked = $existing->social_provider === $provider;
 
                 if (!$alreadyLinked && $existing->password !== null) {
-                    // Do NOT silently link — the password user did not authorise this.
-                    // Redirect them to sign in with their password instead.
                     return redirect("{$frontendUrl}/auth/callback?error=email_exists");
+                }
+
+                // Only pure social accounts (password === null) or already-linked accounts
+                // reach here. Restore if soft-deleted.
+                if ($existing->trashed()) {
+                    $existing->restore();
                 }
 
                 // Safe to update: account was already linked or is a pure social account

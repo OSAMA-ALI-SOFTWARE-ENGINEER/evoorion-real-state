@@ -138,6 +138,36 @@ class AuthController
      *   "errors": {"email": ["The email has already been taken."]}
      * }
      */
+    public function updateProfile(Request $request): JsonResponse
+    {
+        $user = $request->user();
+        $request->validate([
+            'name'  => 'required|string|max:100',
+            'email' => 'required|email|max:255|unique:users,email,' . $user->id,
+        ]);
+
+        $user->update($request->only('name', 'email'));
+
+        return $this->success($user->fresh(), 'Profile updated');
+    }
+
+    public function changePassword(Request $request): JsonResponse
+    {
+        $user = $request->user();
+        $request->validate([
+            'current_password'          => 'required',
+            'new_password'              => 'required|string|min:8|confirmed',
+        ]);
+
+        if (!Hash::check($request->current_password, $user->password)) {
+            return $this->error('Current password is incorrect', null, 422);
+        }
+
+        $user->update(['password' => Hash::make($request->new_password)]);
+
+        return $this->success(null, 'Password changed successfully');
+    }
+
     public function register(Request $request): JsonResponse
     {
         $request->validate([

@@ -7,7 +7,6 @@ import {
   getAgentLeaderboard, getLeadsBySource,
 } from '@/lib/api'
 
-// ── helpers ───────────────────────────────────────────────────────────────────
 const GOLD   = '#C9A84C'
 const STATUS_COLORS: Record<string, string> = {
   new:        '#6366F1',
@@ -29,7 +28,6 @@ function fmtPrice(p: string | number) {
   return `AED ${n.toLocaleString()}`
 }
 
-// ── SVG sparkline (leads over time) ──────────────────────────────────────────
 function Sparkline({ data }: { data: { date: string; total: number }[] }) {
   if (!data.length) return null
   const W = 900; const H = 160; const PAD = 10
@@ -38,8 +36,6 @@ function Sparkline({ data }: { data: { date: string; total: number }[] }) {
   const ys = data.map(d => H - PAD - ((d.total / max) * (H - PAD * 2)))
   const pts = xs.map((x, i) => `${x},${ys[i]}`).join(' ')
   const fillPts = `${PAD},${H - PAD} ${pts} ${W - PAD},${H - PAD}`
-
-  // Pick ~6 x-axis labels evenly
   const step = Math.max(1, Math.floor(data.length / 6))
   const labels = data.filter((_, i) => i % step === 0 || i === data.length - 1)
 
@@ -54,11 +50,7 @@ function Sparkline({ data }: { data: { date: string; total: number }[] }) {
         </defs>
         <polygon points={fillPts} fill="url(#sparkGrad)" />
         <polyline points={pts} fill="none" stroke={GOLD} strokeWidth="2" strokeLinejoin="round" />
-        {/* dots */}
-        {xs.map((x, i) => (
-          <circle key={i} cx={x} cy={ys[i]} r="3" fill={GOLD} />
-        ))}
-        {/* x labels */}
+        {xs.map((x, i) => <circle key={i} cx={x} cy={ys[i]} r="3" fill={GOLD} />)}
         {labels.map((d, i) => {
           const idx = data.indexOf(d)
           return (
@@ -72,7 +64,6 @@ function Sparkline({ data }: { data: { date: string; total: number }[] }) {
   )
 }
 
-// ── Donut chart (leads by source) ─────────────────────────────────────────────
 function DonutChart({ data }: { data: { source: string; total: number }[] }) {
   const total = data.reduce((s, d) => s + d.total, 0) || 1
   const R = 60; const CX = 80; const CY = 80
@@ -92,15 +83,15 @@ function DonutChart({ data }: { data: { source: string; total: number }[] }) {
     <div className="flex items-center gap-8 flex-wrap">
       <svg viewBox="0 0 160 160" className="w-32 h-32 shrink-0">
         {slices.map((s, i) => <path key={i} d={s.d} fill={s.color} />)}
-        <circle cx={CX} cy={CY} r={R * 0.55} fill="white" />
-        <text x={CX} y={CY + 4} textAnchor="middle" fontSize="13" fontWeight="700" fill="#0F172A">{total}</text>
+        <circle cx={CX} cy={CY} r={R * 0.55} className="fill-white dark:fill-slate-800" />
+        <text x={CX} y={CY + 4} textAnchor="middle" fontSize="13" fontWeight="700" fill={GOLD}>{total}</text>
       </svg>
       <div className="flex flex-col gap-2">
         {slices.map((s, i) => (
           <div key={i} className="flex items-center gap-2">
             <span className="w-3 h-3 rounded-full shrink-0" style={{ background: s.color }} />
-            <span className="text-sm text-slate-700 capitalize">{s.source}</span>
-            <span className="text-xs text-slate-400 ml-auto pl-4">{s.total} ({Math.round((s.total / total) * 100)}%)</span>
+            <span className="text-sm text-slate-700 dark:text-slate-200 capitalize">{s.source}</span>
+            <span className="text-xs text-slate-400 dark:text-slate-500 ml-auto pl-4">{s.total} ({Math.round((s.total / total) * 100)}%)</span>
           </div>
         ))}
       </div>
@@ -108,7 +99,6 @@ function DonutChart({ data }: { data: { source: string; total: number }[] }) {
   )
 }
 
-// ── Tab types ─────────────────────────────────────────────────────────────────
 type Tab = 'funnel' | 'over-time' | 'properties' | 'leaderboard' | 'sources'
 
 const TABS: { key: Tab; label: string }[] = [
@@ -119,64 +109,46 @@ const TABS: { key: Tab; label: string }[] = [
   { key: 'sources',     label: 'Leads by Source' },
 ]
 
-// ── Page ──────────────────────────────────────────────────────────────────────
+const card = 'bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700'
+
 export default function ReportsPage() {
-  const [tab, setTab] = useState<Tab>('funnel')
+  const [tab,  setTab]  = useState<Tab>('funnel')
   const [days, setDays] = useState(30)
 
-  // funnel
   const [funnel,    setFunnel]    = useState<{ funnel: { status: string; count: number }[]; total: number; conversion_rate: number } | null>(null)
   const [funnelL,   setFunnelL]   = useState(true)
-
-  // over time
   const [timeline,  setTimeline]  = useState<{ date: string; total: number }[]>([])
   const [timelineL, setTimelineL] = useState(true)
-
-  // properties
   const [props,     setProps]     = useState<Record<string, unknown>[]>([])
   const [propsL,    setPropsL]    = useState(true)
-
-  // leaderboard
   const [board,     setBoard]     = useState<Record<string, unknown>[]>([])
   const [boardL,    setBoardL]    = useState(true)
-
-  // sources
   const [sources,   setSources]   = useState<{ source: string; total: number }[]>([])
   const [sourcesL,  setSourcesL]  = useState(true)
 
   useEffect(() => {
     setFunnelL(true)
-    getLeadFunnel()
-      .then(res => setFunnel(res.data as typeof funnel))
-      .finally(() => setFunnelL(false))
+    getLeadFunnel().then(res => setFunnel(res.data as typeof funnel)).finally(() => setFunnelL(false))
   }, [])
 
   useEffect(() => {
     setTimelineL(true)
-    getLeadsOverTime(days)
-      .then(res => setTimeline(res.data as typeof timeline))
-      .finally(() => setTimelineL(false))
+    getLeadsOverTime(days).then(res => setTimeline(res.data as typeof timeline)).finally(() => setTimelineL(false))
   }, [days])
 
   useEffect(() => {
     setPropsL(true)
-    getPropertyPerformance()
-      .then(res => setProps(res.data as typeof props))
-      .finally(() => setPropsL(false))
+    getPropertyPerformance().then(res => setProps(res.data as typeof props)).finally(() => setPropsL(false))
   }, [])
 
   useEffect(() => {
     setBoardL(true)
-    getAgentLeaderboard()
-      .then(res => setBoard(res.data as typeof board))
-      .finally(() => setBoardL(false))
+    getAgentLeaderboard().then(res => setBoard(res.data as typeof board)).finally(() => setBoardL(false))
   }, [])
 
   useEffect(() => {
     setSourcesL(true)
-    getLeadsBySource()
-      .then(res => setSources(res.data as typeof sources))
-      .finally(() => setSourcesL(false))
+    getLeadsBySource().then(res => setSources(res.data as typeof sources)).finally(() => setSourcesL(false))
   }, [])
 
   const spinner = (
@@ -188,7 +160,7 @@ export default function ReportsPage() {
   return (
     <div className="space-y-5 max-w-5xl">
       {/* Tabs */}
-      <div className="flex gap-1 border-b border-slate-200 overflow-x-auto">
+      <div className="flex gap-1 border-b border-slate-200 dark:border-slate-700 overflow-x-auto">
         {TABS.map(t => (
           <button
             key={t.key}
@@ -198,7 +170,7 @@ export default function ReportsPage() {
               'px-4 py-2.5 text-sm font-medium whitespace-nowrap transition-colors border-b-2 -mb-px',
               tab === t.key
                 ? 'border-[#C9A84C] text-[#C9A84C]'
-                : 'border-transparent text-slate-500 hover:text-slate-700',
+                : 'border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200',
             ].join(' ')}
           >
             {t.label}
@@ -208,12 +180,12 @@ export default function ReportsPage() {
 
       {/* ── Lead Funnel ── */}
       {tab === 'funnel' && (
-        <div className="bg-white rounded-xl border border-slate-200 p-6 space-y-6">
+        <div className={`${card} p-6 space-y-6`}>
           <div className="flex items-center justify-between">
-            <h2 className="text-base font-semibold text-slate-800">Lead Pipeline Funnel</h2>
+            <h2 className="text-base font-semibold text-slate-800 dark:text-slate-100">Lead Pipeline Funnel</h2>
             {funnel && (
-              <span className="text-sm text-slate-500">
-                Conversion rate: <strong className="text-slate-700">{funnel.conversion_rate}%</strong>
+              <span className="text-sm text-slate-500 dark:text-slate-400">
+                Conversion rate: <strong className="text-slate-700 dark:text-slate-200">{funnel.conversion_rate}%</strong>
               </span>
             )}
           </div>
@@ -224,10 +196,10 @@ export default function ReportsPage() {
                 return (
                   <div key={status}>
                     <div className="flex justify-between text-sm mb-1">
-                      <span className="capitalize text-slate-700 font-medium">{status}</span>
-                      <span className="text-slate-500">{count} leads</span>
+                      <span className="capitalize text-slate-700 dark:text-slate-200 font-medium">{status}</span>
+                      <span className="text-slate-500 dark:text-slate-400">{count} leads</span>
                     </div>
-                    <div className="h-8 bg-slate-100 rounded-lg overflow-hidden">
+                    <div className="h-8 bg-slate-100 dark:bg-slate-700 rounded-lg overflow-hidden">
                       <div
                         className="h-full rounded-lg transition-all duration-500 flex items-center pl-3 text-xs font-semibold text-white"
                         style={{ width: `${Math.max(pct, 2)}%`, background: STATUS_COLORS[status] }}
@@ -245,9 +217,9 @@ export default function ReportsPage() {
 
       {/* ── Leads over Time ── */}
       {tab === 'over-time' && (
-        <div className="bg-white rounded-xl border border-slate-200 p-6 space-y-4">
+        <div className={`${card} p-6 space-y-4`}>
           <div className="flex items-center justify-between flex-wrap gap-3">
-            <h2 className="text-base font-semibold text-slate-800">Leads over Time</h2>
+            <h2 className="text-base font-semibold text-slate-800 dark:text-slate-100">Leads over Time</h2>
             <div className="flex gap-2">
               {[7, 14, 30, 60, 90].map(d => (
                 <button
@@ -258,7 +230,7 @@ export default function ReportsPage() {
                     'px-3 py-1 rounded-lg text-xs font-semibold transition-colors',
                     days === d
                       ? 'bg-[#C9A84C] text-slate-900'
-                      : 'bg-slate-100 text-slate-600 hover:bg-slate-200',
+                      : 'bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600',
                   ].join(' ')}
                 >
                   {d}d
@@ -272,47 +244,47 @@ export default function ReportsPage() {
 
       {/* ── Property Performance ── */}
       {tab === 'properties' && (
-        <div className="bg-white rounded-xl border border-slate-200 overflow-hidden">
-          <div className="px-6 py-4 border-b border-slate-100">
-            <h2 className="text-base font-semibold text-slate-800">Top 20 Properties by Views</h2>
+        <div className={`${card} overflow-hidden`}>
+          <div className="px-6 py-4 border-b border-slate-100 dark:border-slate-700">
+            <h2 className="text-base font-semibold text-slate-800 dark:text-slate-100">Top 20 Properties by Views</h2>
           </div>
           {propsL ? spinner : (
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="bg-slate-50 border-b border-slate-100">
-                    <th className="px-5 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">#</th>
-                    <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Property</th>
-                    <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Area</th>
-                    <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Price</th>
-                    <th className="px-4 py-3 text-right text-xs font-semibold text-slate-500 uppercase tracking-wider">Views</th>
-                    <th className="px-4 py-3 text-right text-xs font-semibold text-slate-500 uppercase tracking-wider">Leads</th>
-                    <th className="px-5 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Status</th>
+                  <tr className="bg-slate-50 dark:bg-slate-700/50 border-b border-slate-100 dark:border-slate-700">
+                    <th className="px-5 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">#</th>
+                    <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Property</th>
+                    <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Area</th>
+                    <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Price</th>
+                    <th className="px-4 py-3 text-right text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Views</th>
+                    <th className="px-4 py-3 text-right text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Leads</th>
+                    <th className="px-5 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Status</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100">
+                <tbody className="divide-y divide-slate-100 dark:divide-slate-700">
                   {props.length === 0 ? (
                     <tr><td colSpan={7} className="px-5 py-8 text-center text-slate-400">No data.</td></tr>
                   ) : props.map((p, i) => (
-                    <tr key={String(p.id)} className="hover:bg-slate-50">
+                    <tr key={String(p.id)} className="hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors">
                       <td className="px-5 py-3.5 text-slate-400 text-xs">{i + 1}</td>
                       <td className="px-4 py-3.5">
-                        <Link href={`/properties/${p.slug}`} className="font-medium text-slate-800 hover:text-[#C9A84C] transition-colors line-clamp-1">
+                        <Link href={`/properties/${p.slug}`} className="font-medium text-slate-800 dark:text-slate-100 hover:text-[#C9A84C] transition-colors line-clamp-1">
                           {String(p.title)}
                         </Link>
                         {p.is_featured && (
-                          <span className="inline-block mt-0.5 text-[10px] bg-amber-50 text-amber-600 px-1.5 py-0.5 rounded font-semibold">Featured</span>
+                          <span className="inline-block mt-0.5 text-[10px] bg-amber-50 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 px-1.5 py-0.5 rounded font-semibold">Featured</span>
                         )}
                       </td>
-                      <td className="px-4 py-3.5 text-slate-500 text-xs">{String(p.area ?? '—')}</td>
-                      <td className="px-4 py-3.5 text-slate-700 text-xs">{fmtPrice(p.price as string)}</td>
-                      <td className="px-4 py-3.5 text-right font-medium text-slate-800">{Number(p.views).toLocaleString()}</td>
-                      <td className="px-4 py-3.5 text-right text-slate-600">{Number(p.leads)}</td>
+                      <td className="px-4 py-3.5 text-slate-500 dark:text-slate-400 text-xs">{String(p.area ?? '—')}</td>
+                      <td className="px-4 py-3.5 text-slate-700 dark:text-slate-300 text-xs">{fmtPrice(p.price as string)}</td>
+                      <td className="px-4 py-3.5 text-right font-medium text-slate-800 dark:text-slate-100">{Number(p.views).toLocaleString()}</td>
+                      <td className="px-4 py-3.5 text-right text-slate-600 dark:text-slate-300">{Number(p.leads)}</td>
                       <td className="px-5 py-3.5">
                         <span className={`inline-flex px-2 py-0.5 rounded-full text-[11px] font-semibold capitalize ${
-                          p.status === 'available' ? 'bg-emerald-50 text-emerald-700'
-                          : p.status === 'sold'    ? 'bg-slate-100 text-slate-600'
-                          : 'bg-blue-50 text-blue-700'
+                          p.status === 'available' ? 'bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400'
+                          : p.status === 'sold'    ? 'bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300'
+                          : 'bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400'
                         }`}>{String(p.status)}</span>
                       </td>
                     </tr>
@@ -326,38 +298,33 @@ export default function ReportsPage() {
 
       {/* ── Agent Leaderboard ── */}
       {tab === 'leaderboard' && (
-        <div className="bg-white rounded-xl border border-slate-200 overflow-hidden">
-          <div className="px-6 py-4 border-b border-slate-100">
-            <h2 className="text-base font-semibold text-slate-800">Agent Leaderboard</h2>
+        <div className={`${card} overflow-hidden`}>
+          <div className="px-6 py-4 border-b border-slate-100 dark:border-slate-700">
+            <h2 className="text-base font-semibold text-slate-800 dark:text-slate-100">Agent Leaderboard</h2>
           </div>
           {boardL ? spinner : (
-            <div className="divide-y divide-slate-100">
-              {(board as { id: number; name: string; leads_total: number; leads_closed: number; leads_new: number; close_rate: number }[]).map((a, i) => (
-                <div key={a.id} className="px-6 py-4 flex items-center gap-4">
+            <div className="divide-y divide-slate-100 dark:divide-slate-700">
+              {(board as { id: number; name: string; leads_total: number; leads_closed: number; close_rate: number }[]).map((a, i) => (
+                <div key={a.id} className="px-6 py-4 flex items-center gap-4 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors">
                   <span className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold shrink-0 ${
-                    i === 0 ? 'bg-amber-400 text-white' : i === 1 ? 'bg-slate-300 text-slate-700' : i === 2 ? 'bg-orange-300 text-white' : 'bg-slate-100 text-slate-500'
+                    i === 0 ? 'bg-amber-400 text-white' : i === 1 ? 'bg-slate-300 text-slate-700' : i === 2 ? 'bg-orange-300 text-white' : 'bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-300'
                   }`}>{i + 1}</span>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-slate-800 truncate">{a.name}</p>
+                    <p className="text-sm font-medium text-slate-800 dark:text-slate-100 truncate">{a.name}</p>
                     <div className="flex items-center gap-3 mt-1">
-                      <div className="flex-1 h-1.5 bg-slate-100 rounded-full overflow-hidden">
-                        <div
-                          className="h-full rounded-full bg-[#C9A84C] transition-all"
-                          style={{ width: `${a.close_rate}%` }}
-                        />
+                      <div className="flex-1 h-1.5 bg-slate-100 dark:bg-slate-700 rounded-full overflow-hidden">
+                        <div className="h-full rounded-full bg-[#C9A84C] transition-all" style={{ width: `${a.close_rate}%` }} />
                       </div>
-                      <span className="text-xs text-slate-500 shrink-0">{a.close_rate}% close rate</span>
+                      <span className="text-xs text-slate-500 dark:text-slate-400 shrink-0">{a.close_rate}% close rate</span>
                     </div>
                   </div>
                   <div className="text-right shrink-0">
-                    <p className="text-sm font-semibold text-emerald-600">{a.leads_closed} closed</p>
+                    <p className="text-sm font-semibold text-emerald-600 dark:text-emerald-400">{a.leads_closed} closed</p>
                     <p className="text-xs text-slate-400">{a.leads_total} total</p>
                   </div>
                 </div>
               ))}
-              {board.length === 0 && (
-                <p className="px-6 py-8 text-center text-slate-400 text-sm">No agents yet.</p>
-              )}
+              {board.length === 0 && <p className="px-6 py-8 text-center text-slate-400 text-sm">No agents yet.</p>}
             </div>
           )}
         </div>
@@ -365,8 +332,8 @@ export default function ReportsPage() {
 
       {/* ── Leads by Source ── */}
       {tab === 'sources' && (
-        <div className="bg-white rounded-xl border border-slate-200 p-6">
-          <h2 className="text-base font-semibold text-slate-800 mb-6">Leads by Source</h2>
+        <div className={`${card} p-6`}>
+          <h2 className="text-base font-semibold text-slate-800 dark:text-slate-100 mb-6">Leads by Source</h2>
           {sourcesL ? spinner : sources.length === 0 ? (
             <p className="text-slate-400 text-sm">No data.</p>
           ) : (

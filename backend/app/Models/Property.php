@@ -29,6 +29,7 @@ class Property extends Model
         'operation_type_id',
         'status',
         'is_featured',
+        'is_active',
         'roi_min',
         'roi_max',
         'developer_id',
@@ -39,6 +40,7 @@ class Property extends Model
     ];
 
     protected $casts = [
+        'is_active'   => 'boolean',
         'is_featured' => 'boolean',
         'price' => 'decimal:2',
         'area_sqft' => 'decimal:2',

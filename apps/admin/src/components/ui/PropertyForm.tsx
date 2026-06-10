@@ -8,6 +8,8 @@ import {
   uploadPropertyImage, updatePropertyImage, deletePropertyImage,
 } from '@/lib/api'
 import type { Area, Developer, OperationType, Property, PropertyImage } from '@/types'
+import { RichTextEditor } from '@/components/ui/RichTextEditor'
+import { CustomSelect } from '@/components/ui/CustomSelect'
 
 interface FormState {
   title:             string
@@ -21,6 +23,7 @@ interface FormState {
   bedrooms:          string
   bathrooms:         string
   is_featured:       boolean
+  is_active:         boolean
   roi_min:           string
   roi_max:           string
   area_id:           string
@@ -35,7 +38,7 @@ function blank(): FormState {
   return {
     title: '', description: '', type: 'apartment', status: 'available',
     price: '', currency: 'AED', location: '', area_sqft: '',
-    bedrooms: '', bathrooms: '', is_featured: false,
+    bedrooms: '', bathrooms: '', is_featured: false, is_active: true,
     roi_min: '', roi_max: '', area_id: '', developer_id: '',
     operation_type_id: '', meta_title: '', meta_description: '',
     amenities: [],
@@ -55,6 +58,7 @@ function fromProperty(p: Property): FormState {
     bedrooms:          p.bedrooms != null ? String(p.bedrooms) : '',
     bathrooms:         p.bathrooms != null ? String(p.bathrooms) : '',
     is_featured:       p.is_featured ?? false,
+    is_active:         p.is_active ?? true,
     roi_min:           p.roi_min != null ? String(p.roi_min) : '',
     roi_max:           p.roi_max != null ? String(p.roi_max) : '',
     area_id:           p.area_id != null ? String(p.area_id) : '',
@@ -79,6 +83,7 @@ function toPayload(f: FormState): Record<string, unknown> {
     bedrooms:          f.bedrooms ? Number(f.bedrooms) : undefined,
     bathrooms:         f.bathrooms ? Number(f.bathrooms) : undefined,
     is_featured:       f.is_featured,
+    is_active:         f.is_active,
     roi_min:           f.roi_min ? Number(f.roi_min) : undefined,
     roi_max:           f.roi_max ? Number(f.roi_max) : undefined,
     area_id:           Number(f.area_id),
@@ -90,12 +95,20 @@ function toPayload(f: FormState): Record<string, unknown> {
   }
 }
 
-// ── Field components ──────────────────────────────────────────────────────────
+// ── Shared styles ─────────────────────────────────────────────────────────────
+
+const inputCls = 'w-full px-3.5 py-2.5 rounded-lg border border-slate-200 dark:border-slate-600 text-sm focus:outline-none focus:border-[#C9A84C] focus:ring-1 focus:ring-[#C9A84C] bg-white dark:bg-slate-700 text-slate-800 dark:text-slate-100 placeholder-slate-400 transition-colors'
+const selectCls = inputCls + ' appearance-none cursor-pointer'
+const card = 'bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700'
+const sectionHead = 'text-sm font-semibold text-slate-700 dark:text-slate-300 uppercase tracking-wider'
+const divider = 'border-slate-100 dark:border-slate-700'
+
+// ── Field ─────────────────────────────────────────────────────────────────────
 
 function Field({ label, children, required, htmlFor }: { label: string; children: React.ReactNode; required?: boolean; htmlFor?: string }) {
   return (
     <div>
-      <label htmlFor={htmlFor} className="block text-sm font-medium text-slate-700 mb-1.5">
+      <label htmlFor={htmlFor} className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
         {label}{required && <span className="text-red-400 ml-0.5">*</span>}
       </label>
       {children}
@@ -103,8 +116,54 @@ function Field({ label, children, required, htmlFor }: { label: string; children
   )
 }
 
-const inputCls = 'w-full px-3.5 py-2.5 rounded-lg border border-slate-200 text-sm focus:outline-none focus:border-[#C9A84C] focus:ring-1 focus:ring-[#C9A84C] bg-white text-slate-800 transition-colors'
-const selectCls = inputCls
+// ── LocationCombo — free-text input with area name suggestions ────────────────
+
+function LocationCombo({ value, onChange, areas }: { value: string; onChange: (v: string) => void; areas: Area[] }) {
+  const [open, setOpen] = useState(false)
+  const wrapRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    function onOutside(e: MouseEvent) {
+      if (wrapRef.current && !wrapRef.current.contains(e.target as Node)) setOpen(false)
+    }
+    document.addEventListener('mousedown', onOutside)
+    return () => document.removeEventListener('mousedown', onOutside)
+  }, [])
+
+  const suggestions = areas
+    .filter(a => a.name.toLowerCase().includes(value.toLowerCase()))
+    .slice(0, 8)
+
+  const showDrop = open && value.length > 0 && suggestions.length > 0
+
+  return (
+    <div ref={wrapRef} className="relative">
+      <input
+        type="text"
+        value={value}
+        onChange={e => { onChange(e.target.value); setOpen(true) }}
+        onFocus={() => setOpen(true)}
+        placeholder="e.g. Dubai Marina, Palm Jumeirah…"
+        className={inputCls}
+        autoComplete="off"
+      />
+      {showDrop && (
+        <div className="absolute top-full left-0 right-0 z-50 mt-1 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-600 rounded-lg shadow-xl overflow-hidden">
+          {suggestions.map(a => (
+            <button
+              key={a.id}
+              type="button"
+              onMouseDown={() => { onChange(a.name); setOpen(false) }}
+              className="w-full px-3.5 py-2.5 text-left text-sm text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
+            >
+              {a.name}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
 
 // ── AmenityInput ──────────────────────────────────────────────────────────────
 
@@ -133,7 +192,7 @@ function AmenityInput({ amenities, onChange }: { amenities: string[]; onChange: 
         <button
           type="button"
           onClick={add}
-          className="px-3 py-2 rounded-lg border border-slate-200 text-sm text-slate-600 hover:bg-slate-50 shrink-0"
+          className="px-3 py-2 rounded-lg border border-slate-200 dark:border-slate-600 text-sm text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 shrink-0 transition-colors"
         >
           Add
         </button>
@@ -141,7 +200,7 @@ function AmenityInput({ amenities, onChange }: { amenities: string[]; onChange: 
       {amenities.length > 0 && (
         <div className="flex flex-wrap gap-1.5 mt-2">
           {amenities.map((a, i) => (
-            <span key={i} className="inline-flex items-center gap-1 px-2.5 py-1 bg-slate-100 text-slate-700 text-xs rounded-full">
+            <span key={i} className="inline-flex items-center gap-1 px-2.5 py-1 bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs rounded-full">
               {a}
               <button
                 type="button"
@@ -205,12 +264,12 @@ function ImageManager({ slug, initial }: { slug: string; initial: PropertyImage[
   }
 
   return (
-    <div className="bg-white rounded-xl border border-slate-200 p-6 space-y-4">
+    <div className={`${card} p-6 space-y-4`}>
       <div className="flex items-center justify-between">
-        <h2 className="text-sm font-semibold text-slate-700 uppercase tracking-wider">Images</h2>
+        <h2 className={sectionHead}>Images</h2>
         <label className={`cursor-pointer inline-flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
           uploading
-            ? 'bg-slate-100 text-slate-400 pointer-events-none'
+            ? 'bg-slate-100 dark:bg-slate-700 text-slate-400 pointer-events-none'
             : 'bg-[#C9A84C] hover:bg-[#D4B668] text-slate-900'
         }`}>
           {uploading ? (
@@ -237,11 +296,11 @@ function ImageManager({ slug, initial }: { slug: string; initial: PropertyImage[
 
       {images.length === 0 ? (
         <div
-          className="border-2 border-dashed border-slate-200 rounded-lg p-10 text-center cursor-pointer hover:border-[#C9A84C]/40 transition-colors"
+          className="border-2 border-dashed border-slate-200 dark:border-slate-600 rounded-lg p-10 text-center cursor-pointer hover:border-[#C9A84C]/40 transition-colors"
           onClick={() => fileRef.current?.click()}
         >
           <p className="text-slate-400 text-sm">No images yet — click to upload</p>
-          <p className="text-slate-300 text-xs mt-1">JPEG, PNG, WebP · max 10 MB each</p>
+          <p className="text-slate-300 dark:text-slate-500 text-xs mt-1">JPEG, PNG, WebP · max 10 MB each</p>
         </div>
       ) : (
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
@@ -250,7 +309,7 @@ function ImageManager({ slug, initial }: { slug: string; initial: PropertyImage[
             .sort((a, b) => (b.is_primary ? 1 : 0) - (a.is_primary ? 1 : 0) || a.order - b.order)
             .map(img => (
               <div key={img.id} className={`relative rounded-lg overflow-hidden border-2 transition-colors ${img.is_primary ? 'border-[#C9A84C]' : 'border-transparent'}`}>
-                <div className="relative aspect-[4/3] bg-slate-100">
+                <div className="relative aspect-[4/3] bg-slate-100 dark:bg-slate-700">
                   <Image
                     src={img.url}
                     alt=""
@@ -260,7 +319,6 @@ function ImageManager({ slug, initial }: { slug: string; initial: PropertyImage[
                     unoptimized
                   />
                 </div>
-                {/* Overlay actions */}
                 <div className="absolute inset-0 bg-black/0 hover:bg-black/30 transition-colors flex items-end justify-between p-1.5 opacity-0 hover:opacity-100">
                   <button
                     type="button"
@@ -291,12 +349,11 @@ function ImageManager({ slug, initial }: { slug: string; initial: PropertyImage[
               </div>
             ))}
 
-          {/* Drop zone tile */}
           <div
-            className="aspect-[4/3] rounded-lg border-2 border-dashed border-slate-200 flex items-center justify-center cursor-pointer hover:border-[#C9A84C]/40 transition-colors"
+            className="aspect-[4/3] rounded-lg border-2 border-dashed border-slate-200 dark:border-slate-600 flex items-center justify-center cursor-pointer hover:border-[#C9A84C]/40 transition-colors"
             onClick={() => fileRef.current?.click()}
           >
-            <span className="text-slate-300 text-2xl">+</span>
+            <span className="text-slate-300 dark:text-slate-500 text-2xl">+</span>
           </div>
         </div>
       )}
@@ -359,17 +416,50 @@ export function PropertyForm({ property }: PropertyFormProps) {
     }
   }
 
+  const areaOptions = [
+    { value: '', label: 'Select area…' },
+    ...areas.map(a => ({ value: String(a.id), label: a.name })),
+  ]
+  const devOptions = [
+    { value: '', label: 'Select developer…' },
+    ...devs.map(d => ({ value: String(d.id), label: d.name })),
+  ]
+  const opOptions = [
+    { value: '', label: 'Select type…' },
+    ...opTypes.map(o => ({ value: String(o.id), label: o.name })),
+  ]
+
+  const typeOptions = [
+    { value: 'apartment',  label: 'Apartment' },
+    { value: 'villa',      label: 'Villa' },
+    { value: 'penthouse',  label: 'Penthouse' },
+    { value: 'townhouse',  label: 'Townhouse' },
+    { value: 'commercial', label: 'Commercial' },
+  ]
+  const statusOptions = [
+    { value: 'available', label: 'Available' },
+    { value: 'sold',      label: 'Sold' },
+    { value: 'rented',    label: 'Rented' },
+  ]
+  const currencyOptions = [
+    { value: 'AED', label: 'AED' },
+    { value: 'USD', label: 'USD' },
+    { value: 'EUR', label: 'EUR' },
+    { value: 'GBP', label: 'GBP' },
+    { value: 'SAR', label: 'SAR' },
+  ]
+
   return (
     <div className="max-w-5xl space-y-6">
     <form ref={formRef} onSubmit={handleSubmit} className="space-y-6">
       {error && (
-        <div className="px-4 py-3 rounded-lg bg-red-50 border border-red-200 text-red-600 text-sm">{error}</div>
+        <div className="px-4 py-3 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-600 dark:text-red-400 text-sm">{error}</div>
       )}
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* ── Left column (main) ── */}
-        <div className="lg:col-span-2 space-y-5 bg-white rounded-xl border border-slate-200 p-6">
-          <h2 className="text-sm font-semibold text-slate-700 uppercase tracking-wider">Property Details</h2>
+        <div className={`lg:col-span-2 space-y-5 ${card} p-6`}>
+          <h2 className={sectionHead}>Property Details</h2>
 
           <Field label="Title" required>
             <input
@@ -383,32 +473,27 @@ export function PropertyForm({ property }: PropertyFormProps) {
           </Field>
 
           <Field label="Description">
-            <textarea
-              rows={5}
+            <RichTextEditor
               value={form.description}
-              onChange={e => set('description', e.target.value)}
-              className={inputCls + ' resize-y'}
+              onChange={v => set('description', v)}
               placeholder="Full property description…"
             />
           </Field>
 
           <div className="grid grid-cols-2 gap-4">
-            <Field label="Type" required htmlFor="prop-type">
-              <select id="prop-type" value={form.type} onChange={e => set('type', e.target.value)} className={selectCls} required>
-                <option value="apartment">Apartment</option>
-                <option value="villa">Villa</option>
-                <option value="penthouse">Penthouse</option>
-                <option value="townhouse">Townhouse</option>
-                <option value="commercial">Commercial</option>
-              </select>
+            <Field label="Type" required>
+              <CustomSelect
+                value={form.type}
+                onChange={v => set('type', v)}
+                options={typeOptions}
+                placeholder="Select type…"
+              />
             </Field>
             <Field label="Location">
-              <input
-                type="text"
+              <LocationCombo
                 value={form.location}
-                onChange={e => set('location', e.target.value)}
-                className={inputCls}
-                placeholder="e.g. Palm Jumeirah Frond C"
+                onChange={v => set('location', v)}
+                areas={areas}
               />
             </Field>
           </div>
@@ -434,8 +519,8 @@ export function PropertyForm({ property }: PropertyFormProps) {
             </Field>
           </div>
 
-          <hr className="border-slate-100" />
-          <h2 className="text-sm font-semibold text-slate-700 uppercase tracking-wider">SEO</h2>
+          <hr className={`border-t ${divider}`} />
+          <h2 className={sectionHead}>SEO</h2>
 
           <Field label="Meta Title">
             <input type="text" value={form.meta_title} onChange={e => set('meta_title', e.target.value)} className={inputCls} placeholder="SEO page title" />
@@ -444,22 +529,23 @@ export function PropertyForm({ property }: PropertyFormProps) {
             <textarea rows={2} value={form.meta_description} onChange={e => set('meta_description', e.target.value)} className={inputCls + ' resize-none'} placeholder="SEO description (max 160 chars)" />
           </Field>
 
-          <hr className="border-slate-100" />
-          <h2 className="text-sm font-semibold text-slate-700 uppercase tracking-wider">Amenities</h2>
+          <hr className={`border-t ${divider}`} />
+          <h2 className={sectionHead}>Amenities</h2>
           <AmenityInput amenities={form.amenities} onChange={v => set('amenities', v)} />
         </div>
 
         {/* ── Right sidebar ── */}
         <div className="space-y-5">
-          <div className="bg-white rounded-xl border border-slate-200 p-6 space-y-5">
-            <h2 className="text-sm font-semibold text-slate-700 uppercase tracking-wider">Listing</h2>
+          <div className={`${card} p-6 space-y-5`}>
+            <h2 className={sectionHead}>Listing</h2>
 
-            <Field label="Status" required htmlFor="prop-status">
-              <select id="prop-status" value={form.status} onChange={e => set('status', e.target.value)} className={selectCls} required>
-                <option value="available">Available</option>
-                <option value="sold">Sold</option>
-                <option value="rented">Rented</option>
-              </select>
+            <Field label="Status" required>
+              <CustomSelect
+                value={form.status}
+                onChange={v => set('status', v)}
+                options={statusOptions}
+                placeholder="Select status…"
+              />
             </Field>
 
             <div className="flex gap-3">
@@ -468,46 +554,72 @@ export function PropertyForm({ property }: PropertyFormProps) {
                   <input type="number" min="0" step="0.01" required value={form.price} onChange={e => set('price', e.target.value)} className={inputCls} placeholder="0" />
                 </Field>
               </div>
-              <div className="w-20">
+              <div className="w-28">
                 <Field label="Currency">
-                  <input type="text" maxLength={3} value={form.currency} onChange={e => set('currency', e.target.value.toUpperCase())} className={inputCls} />
+                  <CustomSelect
+                    value={form.currency}
+                    onChange={v => set('currency', v)}
+                    options={currencyOptions}
+                    placeholder="AED"
+                  />
                 </Field>
               </div>
             </div>
 
-            <label className="flex items-center gap-2.5 cursor-pointer">
-              <input
-                type="checkbox"
-                checked={form.is_featured}
-                onChange={e => set('is_featured', e.target.checked)}
-                className="w-4 h-4 rounded border-slate-300 text-[#C9A84C] focus:ring-[#C9A84C]"
-              />
-              <span className="text-sm text-slate-700">Featured property</span>
-            </label>
+            <div className="flex items-center gap-6">
+              <label className="flex items-center gap-2.5 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={form.is_featured}
+                  onChange={e => set('is_featured', e.target.checked)}
+                  className="w-4 h-4 rounded border-slate-300 dark:border-slate-600 text-[#C9A84C] focus:ring-[#C9A84C]"
+                />
+                <span className="text-sm text-slate-700 dark:text-slate-300">Featured property</span>
+              </label>
+              <label className="flex items-center gap-2.5 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={form.is_active}
+                  onChange={e => set('is_active', e.target.checked)}
+                  className="w-4 h-4 rounded border-slate-300 dark:border-slate-600 text-[#C9A84C] focus:ring-[#C9A84C]"
+                />
+                <span className="text-sm text-slate-700 dark:text-slate-300">
+                  Published <span className="text-xs text-slate-400">(visible on website)</span>
+                </span>
+              </label>
+            </div>
           </div>
 
-          <div className="bg-white rounded-xl border border-slate-200 p-6 space-y-5">
-            <h2 className="text-sm font-semibold text-slate-700 uppercase tracking-wider">Classification</h2>
+          <div className={`${card} p-6 space-y-5`}>
+            <h2 className={sectionHead}>Classification</h2>
 
-            <Field label="Area" required htmlFor="prop-area">
-              <select id="prop-area" value={form.area_id} onChange={e => set('area_id', e.target.value)} className={selectCls} required>
-                <option value="">Select area…</option>
-                {areas.map(a => <option key={a.id} value={a.id}>{a.name}</option>)}
-              </select>
+            <Field label="Area" required>
+              <CustomSelect
+                value={form.area_id}
+                onChange={v => set('area_id', v)}
+                options={areaOptions}
+                placeholder="Select area…"
+                searchable={areas.length > 5}
+              />
             </Field>
 
-            <Field label="Developer" required htmlFor="prop-developer">
-              <select id="prop-developer" value={form.developer_id} onChange={e => set('developer_id', e.target.value)} className={selectCls} required>
-                <option value="">Select developer…</option>
-                {devs.map(d => <option key={d.id} value={d.id}>{d.name}</option>)}
-              </select>
+            <Field label="Developer" required>
+              <CustomSelect
+                value={form.developer_id}
+                onChange={v => set('developer_id', v)}
+                options={devOptions}
+                placeholder="Select developer…"
+                searchable={devs.length > 5}
+              />
             </Field>
 
-            <Field label="Operation Type" required htmlFor="prop-optype">
-              <select id="prop-optype" value={form.operation_type_id} onChange={e => set('operation_type_id', e.target.value)} className={selectCls} required>
-                <option value="">Select type…</option>
-                {opTypes.map(o => <option key={o.id} value={o.id}>{o.name}</option>)}
-              </select>
+            <Field label="Operation Type" required>
+              <CustomSelect
+                value={form.operation_type_id}
+                onChange={v => set('operation_type_id', v)}
+                options={opOptions}
+                placeholder="Select type…"
+              />
             </Field>
           </div>
 
@@ -523,7 +635,7 @@ export function PropertyForm({ property }: PropertyFormProps) {
             <button
               type="button"
               onClick={() => router.push('/properties')}
-              className="w-full py-2.5 rounded-lg border border-slate-200 text-slate-600 text-sm font-medium hover:bg-slate-50 transition-colors"
+              className="w-full py-2.5 rounded-lg border border-slate-200 dark:border-slate-600 text-slate-600 dark:text-slate-300 text-sm font-medium hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
             >
               Cancel
             </button>
@@ -536,7 +648,6 @@ export function PropertyForm({ property }: PropertyFormProps) {
       <>
         <ImageManager slug={property.slug} initial={property.images ?? []} />
 
-        {/* Bottom save bar — visible after scrolling past images */}
         <div className="flex items-center gap-3 pt-2 pb-6">
           <button
             type="button"
@@ -549,7 +660,7 @@ export function PropertyForm({ property }: PropertyFormProps) {
           <button
             type="button"
             onClick={() => router.push('/properties')}
-            className="px-5 py-2.5 rounded-lg border border-slate-200 text-slate-600 text-sm font-medium hover:bg-slate-50 transition-colors"
+            className="px-5 py-2.5 rounded-lg border border-slate-200 dark:border-slate-600 text-slate-600 dark:text-slate-300 text-sm font-medium hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
           >
             Cancel
           </button>

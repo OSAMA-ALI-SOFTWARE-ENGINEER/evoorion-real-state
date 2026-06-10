@@ -38,21 +38,16 @@ class AppServiceProvider extends ServiceProvider
         try {
             $s = app(SettingService::class);
 
-            // Mail / SMTP
+            // Mail / SMTP — if a host is configured in settings, override env and switch driver to smtp
             if ($host = $s->get('mail_host')) {
-                config(['mail.mailers.smtp.host' => $host]);
-            }
-            if ($port = $s->get('mail_port')) {
-                config(['mail.mailers.smtp.port' => (int) $port]);
-            }
-            if ($user = $s->get('mail_username')) {
-                config(['mail.mailers.smtp.username' => $user]);
-            }
-            if ($pass = $s->get('mail_password')) {
-                config(['mail.mailers.smtp.password' => $pass]);
-            }
-            if ($enc = $s->get('mail_encryption')) {
-                config(['mail.mailers.smtp.encryption' => $enc]);
+                config([
+                    'mail.default'                  => 'smtp',
+                    'mail.mailers.smtp.host'        => $host,
+                    'mail.mailers.smtp.port'        => (int) ($s->get('mail_port') ?? 587),
+                    'mail.mailers.smtp.username'    => $s->get('mail_username') ?? '',
+                    'mail.mailers.smtp.password'    => $s->get('mail_password') ?? '',
+                    'mail.mailers.smtp.encryption'  => $s->get('mail_encryption') ?? 'tls',
+                ]);
             }
             if ($from = $s->get('mail_from_address')) {
                 config(['mail.from.address' => $from]);

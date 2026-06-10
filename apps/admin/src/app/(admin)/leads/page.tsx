@@ -7,9 +7,32 @@ import type { Lead, LeadStatus, LeadSource } from '@/types'
 import { LeadStatusBadge } from '@/components/ui/Badge'
 import { Pagination } from '@/components/ui/Pagination'
 import { ConfirmModal } from '@/components/ui/ConfirmModal'
+import { CustomSelect } from '@/components/ui/CustomSelect'
 import { useAuth } from '@/context/AuthContext'
+import {
+  IconUsers, IconGlobe, IconPhone, IconMail, IconFacebook, IconInstagram, IconWhatsApp,
+} from '@/components/ui/icons'
 
 const PER_PAGE = 20
+
+const STATUS_OPTIONS = [
+  { value: '',          label: 'All statuses' },
+  { value: 'new',       label: 'New',       description: '🔵' },
+  { value: 'contacted', label: 'Contacted', description: '🟡' },
+  { value: 'qualified', label: 'Qualified', description: '🟣' },
+  { value: 'closed',    label: 'Closed',    description: '🟢' },
+  { value: 'lost',      label: 'Lost',      description: '🔴' },
+]
+
+const SOURCE_OPTIONS = [
+  { value: '',          label: 'All sources' },
+  { value: 'website',   label: 'Website',   icon: <IconGlobe size={14} /> },
+  { value: 'instagram', label: 'Instagram', icon: <IconInstagram size={14} /> },
+  { value: 'facebook',  label: 'Facebook',  icon: <IconFacebook size={14} /> },
+  { value: 'whatsapp',  label: 'WhatsApp',  icon: <IconWhatsApp size={14} /> },
+  { value: 'referral',  label: 'Referral',  icon: <IconMail size={14} /> },
+  { value: 'other',     label: 'Other',     icon: <IconUsers size={14} /> },
+]
 
 const SOURCE_LABELS: Record<LeadSource, string> = {
   website:   'Website',
@@ -60,7 +83,7 @@ export default function LeadsPage() {
     try {
       const res = await getLeads({ page: p, per_page: PER_PAGE, search: s || undefined, status: st || undefined, source: src || undefined })
       setLeads(res.data ?? [])
-      setTotal(res.meta?.pagination.total ?? 0)
+      setTotal(res.meta?.pagination?.total ?? 0)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load leads')
     } finally {
@@ -104,13 +127,13 @@ export default function LeadsPage() {
     <div className="max-w-7xl space-y-4">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <p className="text-sm text-slate-500">{total} leads</p>
+        <p className="text-sm text-slate-500 dark:text-slate-400">{total} leads</p>
         {canDelete && (
           <button
             type="button"
             onClick={handleExport}
             disabled={exporting}
-            className="px-4 py-2 rounded-lg border border-slate-200 text-slate-700 font-medium text-sm hover:bg-slate-50 transition-colors disabled:opacity-50"
+            className="px-4 py-2 rounded-lg border border-slate-200 dark:border-slate-600 text-slate-700 dark:text-slate-200 font-medium text-sm hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors disabled:opacity-50"
           >
             {exporting ? 'Exporting…' : '↓ Export CSV'}
           </button>
@@ -124,57 +147,47 @@ export default function LeadsPage() {
           placeholder="Search name or email…"
           value={search}
           onChange={e => handleSearch(e.target.value)}
-          className="flex-1 px-3.5 py-2 rounded-lg border border-slate-200 text-sm focus:outline-none focus:border-[#C9A84C] focus:ring-1 focus:ring-[#C9A84C] bg-white"
+          className="flex-1 px-3.5 py-2 rounded-lg border border-slate-200 dark:border-slate-600 text-sm focus:outline-none focus:border-[#C9A84C] focus:ring-1 focus:ring-[#C9A84C] bg-white dark:bg-slate-800 dark:text-slate-100 placeholder-slate-400"
         />
-        <select
-          aria-label="Filter by status"
+        <CustomSelect
           value={status}
-          onChange={e => { setStatus(e.target.value); setPage(1) }}
-          className="px-3.5 py-2 rounded-lg border border-slate-200 text-sm focus:outline-none focus:border-[#C9A84C] bg-white text-slate-700"
-        >
-          <option value="">All statuses</option>
-          <option value="new">New</option>
-          <option value="contacted">Contacted</option>
-          <option value="qualified">Qualified</option>
-          <option value="closed">Closed</option>
-          <option value="lost">Lost</option>
-        </select>
-        <select
-          aria-label="Filter by source"
+          onChange={v => { setStatus(v); setPage(1) }}
+          options={STATUS_OPTIONS}
+          placeholder="All statuses"
+          className="sm:w-44"
+        />
+        <CustomSelect
           value={source}
-          onChange={e => { setSource(e.target.value); setPage(1) }}
-          className="px-3.5 py-2 rounded-lg border border-slate-200 text-sm focus:outline-none focus:border-[#C9A84C] bg-white text-slate-700"
-        >
-          <option value="">All sources</option>
-          {(Object.entries(SOURCE_LABELS) as [LeadSource, string][]).map(([k, v]) => (
-            <option key={k} value={k}>{v}</option>
-          ))}
-        </select>
+          onChange={v => { setSource(v); setPage(1) }}
+          options={SOURCE_OPTIONS}
+          placeholder="All sources"
+          className="sm:w-44"
+        />
       </div>
 
       {/* Table */}
-      <div className="bg-white rounded-xl border border-slate-200 overflow-hidden">
+      <div className="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden">
         {error ? (
           <div className="p-8 text-center text-red-500 text-sm">{error}</div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="bg-slate-50 border-b border-slate-100">
-                  <th className="px-5 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Lead</th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Status</th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Source</th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Assigned</th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Received</th>
-                  <th className="px-5 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Actions</th>
+                <tr className="bg-slate-50 dark:bg-slate-700/50 border-b border-slate-100 dark:border-slate-700">
+                  <th className="px-5 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Lead</th>
+                  <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Status</th>
+                  <th className="hidden sm:table-cell px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Source</th>
+                  <th className="hidden sm:table-cell px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Assigned</th>
+                  <th className="hidden lg:table-cell px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Received</th>
+                  <th className="px-5 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100">
+              <tbody className="divide-y divide-slate-100 dark:divide-slate-700">
                 {loading ? (
                   Array.from({ length: 10 }).map((_, i) => (
                     <tr key={i} className="animate-pulse">
-                      {Array.from({ length: 6 }).map((_, j) => (
-                        <td key={j} className="px-5 py-4"><div className="h-3.5 bg-slate-100 rounded w-full" /></td>
+                      {Array.from({ length: 6 }).map((__, j) => (
+                        <td key={j} className={`px-5 py-4${[2,3].includes(j) ? ' hidden sm:table-cell' : j === 4 ? ' hidden lg:table-cell' : ''}`}><div className="h-3.5 bg-slate-100 dark:bg-slate-700 rounded w-full" /></td>
                       ))}
                     </tr>
                   ))
@@ -184,22 +197,30 @@ export default function LeadsPage() {
                   </tr>
                 ) : (
                   leads.map(lead => (
-                    <tr key={lead.id} className="hover:bg-slate-50 transition-colors">
+                    <tr key={lead.id} className="hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors">
                       <td className="px-5 py-3.5">
-                        <p className="font-medium text-slate-800">{lead.name}</p>
+                        <p className="font-medium text-slate-800 dark:text-slate-100">{lead.name}</p>
                         <p className="text-xs text-slate-400">{lead.email}</p>
                         {lead.phone && <p className="text-xs text-slate-400">{lead.phone}</p>}
                       </td>
                       <td className="px-4 py-3.5">
                         <LeadStatusBadge status={lead.status as LeadStatus} />
                       </td>
-                      <td className="px-4 py-3.5 text-slate-600 text-xs">
-                        {SOURCE_LABELS[lead.source] ?? lead.source}
+                      <td className="hidden sm:table-cell px-4 py-3.5">
+                        <div className="flex items-center gap-1.5 text-slate-600 dark:text-slate-300 text-xs">
+                          {lead.source === 'facebook'  && <IconFacebook  size={13} className="text-blue-600 shrink-0" />}
+                          {lead.source === 'instagram' && <IconInstagram size={13} className="text-pink-500 shrink-0" />}
+                          {lead.source === 'whatsapp'  && <IconWhatsApp  size={13} className="text-emerald-500 shrink-0" />}
+                          {lead.source === 'website'   && <IconGlobe     size={13} className="text-slate-400 shrink-0" />}
+                          {lead.source === 'referral'  && <IconMail      size={13} className="text-amber-500 shrink-0" />}
+                          {lead.source === 'other'     && <IconUsers     size={13} className="text-slate-400 shrink-0" />}
+                          {SOURCE_LABELS[lead.source] ?? lead.source}
+                        </div>
                       </td>
-                      <td className="px-4 py-3.5 text-slate-500 text-xs">
-                        {lead.assignee ? lead.assignee.name : <span className="text-amber-500">Unassigned</span>}
+                      <td className="hidden sm:table-cell px-4 py-3.5 text-slate-500 dark:text-slate-400 text-xs">
+                        {lead.assigned_user ? lead.assigned_user.name : <span className="text-amber-500">Unassigned</span>}
                       </td>
-                      <td className="px-4 py-3.5 text-slate-400 text-xs">
+                      <td className="hidden lg:table-cell px-4 py-3.5 text-slate-400 dark:text-slate-500 text-xs">
                         {relativeDate(lead.created_at)}
                       </td>
                       <td className="px-5 py-3.5">
@@ -212,7 +233,7 @@ export default function LeadsPage() {
                           </Link>
                           {canDelete && (
                             <>
-                              <span className="text-slate-200">|</span>
+                              <span className="text-slate-200 dark:text-slate-600">|</span>
                               <button
                                 type="button"
                                 onClick={() => setToDelete(lead)}
@@ -233,7 +254,7 @@ export default function LeadsPage() {
         )}
 
         {!loading && !error && total > PER_PAGE && (
-          <div className="border-t border-slate-100 px-4">
+          <div className="border-t border-slate-100 dark:border-slate-700 px-4">
             <Pagination currentPage={page} lastPage={lastPage} total={total} perPage={PER_PAGE} onPage={setPage} />
           </div>
         )}

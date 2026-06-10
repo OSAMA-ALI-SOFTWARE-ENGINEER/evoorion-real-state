@@ -11,7 +11,7 @@ class Area extends Model
     use HasFactory;
 
     protected $fillable = [
-        'name', 'slug', 'description', 'hero_image_url',
+        'name', 'slug', 'status', 'description', 'hero_image_url', 'gallery',
         'latitude', 'longitude',
         'long_term_roi', 'short_term_roi', 'appreciation', 'off_plan_discount',
         'price_ranges', 'meta_title', 'meta_description',
@@ -19,6 +19,7 @@ class Area extends Model
 
     protected $casts = [
         'price_ranges' => 'array',
+        'gallery'      => 'array',
         'latitude'     => 'float',
         'longitude'    => 'float',
     ];

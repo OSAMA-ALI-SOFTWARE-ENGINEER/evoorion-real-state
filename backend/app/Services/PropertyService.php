@@ -51,7 +51,7 @@ class PropertyService
         $key = 'properties:list:' . md5(json_encode($params));
 
         return Cache::tags(['properties'])->remember($key, 3600, function () use ($request) {
-            $query = Property::available();
+            $query = Property::available()->where('is_active', true);
 
             if ($request->filled('search')) {
                 $query = $query->search($request->input('search'));
@@ -120,7 +120,7 @@ class PropertyService
         return Cache::tags(['properties', "area:{$areaId}"])->remember(
             "properties:area:{$areaId}",
             3600,
-            fn() => Property::where('area_id', $areaId)->available()->get()
+            fn() => Property::where('area_id', $areaId)->available()->where('is_active', true)->get()
         );
     }
 
@@ -129,7 +129,7 @@ class PropertyService
         return Cache::tags(['properties', "developer:{$developerId}"])->remember(
             "properties:developer:{$developerId}",
             3600,
-            fn() => Property::where('developer_id', $developerId)->available()->get()
+            fn() => Property::where('developer_id', $developerId)->available()->where('is_active', true)->get()
         );
     }
 

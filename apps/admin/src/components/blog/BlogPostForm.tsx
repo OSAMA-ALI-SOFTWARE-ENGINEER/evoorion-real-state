@@ -140,26 +140,26 @@ export function BlogPostForm({ post, initialTags }: Props) {
   return (
     <div className="max-w-6xl">
       {/* Top bar */}
-      <div className="flex items-center justify-between mb-6">
-        <div className="flex items-center gap-3">
+      <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
+        <div className="flex items-center gap-2 min-w-0">
           <button
             type="button"
             onClick={() => router.push('/blog')}
-            className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 text-sm transition-colors"
+            className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 text-sm transition-colors shrink-0"
           >
             ← Blog
           </button>
-          <span className="text-slate-300 dark:text-slate-600">/</span>
-          <h1 className="text-base font-semibold text-slate-800 dark:text-slate-100">
+          <span className="text-slate-300 dark:text-slate-600 shrink-0">/</span>
+          <h1 className="text-base font-semibold text-slate-800 dark:text-slate-100 truncate">
             {post ? 'Edit Post' : 'New Post'}
           </h1>
           {!isSuperAdmin && (
-            <span className="text-xs bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 px-2.5 py-0.5 rounded-full font-medium">
-              Will require approval
+            <span className="text-xs bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 px-2.5 py-0.5 rounded-full font-medium shrink-0">
+              Pending approval
             </span>
           )}
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 shrink-0">
           <button
             type="button"
             onClick={() => router.push('/blog')}

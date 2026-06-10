@@ -20,6 +20,8 @@ class SettingController
         'contact_email',
         'contact_phone',
         'contact_address',
+        'contact_hours_weekdays',
+        'contact_hours_sunday',
         // Social media
         'social_facebook',
         'social_instagram',
@@ -48,6 +50,10 @@ class SettingController
         'google_maps_key',
         'google_analytics_id',
         'meta_pixel_id',
+        // Lead notifications
+        'lead_notify_recipients',
+        'lead_notify_agent',
+        'lead_notify_developer',
     ];
 
     public function index(): JsonResponse
@@ -93,6 +99,7 @@ class SettingController
             str_starts_with($key, 'google_client_')   => 'oauth',
             str_starts_with($key, 'facebook_client_') => 'oauth',
             str_starts_with($key, 'mail_')        => 'email',
+            str_starts_with($key, 'lead_notify_')  => 'leads',
             default                               => 'integrations',
         };
     }

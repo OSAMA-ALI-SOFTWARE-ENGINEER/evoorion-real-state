@@ -27,7 +27,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   if (!user) return null
 
   return (
-    <div className="flex h-screen overflow-hidden bg-slate-100">
+    <div className="flex h-screen overflow-hidden bg-slate-100 dark:bg-slate-900">
       {/* Desktop sidebar */}
       <div className="hidden lg:flex">
         <Sidebar />

@@ -75,6 +75,9 @@ export default function PropertiesPage() {
   const [areas, setAreas] = useState<Area[]>([])
   const [opTypes, setOpTypes] = useState<OperationType[]>([])
 
+  // Filter panel toggle
+  const [showAdvanced, setShowAdvanced] = useState(false)
+
   // Compare state
   const [compareList, setCompareList] = useState<PropertySummary[]>([])
 
@@ -209,8 +212,8 @@ export default function PropertiesPage() {
 
       {/* Filters */}
       <section className="sticky top-20 z-30 bg-brand/95 backdrop-blur-md border-b border-gold-border">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 space-y-3">
-          {/* Row 1: type pills + search */}
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+          {/* Row 1: type pills + search + filter toggle */}
           <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
             <div className="flex flex-wrap gap-2">
               {TYPES.map((t) => (
@@ -228,76 +231,110 @@ export default function PropertiesPage() {
                 </button>
               ))}
             </div>
-            <div className="relative w-full sm:w-64">
-              <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted pointer-events-none" />
-              <input
-                type="text"
-                placeholder="Search properties…"
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                className="w-full pl-9 pr-4 py-2 bg-white/5 border border-white/10 focus:border-gold text-white text-sm placeholder-muted outline-none rounded-sm transition-colors"
-              />
+
+            <div className="flex items-center gap-2 w-full sm:w-auto">
+              {/* Search */}
+              <div className="relative flex-1 sm:w-56">
+                <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted pointer-events-none" />
+                <input
+                  type="text"
+                  placeholder="Search properties…"
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  className="w-full pl-9 pr-4 py-2 bg-white/5 border border-white/10 focus:border-gold text-white text-sm placeholder-muted outline-none rounded-sm transition-colors"
+                />
+              </div>
+
+              {/* Filters toggle */}
+              <button
+                type="button"
+                onClick={() => setShowAdvanced(v => !v)}
+                className={`relative flex items-center gap-2 px-3 py-2 rounded-sm border text-sm transition-all duration-200 shrink-0 ${
+                  showAdvanced
+                    ? 'border-gold text-gold bg-gold/5'
+                    : 'border-white/10 text-muted hover:border-gold/40 hover:text-white'
+                }`}
+                aria-expanded={showAdvanced}
+                aria-label="Toggle filters"
+              >
+                <SlidersHorizontal size={14} />
+                <span className="hidden sm:inline">Filters</span>
+                {hasAdvancedFilters && (
+                  <span className="absolute -top-1.5 -right-1.5 w-4 h-4 rounded-full bg-gold text-brand text-[9px] font-bold flex items-center justify-center">
+                    {[areaId, opTypeId, priceKey, sortKey].filter(Boolean).length}
+                  </span>
+                )}
+              </button>
             </div>
           </div>
 
-          {/* Row 2: advanced filters */}
-          <div className="flex flex-wrap gap-2 items-center">
-            {areas.length > 0 && (
-              <select
-                aria-label="Filter by area"
-                value={areaId}
-                onChange={(e) => setAreaId(Number(e.target.value))}
-                className={`${SELECT_CLS} select-dark`}
+          {/* Row 2: advanced filters — collapsible */}
+          <AnimatePresence initial={false}>
+            {showAdvanced && (
+              <motion.div
+                key="advanced"
+                initial={{ height: 0, opacity: 0 }}
+                animate={{ height: 'auto', opacity: 1 }}
+                exit={{ height: 0, opacity: 0 }}
+                transition={{ duration: 0.22, ease: 'easeInOut' }}
+                className="overflow-hidden"
               >
-                <option value={0}>All Areas</option>
-                {areas.map((a) => <option key={a.id} value={a.id}>{a.name}</option>)}
-              </select>
+                <div className="flex flex-wrap gap-2 items-center pt-3">
+                  <select
+                    aria-label="Filter by area"
+                    value={areaId}
+                    onChange={(e) => setAreaId(Number(e.target.value))}
+                    className={`${SELECT_CLS} select-dark`}
+                  >
+                    <option value={0}>All Areas</option>
+                    {areas.map((a) => <option key={a.id} value={a.id}>{a.name}</option>)}
+                  </select>
+
+                  <select
+                    aria-label="Filter by operation type"
+                    value={opTypeId}
+                    onChange={(e) => setOpTypeId(Number(e.target.value))}
+                    className={`${SELECT_CLS} select-dark`}
+                  >
+                    <option value={0}>Buy or Rent</option>
+                    {opTypes.map((o) => <option key={o.id} value={o.id}>{o.name}</option>)}
+                  </select>
+
+                  <select
+                    aria-label="Filter by price range"
+                    value={priceKey}
+                    onChange={(e) => setPriceKey(e.target.value)}
+                    className={`${SELECT_CLS} select-dark`}
+                  >
+                    <option value="">Any Price</option>
+                    {(Object.entries(BUDGET_RANGES) as [string, { label: string }][]).map(([k, v]) => (
+                      <option key={k} value={k}>{v.label}</option>
+                    ))}
+                  </select>
+
+                  <select
+                    aria-label="Sort properties"
+                    value={sortKey}
+                    onChange={(e) => setSortKey(e.target.value)}
+                    className={`${SELECT_CLS} select-dark`}
+                  >
+                    <option value="">Default Order</option>
+                    {SORT_OPTIONS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
+                  </select>
+
+                  {hasAdvancedFilters && (
+                    <button
+                      type="button"
+                      onClick={clearAdvancedFilters}
+                      className="flex items-center gap-1 text-xs text-muted hover:text-white transition-colors"
+                    >
+                      <X size={12} /> Clear all
+                    </button>
+                  )}
+                </div>
+              </motion.div>
             )}
-
-            {opTypes.length > 0 && (
-              <select
-                aria-label="Filter by operation type"
-                value={opTypeId}
-                onChange={(e) => setOpTypeId(Number(e.target.value))}
-                className={`${SELECT_CLS} select-dark`}
-              >
-                <option value={0}>Buy or Rent</option>
-                {opTypes.map((o) => <option key={o.id} value={o.id}>{o.name}</option>)}
-              </select>
-            )}
-
-            <select
-              aria-label="Filter by price range"
-              value={priceKey}
-              onChange={(e) => setPriceKey(e.target.value)}
-              className={`${SELECT_CLS} select-dark`}
-            >
-              <option value="">Any Price</option>
-              {(Object.entries(BUDGET_RANGES) as [string, { label: string }][]).map(([k, v]) => (
-                <option key={k} value={k}>{v.label}</option>
-              ))}
-            </select>
-
-            <select
-              aria-label="Sort properties"
-              value={sortKey}
-              onChange={(e) => setSortKey(e.target.value)}
-              className={`${SELECT_CLS} select-dark`}
-            >
-              <option value="">Default Order</option>
-              {SORT_OPTIONS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
-            </select>
-
-            {hasAdvancedFilters && (
-              <button
-                type="button"
-                onClick={clearAdvancedFilters}
-                className="flex items-center gap-1 text-xs text-muted hover:text-white transition-colors"
-              >
-                <X size={12} /> Clear
-              </button>
-            )}
-          </div>
+          </AnimatePresence>
         </div>
       </section>
 
