@@ -34,7 +34,7 @@ class MediaController
     public function upload(Request $request): JsonResponse
     {
         $request->validate([
-            'file'   => 'required|file|mimes:jpeg,jpg,png,webp,gif,svg,pdf|max:10240',
+            'file'   => 'required|file|mimes:jpeg,jpg,png,webp,gif,pdf|max:10240',
             'folder' => 'nullable|string|max:100',
         ]);
 
