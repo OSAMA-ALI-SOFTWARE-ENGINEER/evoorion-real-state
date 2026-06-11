@@ -1,28 +1,21 @@
 import { TrendingUp, Home, Users } from 'lucide-react'
 import { ScrollReveal } from '@/components/ui/ScrollReveal'
 
-const SERVICES = [
-  {
-    icon: TrendingUp,
-    title: 'Off-Plan Investments',
-    description:
-      'Access pre-launch opportunities from Dubai\'s most prestigious developers. Secure units at pre-market pricing with flexible payment plans and exceptional capital appreciation potential.',
-  },
-  {
-    icon: Home,
-    title: 'Ready Properties',
-    description:
-      'Immediate rental income from handpicked ready-to-occupy villas, apartments, and penthouses in Dubai\'s most sought-after communities — delivering 8–12% annual rental yields.',
-  },
-  {
-    icon: Users,
-    title: 'Private Advisory',
-    description:
-      'End-to-end investment management: market intelligence, legal structuring, property management, and portfolio optimisation — all handled by our expert team.',
-  },
+const ICONS = [TrendingUp, Home, Users]
+
+const DEFAULT_SERVICES = [
+  { title: 'Off-Plan Investments', description: "Access pre-launch opportunities from Dubai's most prestigious developers. Secure units at pre-market pricing with flexible payment plans and exceptional capital appreciation potential." },
+  { title: 'Ready Properties',     description: "Immediate rental income from handpicked ready-to-occupy villas, apartments, and penthouses in Dubai's most sought-after communities — delivering 8–12% annual rental yields." },
+  { title: 'Private Advisory',     description: 'End-to-end investment management: market intelligence, legal structuring, property management, and portfolio optimisation — all handled by our expert team.' },
 ]
 
-export function WhatWeDo() {
+export function WhatWeDo({ cms }: { cms?: Record<string, unknown> }) {
+  const eyebrow  = (cms?.what_we_do_eyebrow as string) ?? 'What We Do'
+  const body     = (cms?.what_we_do_body as string)    ?? 'EVOORION is a Dubai-based luxury real estate investment firm dedicated to helping high-net-worth individuals build and grow their real estate portfolios with confidence and precision.'
+  const rawHeadline = (cms?.what_we_do_headline as string) ?? "Strategic Investments.\nTailored for You."
+  const [headLine1, headLine2] = rawHeadline.split('\n')
+  const cmsServices = cms?.what_we_do_services as Array<{ title: string; description: string }> | undefined
+  const services = (cmsServices ?? DEFAULT_SERVICES).map((s, i) => ({ ...s, icon: ICONS[i] ?? TrendingUp }))
   return (
     <section className="py-24 bg-brand">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -32,25 +25,21 @@ export function WhatWeDo() {
             <div>
               <div className="flex items-center gap-3 mb-5">
                 <div className="h-px w-10 bg-gold" />
-                <span className="text-gold text-xs tracking-[0.3em] uppercase">What We Do</span>
+                <span className="text-gold text-xs tracking-[0.3em] uppercase">{eyebrow}</span>
               </div>
               <h2 className="font-serif text-4xl sm:text-5xl font-bold text-white leading-tight">
-                Strategic Investments.
+                {headLine1}
                 <br />
-                <span className="text-gold-gradient italic">Tailored for You.</span>
+                <span className="text-gold-gradient italic">{headLine2}</span>
               </h2>
-              <p className="text-muted mt-6 leading-relaxed max-w-md">
-                EVOORION is a Dubai-based luxury real estate investment firm dedicated to helping
-                high-net-worth individuals build and grow their real estate portfolios with
-                confidence and precision.
-              </p>
+              <p className="text-muted mt-6 leading-relaxed max-w-md">{body}</p>
               <div className="mt-8 h-px w-full bg-gradient-to-r from-gold/40 to-transparent" />
             </div>
           </ScrollReveal>
 
           {/* Right cards */}
           <div className="space-y-5">
-            {SERVICES.map((service, i) => {
+            {services.map((service, i) => {
               const Icon = service.icon
               return (
                 <ScrollReveal key={service.title} delay={i * 0.15}>

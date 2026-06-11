@@ -1,33 +1,17 @@
 import { ScrollReveal } from '@/components/ui/ScrollReveal'
 
-const STEPS = [
-  {
-    number: '01',
-    title: 'Discover',
-    description:
-      'We conduct a thorough discovery session to understand your investment goals, risk profile, and preferences.',
-  },
-  {
-    number: '02',
-    title: 'Select',
-    description:
-      'Our advisors curate a bespoke shortlist of off-market and listed properties matched to your criteria.',
-  },
-  {
-    number: '03',
-    title: 'Acquire',
-    description:
-      'We handle negotiations, legal due diligence, SPA drafting, and DLD registration — end to end.',
-  },
-  {
-    number: '04',
-    title: 'Manage',
-    description:
-      'Post-acquisition, our team ensures your asset is tenanted, managed, and optimised for maximum yield.',
-  },
+const DEFAULT_STEPS = [
+  { number: '01', title: 'Discover', description: 'We conduct a thorough discovery session to understand your investment goals, risk profile, and preferences.' },
+  { number: '02', title: 'Select',   description: 'Our advisors curate a bespoke shortlist of off-market and listed properties matched to your criteria.' },
+  { number: '03', title: 'Acquire',  description: 'We handle negotiations, legal due diligence, SPA drafting, and DLD registration — end to end.' },
+  { number: '04', title: 'Manage',   description: 'Post-acquisition, our team ensures your asset is tenanted, managed, and optimised for maximum yield.' },
 ]
 
-export function OurProcess() {
+export function OurProcess({ cms }: { cms?: Record<string, unknown> }) {
+  const eyebrow = (cms?.our_process_eyebrow as string) ?? 'The Process'
+  const rawHeadline = (cms?.our_process_headline as string) ?? "A Seamless\nInvestment Journey"
+  const [headLine1, headLine2] = rawHeadline.split('\n')
+  const STEPS = (cms?.our_process_steps as typeof DEFAULT_STEPS) ?? DEFAULT_STEPS
   return (
     <section className="py-24 bg-brand">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -35,13 +19,13 @@ export function OurProcess() {
           <div className="text-center mb-16">
             <div className="inline-flex items-center gap-3 mb-5">
               <div className="h-px w-10 bg-gold" />
-              <span className="text-gold text-xs tracking-[0.3em] uppercase">The Process</span>
+              <span className="text-gold text-xs tracking-[0.3em] uppercase">{eyebrow}</span>
               <div className="h-px w-10 bg-gold" />
             </div>
             <h2 className="font-serif text-4xl sm:text-5xl font-bold text-white">
-              A Seamless
+              {headLine1}
               <br />
-              <span className="text-gold-gradient italic">Investment Journey</span>
+              <span className="text-gold-gradient italic">{headLine2}</span>
             </h2>
           </div>
         </ScrollReveal>

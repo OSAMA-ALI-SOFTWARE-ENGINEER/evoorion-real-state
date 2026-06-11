@@ -4,11 +4,14 @@ import { SocialIcon } from '@/components/ui/SocialIcon'
 import { LeadForm } from '@/components/ui/LeadForm'
 import { ScrollReveal } from '@/components/ui/ScrollReveal'
 import { ContactAddressMap } from '@/components/ui/ContactAddressMap'
+import { getCmsContent } from '@/lib/api'
 
-export const metadata: Metadata = {
-  title: 'Contact Us',
-  description:
-    'Get in touch with EVOORION\'s investment advisors. Book a private consultation or send an enquiry.',
+export async function generateMetadata(): Promise<Metadata> {
+  const cms = await getCmsContent('contact')
+  return {
+    title:       (cms?.meta_title as string)       ?? 'Contact Us',
+    description: (cms?.meta_description as string) ?? "Get in touch with EVOORION's investment advisors. Book a private consultation or send an enquiry.",
+  }
 }
 
 type ContactSettings = {
@@ -38,7 +41,7 @@ async function getContactSettings(): Promise<ContactSettings> {
 }
 
 export default async function ContactPage() {
-  const s = await getContactSettings()
+  const [s, cms] = await Promise.all([getContactSettings(), getCmsContent('contact')])
 
   const address     = s.contact_address        ?? 'Office 2402, Burj Al Salam Tower, Sheikh Zayed Road, Dubai, UAE'
   const phone       = s.contact_phone          ?? '+971 00 000 0000'
@@ -62,15 +65,16 @@ export default async function ContactPage() {
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <div className="inline-flex items-center gap-3 mb-5">
             <div className="h-px w-10 bg-gold" />
-            <span className="text-gold text-xs tracking-[0.3em] uppercase">Get in Touch</span>
+            <span className="text-gold text-xs tracking-[0.3em] uppercase">
+              {(cms.hero_eyebrow as string) ?? 'Get in Touch'}
+            </span>
             <div className="h-px w-10 bg-gold" />
           </div>
           <h1 className="font-serif text-5xl sm:text-6xl font-bold text-white mb-5">
-            Start Your <span className="text-gold-gradient italic">Conversation</span>
+            {(cms.hero_headline as string) ?? 'Start Your Conversation'}
           </h1>
           <p className="text-muted max-w-xl mx-auto">
-            Our senior advisors are available for private consultations — in person, by phone,
-            or via video call, wherever you are in the world.
+            {(cms.hero_body as string) ?? 'Our senior advisors are available for private consultations — in person, by phone, or via video call, wherever you are in the world.'}
           </p>
         </div>
       </section>
@@ -162,8 +166,8 @@ export default async function ContactPage() {
               <ScrollReveal delay={0.15}>
                 <div className="p-8 border border-gold-border rounded-sm bg-brand-section/30">
                   <LeadForm
-                    title="Book a Private Consultation"
-                    subtitle="Complete the form and an advisor will be in touch within 2 hours during office hours."
+                    title={(cms.form_title as string) ?? 'Book a Private Consultation'}
+                    subtitle={(cms.form_subtitle as string) ?? 'Complete the form and an advisor will be in touch within 2 hours during office hours.'}
                   />
                 </div>
               </ScrollReveal>

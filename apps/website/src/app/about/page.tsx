@@ -2,41 +2,64 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { Shield, Star, HeartHandshake, BarChart3, ArrowRight } from 'lucide-react'
 import { ScrollReveal } from '@/components/ui/ScrollReveal'
+import { getCmsContent } from '@/lib/api'
 
-export const metadata: Metadata = {
-  title: 'About EVOORION',
-  description:
-    'Learn about EVOORION — Dubai\'s premier luxury real estate investment firm, dedicated to delivering exceptional returns and a seamless investment experience.',
-}
+const DIFF_ICONS = [Shield, Star, HeartHandshake, BarChart3]
 
-const DIFFERENTIATORS = [
-  {
-    icon: Shield,
-    title: 'Exclusive Access',
-    description:
-      'Direct partnerships with Dubai\'s leading developers give our clients access to pre-launch allocations and off-market properties unavailable to the general public.',
-  },
-  {
-    icon: Star,
-    title: 'Expert Advisory',
-    description:
-      'Our team of certified real estate advisors brings decades of combined experience in Dubai\'s luxury property market, with deep knowledge of every micro-location.',
-  },
-  {
-    icon: HeartHandshake,
-    title: 'End-to-End Support',
-    description:
-      'From initial consultation and property selection through legal completion, handover, and ongoing management — we handle every detail seamlessly.',
-  },
-  {
-    icon: BarChart3,
-    title: 'Proven Track Record',
-    description:
-      'Over AED 2 billion in completed transactions, 500+ satisfied clients, and a portfolio spanning Dubai\'s most prestigious communities since our founding.',
-  },
+const DEFAULT_DIFFERENTIATORS = [
+  { title: 'Exclusive Access',    description: "Direct partnerships with Dubai's leading developers give our clients access to pre-launch allocations and off-market properties unavailable to the general public." },
+  { title: 'Expert Advisory',     description: "Our team of certified real estate advisors brings decades of combined experience in Dubai's luxury property market, with deep knowledge of every micro-location." },
+  { title: 'End-to-End Support',  description: 'From initial consultation and property selection through legal completion, handover, and ongoing management — we handle every detail seamlessly.' },
+  { title: 'Proven Track Record', description: "Over AED 2 billion in completed transactions, 500+ satisfied clients, and a portfolio spanning Dubai's most prestigious communities since our founding." },
 ]
 
-export default function AboutPage() {
+const DEFAULT_STORY_STATS = [
+  ['500+', 'Properties Sold'],
+  ['AED 2B+', 'Transaction Volume'],
+  ['98%', 'Client Satisfaction'],
+  ['15+', 'Developer Partnerships'],
+]
+
+export async function generateMetadata(): Promise<Metadata> {
+  const cms = await getCmsContent('about')
+  return {
+    title:       (cms?.meta_title as string)       ?? 'About EVOORION',
+    description: (cms?.meta_description as string) ?? "Learn about EVOORION — Dubai's premier luxury real estate investment firm, dedicated to delivering exceptional returns and a seamless investment experience.",
+  }
+}
+
+export default async function AboutPage() {
+  const cms = await getCmsContent('about')
+
+  const heroEyebrow = (cms.hero_eyebrow as string)        ?? 'Our Story'
+  const heroLine1   = (cms.hero_headline_line1 as string) ?? 'Built on Trust.'
+  const heroLine2   = (cms.hero_headline_line2 as string) ?? 'Driven by Results.'
+  const heroBody    = (cms.hero_body as string)           ?? "EVOORION was founded on a singular conviction: that investing in Dubai real estate should be as effortless as it is rewarding. We exist to bridge the gap between world-class properties and the discerning investors who deserve them."
+
+  const storyHeadline = (cms.story_headline as string) ?? 'Our Story'
+  const storyBody     = (cms.story_body as string)     ?? ''
+  const storyParagraphs = storyBody
+    ? storyBody.split('\n\n').filter(Boolean)
+    : [
+        "EVOORION was established by a team of seasoned real estate professionals who recognised a growing disconnect between the pace of Dubai's property market and the quality of guidance available to international investors.",
+        "We set out to build an advisory firm that combined institutional-grade market intelligence with personalised, relationship-first service — one that would treat every client's capital with the same respect we would our own.",
+        "Today, EVOORION serves a global clientele of high-net-worth individuals, family offices, and corporate investors, managing some of the most prestigious property portfolios in the UAE.",
+      ]
+
+  const storyStats = (cms.story_stats as Array<{ value: string; label: string }>) ?? DEFAULT_STORY_STATS.map(([value, label]) => ({ value, label }))
+
+  const missionQuote  = (cms.mission_quote as string)  ?? "Our mission is to make Dubai's most exceptional real estate accessible to every investor who dreams of building a lasting legacy — regardless of where in the world they call home."
+  const missionByline = (cms.mission_byline as string) ?? 'The EVOORION Team'
+
+  const diffEyebrow  = (cms.differentiators_eyebrow as string)  ?? 'Why EVOORION'
+  const diffHeadline = (cms.differentiators_headline as string) ?? 'What Sets Us Apart'
+  const cmsDs = cms.differentiators as Array<{ title: string; description: string }> | undefined
+  const differentiators = (cmsDs ?? DEFAULT_DIFFERENTIATORS).map((d, i) => ({ ...d, icon: DIFF_ICONS[i] ?? Shield }))
+
+  const ctaHeadline = (cms.cta_headline as string) ?? "Let's Build Your Portfolio Together"
+  const ctaBody     = (cms.cta_body as string)     ?? 'Schedule a confidential conversation with one of our senior investment advisors.'
+  const ctaButton   = (cms.cta_button as string)   ?? 'Get in Touch'
+
   return (
     <>
       {/* Hero */}
@@ -47,18 +70,14 @@ export default function AboutPage() {
           <div className="max-w-3xl">
             <div className="inline-flex items-center gap-3 mb-5">
               <div className="h-px w-10 bg-gold" />
-              <span className="text-gold text-xs tracking-[0.3em] uppercase">Our Story</span>
+              <span className="text-gold text-xs tracking-[0.3em] uppercase">{heroEyebrow}</span>
             </div>
             <h1 className="font-serif text-5xl sm:text-6xl font-bold text-white leading-tight mb-6">
-              Built on Trust.
+              {heroLine1}
               <br />
-              <span className="text-gold-gradient italic">Driven by Results.</span>
+              <span className="text-gold-gradient italic">{heroLine2}</span>
             </h1>
-            <p className="text-muted text-lg leading-relaxed">
-              EVOORION was founded on a singular conviction: that investing in Dubai real estate
-              should be as effortless as it is rewarding. We exist to bridge the gap between
-              world-class properties and the discerning investors who deserve them.
-            </p>
+            <p className="text-muted text-lg leading-relaxed">{heroBody}</p>
           </div>
         </div>
       </section>
@@ -70,39 +89,19 @@ export default function AboutPage() {
             <ScrollReveal>
               <div>
                 <h2 className="font-serif text-3xl sm:text-4xl font-bold text-white mb-6">
-                  Our Story
+                  {storyHeadline}
                 </h2>
                 <div className="space-y-4 text-muted leading-relaxed">
-                  <p>
-                    EVOORION was established by a team of seasoned real estate professionals who
-                    recognised a growing disconnect between the pace of Dubai&apos;s property market
-                    and the quality of guidance available to international investors.
-                  </p>
-                  <p>
-                    We set out to build an advisory firm that combined institutional-grade market
-                    intelligence with personalised, relationship-first service — one that would
-                    treat every client&apos;s capital with the same respect we would our own.
-                  </p>
-                  <p>
-                    Today, EVOORION serves a global clientele of high-net-worth individuals,
-                    family offices, and corporate investors, managing some of the most prestigious
-                    property portfolios in the UAE.
-                  </p>
+                  {storyParagraphs.map((p, i) => <p key={i}>{p}</p>)}
                 </div>
               </div>
             </ScrollReveal>
 
-            {/* Stats */}
             <ScrollReveal delay={0.2}>
               <div className="grid grid-cols-2 gap-4">
-                {[
-                  ['500+', 'Properties Sold'],
-                  ['AED 2B+', 'Transaction Volume'],
-                  ['98%', 'Client Satisfaction'],
-                  ['15+', 'Developer Partnerships'],
-                ].map(([val, label]) => (
+                {storyStats.map(({ value, label }) => (
                   <div key={label} className="p-8 border border-gold-border rounded-sm bg-brand-section/50 text-center">
-                    <div className="font-serif text-4xl font-bold text-gold mb-2">{val}</div>
+                    <div className="font-serif text-4xl font-bold text-gold mb-2">{value}</div>
                     <div className="text-muted text-sm">{label}</div>
                   </div>
                 ))}
@@ -119,12 +118,10 @@ export default function AboutPage() {
         <div className="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <ScrollReveal>
             <blockquote className="font-serif text-2xl sm:text-3xl text-white/90 italic leading-relaxed mb-6">
-              &ldquo;Our mission is to make Dubai&apos;s most exceptional real estate accessible to every
-              investor who dreams of building a lasting legacy — regardless of where in the world
-              they call home.&rdquo;
+              &ldquo;{missionQuote}&rdquo;
             </blockquote>
             <div className="h-px w-16 bg-gold mx-auto mb-4" />
-            <p className="text-gold text-sm tracking-widest uppercase">The EVOORION Team</p>
+            <p className="text-gold text-sm tracking-widest uppercase">{missionByline}</p>
           </ScrollReveal>
         </div>
       </section>
@@ -136,17 +133,22 @@ export default function AboutPage() {
             <div className="text-center mb-14">
               <div className="inline-flex items-center gap-3 mb-5">
                 <div className="h-px w-10 bg-gold" />
-                <span className="text-gold text-xs tracking-[0.3em] uppercase">Why EVOORION</span>
+                <span className="text-gold text-xs tracking-[0.3em] uppercase">{diffEyebrow}</span>
                 <div className="h-px w-10 bg-gold" />
               </div>
               <h2 className="font-serif text-4xl sm:text-5xl font-bold text-white">
-                What Sets Us <span className="text-gold-gradient italic">Apart</span>
+                {diffHeadline.includes(' ') ? (
+                  <>
+                    {diffHeadline.split(' ').slice(0, -1).join(' ')}{' '}
+                    <span className="text-gold-gradient italic">{diffHeadline.split(' ').at(-1)}</span>
+                  </>
+                ) : diffHeadline}
               </h2>
             </div>
           </ScrollReveal>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-            {DIFFERENTIATORS.map((d, i) => {
+            {differentiators.map((d, i) => {
               const Icon = d.icon
               return (
                 <ScrollReveal key={d.title} delay={i * 0.1}>
@@ -171,16 +173,14 @@ export default function AboutPage() {
         <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <ScrollReveal>
             <h2 className="font-serif text-3xl sm:text-4xl font-bold text-white mb-4">
-              Let&apos;s Build Your Portfolio Together
+              {ctaHeadline}
             </h2>
-            <p className="text-muted mb-8">
-              Schedule a confidential conversation with one of our senior investment advisors.
-            </p>
+            <p className="text-muted mb-8">{ctaBody}</p>
             <Link
               href="/contact"
               className="group inline-flex items-center gap-3 px-8 py-4 bg-gold text-brand font-semibold text-sm tracking-widest uppercase rounded-sm hover:bg-gold-light transition-colors"
             >
-              Get in Touch
+              {ctaButton}
               <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
             </Link>
           </ScrollReveal>

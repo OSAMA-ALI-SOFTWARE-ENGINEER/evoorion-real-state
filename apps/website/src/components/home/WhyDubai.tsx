@@ -1,34 +1,21 @@
 import { Percent, TrendingUp, Globe, Award } from 'lucide-react'
 import { ScrollReveal } from '@/components/ui/ScrollReveal'
 
-const STATS = [
-  {
-    icon: Percent,
-    value: '0%',
-    label: 'Property Tax',
-    description: 'No capital gains or property tax makes Dubai the most tax-efficient real estate market globally.',
-  },
-  {
-    icon: TrendingUp,
-    value: '8–12%',
-    label: 'Rental Yield',
-    description: 'Among the highest net rental yields of any global prime city, consistently outperforming London and New York.',
-  },
-  {
-    icon: Globe,
-    value: '100%',
-    label: 'Foreign Ownership',
-    description: 'Designated freehold zones allow full foreign ownership with no restrictions on repatriation of funds.',
-  },
-  {
-    icon: Award,
-    value: '#1',
-    label: 'Global Destination',
-    description: 'Dubai ranks as the world\'s most visited city and a top destination for HNWI relocation.',
-  },
+const ICONS = [Percent, TrendingUp, Globe, Award]
+
+const DEFAULT_STATS = [
+  { value: '0%',    label: 'Property Tax',      description: 'No capital gains or property tax makes Dubai the most tax-efficient real estate market globally.' },
+  { value: '8–12%', label: 'Rental Yield',      description: 'Among the highest net rental yields of any global prime city, consistently outperforming London and New York.' },
+  { value: '100%',  label: 'Foreign Ownership', description: 'Designated freehold zones allow full foreign ownership with no restrictions on repatriation of funds.' },
+  { value: '#1',    label: 'Global Destination', description: "Dubai ranks as the world's most visited city and a top destination for HNWI relocation." },
 ]
 
-export function WhyDubai() {
+export function WhyDubai({ cms }: { cms?: Record<string, unknown> }) {
+  const eyebrow = (cms?.why_dubai_eyebrow as string) ?? 'Why Dubai'
+  const rawHeadline = (cms?.why_dubai_headline as string) ?? "The World's Premier\nInvestment Destination"
+  const [headLine1, headLine2] = rawHeadline.split('\n')
+  const cmsStats = cms?.why_dubai_stats as Array<{ value: string; label: string; description: string }> | undefined
+  const STATS = (cmsStats ?? DEFAULT_STATS).map((s, i) => ({ ...s, icon: ICONS[i] ?? Percent }))
   return (
     <section className="relative py-28 overflow-hidden">
       {/* Background */}
@@ -42,13 +29,13 @@ export function WhyDubai() {
           <div className="text-center mb-16">
             <div className="inline-flex items-center gap-3 mb-5">
               <div className="h-px w-10 bg-gold" />
-              <span className="text-gold text-xs tracking-[0.3em] uppercase">Why Dubai</span>
+              <span className="text-gold text-xs tracking-[0.3em] uppercase">{eyebrow}</span>
               <div className="h-px w-10 bg-gold" />
             </div>
             <h2 className="font-serif text-4xl sm:text-5xl font-bold text-white">
-              The World&apos;s Premier
+              {headLine1}
               <br />
-              <span className="text-gold-gradient italic">Investment Destination</span>
+              <span className="text-gold-gradient italic">{headLine2}</span>
             </h2>
           </div>
         </ScrollReveal>

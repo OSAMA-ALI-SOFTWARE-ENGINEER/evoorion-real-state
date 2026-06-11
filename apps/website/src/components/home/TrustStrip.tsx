@@ -3,22 +3,17 @@
 import { motion } from 'framer-motion'
 import { ScrollReveal } from '@/components/ui/ScrollReveal'
 
-const DEVELOPERS = [
-  'EMAAR',
-  'DAMAC',
-  'SOBHA REALTY',
-  'NAKHEEL',
-  'MERAAS',
-  'SELECT GROUP',
-]
+const DEFAULT_DEVELOPERS = ['EMAAR', 'DAMAC', 'SOBHA REALTY', 'NAKHEEL', 'MERAAS', 'SELECT GROUP']
 
-export function TrustStrip() {
+export function TrustStrip({ cms }: { cms?: Record<string, unknown> }) {
+  const label      = (cms?.trust_strip_label as string)      ?? 'Trusted by Leading Developers'
+  const DEVELOPERS = (cms?.trust_strip_developers as string[]) ?? DEFAULT_DEVELOPERS
   return (
     <section className="bg-brand-section py-14 border-y border-gold-border relative overflow-hidden">
       <div className="max-w-7xl mx-auto px-6">
         <ScrollReveal>
           <p className="text-center text-muted text-[10px] tracking-[0.4em] uppercase mb-8">
-            Trusted by Leading Developers
+            {label}
           </p>
         </ScrollReveal>
 

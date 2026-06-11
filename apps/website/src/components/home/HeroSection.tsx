@@ -5,7 +5,19 @@ import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { ArrowRight, ChevronDown } from 'lucide-react'
 
-export function HeroSection() {
+export function HeroSection({ cms }: { cms?: Record<string, unknown> }) {
+  const eyebrow   = (cms?.hero_eyebrow as string)        ?? 'Luxury Real Estate Investment'
+  const line1     = (cms?.hero_headline_line1 as string) ?? 'Invest in Dubai.'
+  const line2     = (cms?.hero_headline_line2 as string) ?? 'Secure Your Legacy.'
+  const subtext   = (cms?.hero_subtext as string)        ?? 'Exclusive off-market opportunities. High returns. Full-service investment advisory.'
+  const ctaPrimary   = (cms?.hero_cta_primary as string)   ?? 'Explore Opportunities'
+  const ctaSecondary = (cms?.hero_cta_secondary as string) ?? 'Book Private Call'
+  const stats = (cms?.hero_stats as Array<{ value: string; label: string }>) ?? [
+    { value: '500+',    label: 'Properties Sold' },
+    { value: 'AED 2B+', label: 'Transactions' },
+    { value: '98%',     label: 'Client Satisfaction' },
+  ]
+
   const parallaxRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -53,7 +65,7 @@ export function HeroSection() {
         >
           <div className="h-px w-12 bg-gold" />
           <span className="text-gold text-xs tracking-[0.4em] uppercase font-light">
-            Luxury Real Estate Investment
+            {eyebrow}
           </span>
           <div className="h-px w-12 bg-gold" />
         </motion.div>
@@ -65,8 +77,8 @@ export function HeroSection() {
           transition={{ duration: 0.8, delay: 0.4 }}
           className="font-serif text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold leading-[1.05] mb-4"
         >
-          <span className="text-white block">Invest in Dubai.</span>
-          <span className="text-gold-gradient block mt-1">Secure Your Legacy.</span>
+          <span className="text-white block">{line1}</span>
+          <span className="text-gold-gradient block mt-1">{line2}</span>
         </motion.h1>
 
         {/* Subtext */}
@@ -76,7 +88,7 @@ export function HeroSection() {
           transition={{ duration: 0.7, delay: 0.65 }}
           className="text-muted text-base sm:text-lg max-w-2xl mx-auto mb-10 leading-relaxed"
         >
-          Exclusive off-market opportunities. High returns. Full-service investment advisory.
+          {subtext}
         </motion.p>
 
         {/* CTAs */}
@@ -90,14 +102,14 @@ export function HeroSection() {
             href="/properties"
             className="group flex items-center gap-2.5 px-8 py-4 bg-gold text-brand font-semibold text-sm tracking-widest uppercase rounded-sm hover:bg-gold-light transition-colors duration-300"
           >
-            Explore Opportunities
+            {ctaPrimary}
             <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
           </Link>
           <Link
             href="/contact"
             className="flex items-center gap-2.5 px-8 py-4 border border-gold/50 text-white text-sm tracking-widest uppercase rounded-sm hover:border-gold hover:bg-gold/5 transition-all duration-300"
           >
-            Book Private Call
+            {ctaSecondary}
           </Link>
         </motion.div>
 
@@ -108,13 +120,9 @@ export function HeroSection() {
           transition={{ duration: 0.8, delay: 1.2 }}
           className="mt-16 flex flex-wrap items-center justify-center gap-8 text-center"
         >
-          {[
-            ['500+', 'Properties Sold'],
-            ['AED 2B+', 'Transactions'],
-            ['98%', 'Client Satisfaction'],
-          ].map(([val, label]) => (
+          {stats.map(({ value, label }) => (
             <div key={label}>
-              <div className="text-gold font-serif text-2xl font-bold">{val}</div>
+              <div className="text-gold font-serif text-2xl font-bold">{value}</div>
               <div className="text-muted text-xs tracking-wider uppercase mt-0.5">{label}</div>
             </div>
           ))}

@@ -2,7 +2,12 @@ import Link from 'next/link'
 import { ArrowRight } from 'lucide-react'
 import { ScrollReveal } from '@/components/ui/ScrollReveal'
 
-export function CTABanner() {
+export function CTABanner({ cms }: { cms?: Record<string, unknown> }) {
+  const eyebrow = (cms?.cta_eyebrow as string) ?? 'Get Started'
+  const rawHeadline = (cms?.cta_headline as string) ?? "Ready to Build Your\nDubai Real Estate Portfolio?"
+  const [headLine1, headLine2] = rawHeadline.split('\n')
+  const body       = (cms?.cta_body as string)   ?? 'Book a private consultation with our experts. No pressure, no obligations — just personalised investment intelligence.'
+  const buttonText = (cms?.cta_button as string) ?? 'Book Private Consultation'
   return (
     <section className="relative py-24 overflow-hidden">
       <div className="absolute inset-0 bg-gradient-to-r from-[#060A15] via-brand-section to-[#060A15]" />
@@ -17,23 +22,22 @@ export function CTABanner() {
         <ScrollReveal>
           <div className="inline-flex items-center gap-3 mb-6">
             <div className="h-px w-10 bg-gold" />
-            <span className="text-gold text-xs tracking-[0.3em] uppercase">Get Started</span>
+            <span className="text-gold text-xs tracking-[0.3em] uppercase">{eyebrow}</span>
             <div className="h-px w-10 bg-gold" />
           </div>
           <h2 className="font-serif text-4xl sm:text-5xl lg:text-6xl font-bold text-white leading-tight mb-5">
-            Ready to Build Your
+            {headLine1}
             <br />
-            <span className="text-gold-gradient italic">Dubai Real Estate Portfolio?</span>
+            <span className="text-gold-gradient italic">{headLine2}</span>
           </h2>
           <p className="text-muted text-base sm:text-lg mb-10 max-w-lg mx-auto">
-            Book a private consultation with our experts. No pressure, no obligations — just
-            personalised investment intelligence.
+            {body}
           </p>
           <Link
             href="/contact"
             className="group inline-flex items-center gap-3 px-10 py-4 bg-gold text-brand font-semibold text-sm tracking-widest uppercase rounded-sm hover:bg-gold-light transition-colors duration-300"
           >
-            Book Private Consultation
+            {buttonText}
             <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
           </Link>
         </ScrollReveal>

@@ -173,6 +173,20 @@ export async function removeFavorite(propertySlug: string): Promise<ApiResponse<
   return res.data
 }
 
+// ── CMS (public) ─────────────────────────────────────────────────────────────
+
+export async function getCmsContent(slug: string): Promise<Record<string, unknown>> {
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000/api/v1'
+  try {
+    const res = await fetch(`${apiUrl}/pages/${slug}`, { next: { revalidate: 60 } })
+    if (!res.ok) return {}
+    const json = await res.json()
+    return (json?.data?.content as Record<string, unknown>) ?? {}
+  } catch {
+    return {}
+  }
+}
+
 // ── Currencies ────────────────────────────────────────────────────────────────
 
 export interface ApiCurrency {
