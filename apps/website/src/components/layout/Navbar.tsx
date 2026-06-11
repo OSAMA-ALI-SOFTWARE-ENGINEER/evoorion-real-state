@@ -8,6 +8,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { Menu, X, Phone, ChevronDown, LogOut, User, Heart, Building2, MapPin } from 'lucide-react'
 import { useAuth } from '@/context/AuthContext'
 import { AuthModal } from '@/components/ui/AuthModal'
+import { CountrySelector } from '@/components/ui/CountrySelector'
 
 // Top-level nav links (Properties/Locations handled by dropdown)
 const NAV_LINKS = [
@@ -274,6 +275,7 @@ export function Navbar() {
                   </button>
                 )
               )}
+              <CountrySelector />
               <Link
                 href="/contact"
                 className="hidden lg:flex items-center gap-2 px-5 py-2.5 bg-gold text-brand text-sm font-semibold tracking-wider uppercase rounded-sm hover:bg-gold-light transition-colors duration-300"

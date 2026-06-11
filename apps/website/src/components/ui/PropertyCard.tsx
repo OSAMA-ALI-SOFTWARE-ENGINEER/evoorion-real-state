@@ -5,6 +5,7 @@ import Image from 'next/image'
 import { motion } from 'framer-motion'
 import { MapPin, BedDouble, Bath, TrendingUp, Heart, Check } from 'lucide-react'
 import type { PropertySummary } from '@/types'
+import { useCountry } from '@/context/CountryContext'
 
 interface PropertyCardProps {
   property: PropertySummary
@@ -16,13 +17,6 @@ interface PropertyCardProps {
 
 const PLACEHOLDER =
   'https://images.unsplash.com/photo-1582407947304-fd86f028f716?auto=format&fit=crop&w=800&q=80'
-
-function formatPrice(price: string, currency: string) {
-  const num = parseFloat(price)
-  if (num >= 1_000_000) return `${currency} ${(num / 1_000_000).toFixed(1)}M`
-  if (num >= 1_000) return `${currency} ${(num / 1_000).toFixed(0)}K`
-  return `${currency} ${num.toLocaleString()}`
-}
 
 function getStatusBadge(status: string) {
   if (status === 'rented') return { label: 'RENTED', cls: 'bg-blue-500/80 text-white' }
@@ -37,6 +31,7 @@ export function PropertyCard({
   isComparing = false,
   onToggleCompare,
 }: PropertyCardProps) {
+  const { formatPrice } = useCountry()
   const primaryImage = property.images?.find((i) => i.is_primary)?.url ?? property.images?.[0]?.url
   const imageUrl = primaryImage ?? PLACEHOLDER
   const badge = getStatusBadge(property.status)
@@ -114,7 +109,7 @@ export function PropertyCard({
 
           <div className="flex items-end justify-between">
             <p className="text-gold font-semibold text-lg leading-tight">
-              {formatPrice(property.price, property.currency ?? 'AED')}
+              {formatPrice(property.price)}
             </p>
             {property.roi_min && property.roi_max && (
               <div className="flex items-center gap-1 text-emerald-400 text-xs">

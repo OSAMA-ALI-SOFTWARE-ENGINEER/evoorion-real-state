@@ -11,14 +11,9 @@ import { SkeletonCard } from '@/components/ui/SkeletonCard'
 import { LeadForm } from '@/components/ui/LeadForm'
 import { ScrollReveal } from '@/components/ui/ScrollReveal'
 import type { Area, PriceRange, PropertySummary } from '@/types'
+import { useCountry } from '@/context/CountryContext'
 
 const PLACEHOLDER = 'https://images.unsplash.com/photo-1512453979798-5ea266f8880c?auto=format&fit=crop&w=1600&q=80'
-
-function fmtPrice(n: number) {
-  if (n >= 1_000_000) return `AED ${(n / 1_000_000).toFixed(1)}M`
-  if (n >= 1_000) return `AED ${(n / 1_000).toFixed(0)}K`
-  return `AED ${n.toLocaleString()}`
-}
 
 function StatCard({ icon, label, value, sub }: { icon: React.ReactNode; label: string; value: string; sub?: string }) {
   return (
@@ -35,6 +30,7 @@ function StatCard({ icon, label, value, sub }: { icon: React.ReactNode; label: s
 
 function PriceRangesPanel({ ranges }: { ranges: PriceRange[] }) {
   const [active, setActive] = useState(0)
+  const { formatPrice } = useCountry()
   const range = ranges[active]
 
   return (
@@ -60,11 +56,11 @@ function PriceRangesPanel({ ranges }: { ranges: PriceRange[] }) {
       <div className="p-6 grid grid-cols-2 gap-6">
         <div>
           <p className="text-muted text-xs uppercase tracking-wider mb-1">Starting from</p>
-          <p className="text-gold font-serif text-2xl font-bold">{fmtPrice(range.min)}</p>
+          <p className="text-gold font-serif text-2xl font-bold">{formatPrice(range.min)}</p>
         </div>
         <div>
           <p className="text-muted text-xs uppercase tracking-wider mb-1">Up to</p>
-          <p className="text-white font-serif text-2xl font-bold">{fmtPrice(range.max)}</p>
+          <p className="text-white font-serif text-2xl font-bold">{formatPrice(range.max)}</p>
         </div>
         {/* Bar */}
         <div className="col-span-2">
@@ -72,8 +68,8 @@ function PriceRangesPanel({ ranges }: { ranges: PriceRange[] }) {
             <div className="h-full bg-gradient-to-r from-gold/60 to-gold rounded-full w-full" />
           </div>
           <div className="flex justify-between mt-1 text-muted text-[10px]">
-            <span>{fmtPrice(range.min)}</span>
-            <span>{fmtPrice(range.max)}</span>
+            <span>{formatPrice(range.min)}</span>
+            <span>{formatPrice(range.max)}</span>
           </div>
         </div>
       </div>

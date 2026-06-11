@@ -7,16 +7,10 @@ import Image from 'next/image'
 import { ArrowLeft, Star } from 'lucide-react'
 import { compareProperties } from '@/lib/api'
 import type { ComparisonResult, Property } from '@/types'
+import { useCountry } from '@/context/CountryContext'
 
 const PLACEHOLDER =
   'https://images.unsplash.com/photo-1582407947304-fd86f028f716?auto=format&fit=crop&w=800&q=80'
-
-function fmt(price: string, currency: string) {
-  const n = parseFloat(price)
-  if (n >= 1_000_000) return `${currency} ${(n / 1_000_000).toFixed(1)}M`
-  if (n >= 1_000) return `${currency} ${(n / 1_000).toFixed(0)}K`
-  return `${currency} ${n.toLocaleString()}`
-}
 
 function WinBadge({ label }: { label: string }) {
   return (
@@ -28,6 +22,7 @@ function WinBadge({ label }: { label: string }) {
 }
 
 function CompareTable({ result }: { result: ComparisonResult }) {
+  const { formatPrice } = useCountry()
   const { properties, summary } = result
 
   const rows: { label: string; render: (p: Property) => React.ReactNode }[] = [
@@ -44,7 +39,7 @@ function CompareTable({ result }: { result: ComparisonResult }) {
       label: 'Price',
       render: (p) => (
         <div className="space-y-1">
-          <p className="text-gold font-semibold">{fmt(p.price, p.currency ?? 'AED')}</p>
+          <p className="text-gold font-semibold">{formatPrice(p.price)}</p>
           {p.slug === summary.cheapest && <WinBadge label="Cheapest" />}
         </div>
       ),

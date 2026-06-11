@@ -173,4 +173,22 @@ export async function removeFavorite(propertySlug: string): Promise<ApiResponse<
   return res.data
 }
 
+// ── Currencies ────────────────────────────────────────────────────────────────
+
+export interface ApiCurrency {
+  id:            number
+  code:          string
+  name:          string
+  symbol:        string
+  exchange_rate: number
+  is_active:     boolean
+  is_default:    boolean
+  sort_order:    number
+}
+
+export async function getCurrencies(): Promise<ApiResponse<ApiCurrency[]>> {
+  const res = await api.get<ApiResponse<ApiCurrency[]>>('/currencies')
+  return res.data
+}
+
 export default api
