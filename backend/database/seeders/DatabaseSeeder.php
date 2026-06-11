@@ -19,6 +19,7 @@ class DatabaseSeeder extends Seeder
             AgentSeeder::class,
             PropertySeeder::class,
             BlogSeeder::class,
+            PageContentSeeder::class,
         ]);
     }
 }
