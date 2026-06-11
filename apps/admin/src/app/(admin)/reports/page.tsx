@@ -272,7 +272,7 @@ export default function ReportsPage() {
                         <Link href={`/properties/${p.slug}`} className="font-medium text-slate-800 dark:text-slate-100 hover:text-[#C9A84C] transition-colors line-clamp-1">
                           {String(p.title)}
                         </Link>
-                        {p.is_featured && (
+                        {Boolean(p.is_featured) && (
                           <span className="inline-block mt-0.5 text-[10px] bg-amber-50 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 px-1.5 py-0.5 rounded font-semibold">Featured</span>
                         )}
                       </td>

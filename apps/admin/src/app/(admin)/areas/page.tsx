@@ -79,7 +79,7 @@ function AreaCard({ area, onDelete, onStatusChange }: { area: Area; onDelete: ()
       <div className="p-4 flex flex-col flex-1">
         <div className="flex items-start justify-between gap-2 mb-1">
           <p className="font-semibold text-slate-800 dark:text-slate-100 leading-tight">{area.name}</p>
-          {hasGeo && <IconMapPin size={13} className="text-emerald-500 shrink-0 mt-0.5" title="Has coordinates" />}
+          {hasGeo && <span title="Has coordinates"><IconMapPin size={13} className="text-emerald-500 shrink-0 mt-0.5" /></span>}
         </div>
         <p className="text-xs text-slate-400 font-mono mb-3">{area.slug}</p>
 

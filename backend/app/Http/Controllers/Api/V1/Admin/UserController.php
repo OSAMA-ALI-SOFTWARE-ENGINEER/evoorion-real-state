@@ -7,6 +7,7 @@ use App\Http\Requests\UpdateUserRequest;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 
 /**
  * @group Users & Favorites
@@ -15,6 +16,24 @@ use Illuminate\Http\Request;
  */
 class UserController extends Controller
 {
+    public function store(Request $request): JsonResponse
+    {
+        abort_unless(auth()->user()->hasRole('super_admin'), 403);
+
+        $data = $request->validate([
+            'name'                  => 'required|string|max:255',
+            'email'                 => 'required|email|unique:users',
+            'password'              => 'required|string|min:8|confirmed',
+            'role'                  => 'required|in:super_admin,manager,agent',
+            'is_active'             => 'boolean',
+        ]);
+
+        $data['password'] = Hash::make($data['password']);
+        $user = User::create($data);
+
+        return response()->json(['success' => true, 'data' => $user], 201);
+    }
+
     public function index(Request $request): JsonResponse
     {
         abort_unless(auth()->user()->hasRole('super_admin'), 403);

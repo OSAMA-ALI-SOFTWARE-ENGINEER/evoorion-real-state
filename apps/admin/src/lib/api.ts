@@ -8,6 +8,7 @@ import type {
   AuthUser,
   BlogPost,
   BlogTag,
+  CmsSection,
   Currency,
   DashboardStats,
   Developer,
@@ -15,6 +16,7 @@ import type {
   Lead,
   LeadNote,
   LeadTask,
+  MediaFile,
   Notification,
   OperationType,
   PaginatedResponse,
@@ -183,27 +185,6 @@ export async function updatePropertyImage(slug: string, imageId: number, data: {
 
 export async function deletePropertyImage(slug: string, imageId: number) {
   return request<ApiResponse<null>>(`/admin/properties/${slug}/images/${imageId}`, { method: 'DELETE' })
-}
-
-export async function uploadMedia(file: File, folder = 'misc'): Promise<{ url: string; public_id: string }> {
-  const tok = getToken()
-  const fd  = new FormData()
-  fd.append('file', file)
-  fd.append('folder', folder)
-  const res = await fetch(`${BASE_URL}/admin/media/upload`, {
-    method: 'POST',
-    headers: {
-      Accept: 'application/json',
-      ...(tok ? { Authorization: `Bearer ${tok}` } : {}),
-    },
-    body: fd,
-  })
-  if (!res.ok) {
-    const body = await res.json().catch(() => ({}))
-    throw new Error((body as { message?: string }).message ?? `HTTP ${res.status}`)
-  }
-  const data = await res.json() as ApiResponse<{ url: string; public_id: string }>
-  return data.data!
 }
 
 // ── Leads ─────────────────────────────────────────────────────────────────────
@@ -453,6 +434,7 @@ export async function getActivityLogs(params?: {
   model_type?: string
   date_from?: string
   date_to?: string
+  user_id?: number
 }) {
   return request<PaginatedResponse<Record<string, unknown>>>(`/admin/activity-logs${qs(params)}`)
 }
@@ -547,4 +529,59 @@ export async function getAgentLeaderboard() {
 
 export async function getLeadsBySource() {
   return request<ApiResponse<unknown>>('/admin/reports/leads-by-source')
+}
+
+// ── Create user ───────────────────────────────────────────────────────────────
+
+export async function createUser(data: {
+  name: string; email: string; password: string; password_confirmation: string
+  role: string; is_active?: boolean
+}) {
+  return request<ApiResponse<AdminUser>>('/admin/users', { method: 'POST', body: JSON.stringify(data) })
+}
+
+// ── Media library ─────────────────────────────────────────────────────────────
+
+export async function getMedia(params?: { folder?: string; search?: string; per_page?: number }) {
+  return request<PaginatedResponse<MediaFile>>(`/admin/media${qs(params)}`)
+}
+
+export async function uploadMedia(file: File, folder = 'misc'): Promise<MediaFile> {
+  const token = typeof window !== 'undefined' ? localStorage.getItem('evoorion_admin_token') : null
+  const form = new FormData()
+  form.append('file', file)
+  form.append('folder', folder)
+  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000/api/v1'}/admin/media/upload`, {
+    method: 'POST',
+    headers: { Accept: 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}) },
+    body: form,
+  })
+  if (!res.ok) {
+    const j = await res.json().catch(() => ({}))
+    throw new Error(j.message ?? 'Upload failed')
+  }
+  const json = await res.json() as ApiResponse<MediaFile>
+  return json.data!
+}
+
+export async function deleteMedia(id: number) {
+  return request<ApiResponse<null>>(`/admin/media/${id}`, { method: 'DELETE' })
+}
+
+// ── CMS ───────────────────────────────────────────────────────────────────────
+
+export async function getCmsPages() {
+  return request<ApiResponse<string[]>>('/admin/cms')
+}
+
+export async function getCmsPage(slug: string) {
+  return request<ApiResponse<{ page_slug: string; sections: CmsSection[] }>>(`/admin/cms/${slug}`)
+}
+
+export async function updateCmsPage(slug: string, sections: Array<{ section_key: string; content: unknown }>) {
+  return request<ApiResponse<null>>(`/admin/cms/${slug}`, { method: 'PUT', body: JSON.stringify({ sections }) })
+}
+
+export async function deleteCmsSection(slug: string, key: string) {
+  return request<ApiResponse<null>>(`/admin/cms/${slug}/sections/${key}`, { method: 'DELETE' })
 }

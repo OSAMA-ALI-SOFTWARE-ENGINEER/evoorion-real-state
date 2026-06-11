@@ -307,3 +307,30 @@ export interface Notification {
   read_at: string | null
   created_at: string
 }
+
+// ── Media ─────────────────────────────────────────────────────────────────────
+
+export interface MediaFile {
+  id: number
+  name: string
+  url: string
+  public_id: string
+  mime_type?: string | null
+  folder: string
+  size?: number | null
+  uploaded_by?: number | null
+  uploader?: { id: number; name: string } | null
+  created_at: string
+  updated_at: string
+}
+
+// ── CMS ───────────────────────────────────────────────────────────────────────
+
+export interface CmsSection {
+  id: number
+  page_slug: string
+  section_key: string
+  content: unknown
+  created_at: string
+  updated_at: string
+}

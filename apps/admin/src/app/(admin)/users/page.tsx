@@ -1,5 +1,6 @@
 'use client'
 
+import Link from 'next/link'
 import { useCallback, useEffect, useState } from 'react'
 import { getUsers, updateUser, deleteUser, restoreUser } from '@/lib/api'
 import type { AdminUser, UserRole } from '@/types'
@@ -173,6 +174,15 @@ export default function UsersPage() {
 
   return (
     <div className="space-y-4">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <span className="text-sm text-slate-500 dark:text-slate-400">{filtered.length} user{filtered.length !== 1 ? 's' : ''}</span>
+        <Link href="/users/new"
+          className="px-4 py-2 rounded-lg bg-[#C9A84C] hover:bg-[#D4B668] text-slate-900 font-semibold text-sm">
+          + New User
+        </Link>
+      </div>
+
       {/* Filters */}
       <div className="flex items-center gap-3 flex-wrap">
         <div className="relative">
@@ -191,7 +201,6 @@ export default function UsersPage() {
         <div className="w-44">
           <CustomSelect value={statusFilter} onChange={setStatusFilter} options={STATUS_OPTIONS} placeholder="All statuses" />
         </div>
-        <span className="text-slate-400 dark:text-slate-500 text-sm ml-auto">{filtered.length} user{filtered.length !== 1 ? 's' : ''}</span>
       </div>
 
       <div className="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden">

@@ -33,7 +33,10 @@ use App\Http\Controllers\Api\V1\PropertyController;
 use App\Http\Controllers\Api\V1\AreaController;
 use App\Http\Controllers\Api\V1\DeveloperController;
 use App\Http\Controllers\Api\V1\OperationTypeController;
+use App\Http\Controllers\Api\V1\Admin\CmsController as AdminCmsController;
+use App\Http\Controllers\Api\V1\CmsController;
 use App\Http\Controllers\Api\V1\PublicSettingController;
+use App\Http\Controllers\Api\V1\UserPreferenceController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')->group(function () {
@@ -61,6 +64,9 @@ Route::prefix('v1')->group(function () {
     // Public settings (contact info, social links, hours)
     Route::middleware('throttle:60,1')->get('settings', [PublicSettingController::class, 'index']);
 
+    // Public CMS pages
+    Route::middleware('throttle:120,1')->get('pages/{slug}', [CmsController::class, 'show']);
+
     // Public master data endpoints (rate-limited)
     Route::middleware('throttle:120,1')->group(function () {
         Route::get('areas', [AreaController::class, 'index']);
@@ -85,11 +91,14 @@ Route::prefix('v1')->group(function () {
     // Public lead submission (stricter rate limit)
     Route::middleware('throttle:10,1')->post('leads', [LeadController::class, 'store']);
 
-    // Favorites (any authenticated user, no admin prefix)
+    // Favorites & user preferences (any authenticated user)
     Route::middleware('auth:sanctum')->group(function () {
         Route::get('favorites', [FavoritesController::class, 'index']);
         Route::post('favorites/{property}', [FavoritesController::class, 'store']);
         Route::delete('favorites/{property}', [FavoritesController::class, 'destroy']);
+
+        Route::get('user/preferences',  [UserPreferenceController::class, 'show']);
+        Route::put('user/preferences',  [UserPreferenceController::class, 'update']);
     });
 
     // Admin endpoints
@@ -179,13 +188,16 @@ Route::prefix('v1')->group(function () {
 
             // User management (super_admin — controller enforces this)
             Route::get('users', [UserController::class, 'index']);
+            Route::post('users', [UserController::class, 'store']);
             Route::get('users/{user}', [UserController::class, 'show']);
             Route::put('users/{user}', [UserController::class, 'update']);
             Route::delete('users/{user}', [UserController::class, 'destroy']);
             Route::post('users/{id}/restore', [UserController::class, 'restore']);
 
-            // Media upload
+            // Media library
+            Route::get('media',         [MediaController::class, 'index']);
             Route::post('media/upload', [MediaController::class, 'upload']);
+            Route::delete('media/{id}', [MediaController::class, 'destroy']);
 
             // Master data endpoints
             Route::resource('areas', AdminAreaController::class);
@@ -221,10 +233,15 @@ Route::prefix('v1')->group(function () {
             Route::delete('blog-tags/{tag}',   [AdminBlogController::class, 'destroyTag']);
         });
 
-        // Settings — super_admin only
+        // Settings & CMS — super_admin only
         Route::middleware('role:super_admin')->group(function () {
             Route::get('settings',             [SettingController::class, 'index']);
             Route::put('settings',             [SettingController::class, 'update']);
+
+            Route::get('cms',                                    [AdminCmsController::class, 'index']);
+            Route::get('cms/{slug}',                             [AdminCmsController::class, 'show']);
+            Route::put('cms/{slug}',                             [AdminCmsController::class, 'update']);
+            Route::delete('cms/{slug}/sections/{key}',           [AdminCmsController::class, 'destroySection']);
         });
     });
 });

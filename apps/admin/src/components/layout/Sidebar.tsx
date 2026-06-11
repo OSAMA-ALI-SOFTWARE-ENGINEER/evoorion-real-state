@@ -16,7 +16,9 @@ import {
   IconLayers,
   IconLogOut,
   IconMapPin,
+  IconImage,
   IconSettings,
+  IconSliders,
   IconTag,
   IconUser,
   IconUsers,
@@ -66,6 +68,8 @@ const NAV: Array<{ group?: string; items: NavItem[] }> = [
     group: 'Content',
     items: [
       { label: 'Blog',     href: '/blog',     icon: <IconFileText />,  roles: ['manager', 'super_admin'] },
+      { label: 'Media',    href: '/media',    icon: <IconImage />,     roles: ['manager', 'super_admin'] },
+      { label: 'CMS',      href: '/cms',      icon: <IconSliders />,   roles: ['super_admin'] },
       { label: 'Settings', href: '/settings', icon: <IconSettings />, roles: ['super_admin'] },
     ],
   },

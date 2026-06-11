@@ -130,7 +130,7 @@ export default function ActivityLogsPage() {
     if (me && me.role !== 'super_admin') params.user_id = me.id
     getActivityLogs(params)
       .then(res => {
-        setLogs((res.data as ActivityLog[]) ?? [])
+        setLogs((res.data as unknown as ActivityLog[]) ?? [])
         const meta = res.meta?.pagination
         if (meta) { setTotal(meta.total); setLastPage(meta.last_page) }
       })
@@ -307,7 +307,7 @@ export default function ActivityLogsPage() {
       )}
 
       {lastPage > 1 && (
-        <Pagination page={page} lastPage={lastPage} onPage={setPage} />
+        <Pagination currentPage={page} lastPage={lastPage} total={total} perPage={25} onPage={setPage} />
       )}
     </div>
   )
