@@ -39,7 +39,7 @@ jobs:
 
             echo "→ Installing PHP dependencies..."
             cd "$APP_DIR"
-            composer install --no-dev --optimize-autoloader --no-interaction
+            composer install --optimize-autoloader --no-interaction
 
             echo "→ Running migrations..."
             php artisan migrate --force

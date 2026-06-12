@@ -22,7 +22,7 @@ git clone "$REPO_URL" "$REPO_DIR"
 echo "→ Setting up API..."
 rsync -a --exclude='.env' "$REPO_DIR/backend/" "$API_DIR/"
 cd "$API_DIR"
-composer install --no-dev --optimize-autoloader --no-interaction
+composer install --optimize-autoloader --no-interaction
 
 echo ""
 echo "ACTION REQUIRED — create $API_DIR/.env"
