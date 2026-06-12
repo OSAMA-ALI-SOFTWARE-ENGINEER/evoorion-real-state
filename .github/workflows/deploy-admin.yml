@@ -9,11 +9,42 @@ on:
 
 jobs:
   deploy:
-    name: Deploy Next.js Admin to Hostinger
+    name: Build on runner, deploy to Hostinger
     runs-on: ubuntu-latest
 
     steps:
-      - name: Deploy via SSH
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+          cache-dependency-path: apps/admin/package-lock.json
+
+      - name: Build admin
+        working-directory: apps/admin
+        env:
+          NEXT_PUBLIC_API_URL: https://evoorion-api.osama-ali.com/api/v1
+        run: |
+          npm ci
+          npm run build
+
+      - name: Package artifacts (source + build, no node_modules)
+        run: |
+          cd apps/admin
+          tar czf ../../admin-deploy.tar.gz --exclude='node_modules' .
+
+      - name: Upload package to server
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          password: ${{ secrets.SSH_PASSWORD }}
+          port: ${{ secrets.SSH_PORT }}
+          source: admin-deploy.tar.gz
+          target: /tmp/
+
+      - name: Extract and restart
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.SSH_HOST }}
@@ -22,30 +53,16 @@ jobs:
           port: ${{ secrets.SSH_PORT }}
           script: |
             set -e
+            APP_DIR=~/domains/osama-ali.com/public_html/evoorion-admin
 
-            REPO_DIR="$HOME/evoorion"
-            APP_DIR="$HOME/domains/osama-ali.com/public_html/evoorion-admin"
-
-            echo "→ Pulling latest code..."
-            cd "$REPO_DIR"
-            git pull origin master
-
-            echo "→ Syncing admin files (preserving .env.production)..."
-            rsync -a --delete \
-              --exclude='.env.production' \
-              --exclude='node_modules' \
-              --exclude='.next' \
-              "$REPO_DIR/apps/admin/" "$APP_DIR/"
-
-            echo "→ Installing dependencies..."
             cd "$APP_DIR"
-            npm ci --prefer-offline
+            tar xzf /tmp/admin-deploy.tar.gz
+            rm /tmp/admin-deploy.tar.gz
 
-            echo "→ Building..."
-            npm run build
+            echo "NEXT_PUBLIC_API_URL=https://evoorion-api.osama-ali.com/api/v1" > .env.production
 
-            echo "→ Restarting Node.js app..."
+            npm ci --omit=dev
+
             mkdir -p tmp
             touch tmp/restart.txt
-
             echo "✓ Admin deployed"
