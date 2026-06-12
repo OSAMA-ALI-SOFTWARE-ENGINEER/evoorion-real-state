@@ -33,7 +33,6 @@ read -p "Press ENTER once .env is created to continue..."
 
 php artisan key:generate
 php artisan migrate --force
-php artisan db:seed --class=RoleSeeder
 php artisan db:seed --class=CurrencySeeder
 php artisan db:seed --class=PageContentSeeder
 php artisan storage:link
