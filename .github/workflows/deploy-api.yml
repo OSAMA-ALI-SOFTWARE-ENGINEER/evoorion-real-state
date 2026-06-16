@@ -9,37 +9,12 @@ on:
 
 jobs:
   deploy:
-    name: Deploy Laravel to Hostinger
+    name: Trigger Hostinger Deploy
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Upload files via FTP
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
-        with:
-          protocol: ftps
-          server: ${{ secrets.FTP_HOST }}
-          username: ${{ secrets.FTP_USERNAME }}
-          password: ${{ secrets.FTP_PASSWORD }}
-          local-dir: backend/
-          server-dir: /domains/osama-ali.com/public_html/evoorion-api.osama-ali.com/
-          exclude: |
-            **/.git*
-            **/.git*/**
-            **/node_modules/**
-            .env
-            storage/logs/**
-            storage/framework/cache/**
-            storage/framework/sessions/**
-            storage/framework/views/**
-            storage/app/public/**
-            bootstrap/cache/**
-
       - name: Trigger server deploy hook
         run: |
           curl -sf -X POST "https://evoorion-api.osama-ali.com/deploy.php" \
             -H "X-Deploy-Secret: ${{ secrets.DEPLOY_WEBHOOK_SECRET }}" \
-            --max-time 10 \
-            || echo "Webhook call failed — cron will not run artisan commands"
+            --max-time 10
