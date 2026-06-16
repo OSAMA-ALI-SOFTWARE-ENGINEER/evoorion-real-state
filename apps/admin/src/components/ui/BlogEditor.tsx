@@ -143,7 +143,7 @@ export function BlogEditor({ value, onChange, placeholder = 'Write your post con
         <Sep />
         <Btn onClick={() => editor.chain().focus().toggleBulletList().run()} active={editor.isActive('bulletList')} title="Bullet list"><span className="text-xs">• ≡</span></Btn>
         <Btn onClick={() => editor.chain().focus().toggleOrderedList().run()} active={editor.isActive('orderedList')} title="Numbered list"><span className="text-xs">1.</span></Btn>
-        <Btn onClick={() => editor.chain().focus().toggleBlockquote().run()} active={editor.isActive('blockquote')} title="Blockquote"><span className="text-xs font-serif">"</span></Btn>
+        <Btn onClick={() => editor.chain().focus().toggleBlockquote().run()} active={editor.isActive('blockquote')} title="Blockquote"><span className="text-xs font-serif">&ldquo;</span></Btn>
         <Btn onClick={() => editor.chain().focus().toggleCodeBlock().run()} active={editor.isActive('codeBlock')} title="Code block"><code className="text-[10px] font-mono">{'</>'}</code></Btn>
         <Sep />
         <Btn onClick={addLink} active={editor.isActive('link')} title="Insert link"><span className="text-xs">🔗</span></Btn>
