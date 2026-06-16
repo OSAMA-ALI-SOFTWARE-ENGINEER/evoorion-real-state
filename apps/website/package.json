@@ -9,7 +9,6 @@
     "lint": "eslint"
   },
   "dependencies": {
-    "adapter-vercel": "github:nextjs/adapter-vercel",
     "axios": "^1.17.0",
     "framer-motion": "^12.40.0",
     "lucide-react": "^1.17.0",
