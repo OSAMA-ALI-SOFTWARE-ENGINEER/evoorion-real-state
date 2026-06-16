@@ -31,6 +31,7 @@ use App\Http\Controllers\Api\V1\PasswordResetController;
 use App\Http\Controllers\Api\V1\PropertyComparisonController;
 use App\Http\Controllers\Api\V1\PropertyController;
 use App\Http\Controllers\Api\V1\AreaController;
+use App\Http\Controllers\Api\V1\CurrencyController;
 use App\Http\Controllers\Api\V1\DeveloperController;
 use App\Http\Controllers\Api\V1\OperationTypeController;
 use App\Http\Controllers\Api\V1\Admin\CmsController as AdminCmsController;
@@ -69,10 +70,7 @@ Route::prefix('v1')->group(function () {
 
     // Public master data endpoints (rate-limited)
     Route::middleware('throttle:120,1')->group(function () {
-        Route::get('currencies', fn() => response()->json([
-            'success' => true,
-            'data' => \App\Models\Currency::where('is_active', true)->orderBy('sort_order')->orderBy('code')->get(),
-        ]));
+        Route::get('currencies', [CurrencyController::class, 'index']);
         Route::get('areas', [AreaController::class, 'index']);
         Route::get('areas/{area}', [AreaController::class, 'show']);
         Route::get('developers', [DeveloperController::class, 'index']);
