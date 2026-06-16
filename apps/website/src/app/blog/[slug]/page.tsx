@@ -190,7 +190,7 @@ export default async function BlogPostPage({ params }: Props) {
                 <p className="text-gold text-xs tracking-widest uppercase mb-2">Ready to Invest?</p>
                 <h3 className="font-serif text-white text-xl mb-3">Speak with an advisor</h3>
                 <p className="text-muted text-sm mb-4 leading-relaxed">
-                  Get personalised guidance on Dubai's most exclusive properties.
+                  Get personalised guidance on Dubai&apos;s most exclusive properties.
                 </p>
                 <Link
                   href="/contact"
