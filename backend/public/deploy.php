@@ -3,7 +3,7 @@
 $env = @parse_ini_file(__DIR__ . '/../.env') ?: [];
 $secret = $env['DEPLOY_WEBHOOK_SECRET'] ?? '';
 
-if (!$secret || ($_SERVER['HTTP_X_DEPLOY_SECRET'] ?? '') !== $secret) {
+if (!$secret || !hash_equals($secret, $_SERVER['HTTP_X_DEPLOY_SECRET'] ?? '')) {
     http_response_code(403);
     exit('Forbidden');
 }
