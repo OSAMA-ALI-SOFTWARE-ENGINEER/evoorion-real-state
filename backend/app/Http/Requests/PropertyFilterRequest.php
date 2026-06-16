@@ -19,7 +19,7 @@ class PropertyFilterRequest extends FormRequest
             'developer_id'       => 'nullable|integer|exists:developers,id',
             'operation_type_id'  => 'nullable|integer|exists:operation_types,id',
             'type'               => 'nullable|in:villa,apartment,penthouse,townhouse,commercial',
-            'featured'           => 'nullable|boolean',
+            'featured'           => 'nullable|in:0,1,true,false',
             'min_price'          => 'nullable|numeric|min:0',
             'max_price'          => 'nullable|numeric|min:0',
             'bedrooms_min'       => 'nullable|integer|min:0',
