@@ -15,7 +15,7 @@ jobs:
     steps:
       - name: Trigger server deploy hook
         run: |
-          STATUS=$(curl -s -o /tmp/response.txt -w "%{http_code}" -X POST "https://evoorion-api.osama-ali.com/deploy.php" \
+          STATUS=$(curl -s -o /tmp/response.txt -w "%{http_code}" -X POST "https://evoorion-api.osama-ali.com/deploy" \
             -H "X-Deploy-Secret: ${{ secrets.DEPLOY_WEBHOOK_SECRET }}" \
             --max-time 120)
           echo "HTTP Status: $STATUS"
