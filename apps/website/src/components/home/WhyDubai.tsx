@@ -1,3 +1,4 @@
+import Image from 'next/image'
 import { Percent, TrendingUp, Globe, Award } from 'lucide-react'
 import { ScrollReveal } from '@/components/ui/ScrollReveal'
 
@@ -10,7 +11,7 @@ const DEFAULT_STATS = [
   { value: '#1',    label: 'Global Destination', description: "Dubai ranks as the world's most visited city and a top destination for HNWI relocation." },
 ]
 
-export function WhyDubai({ cms }: { cms?: Record<string, unknown> }) {
+export function WhyDubai({ cms, bgImage }: { cms?: Record<string, unknown>; bgImage?: string | null }) {
   const eyebrow = (cms?.why_dubai_eyebrow as string) ?? 'Why Dubai'
   const rawHeadline = (cms?.why_dubai_headline as string) ?? "The World's Premier\nInvestment Destination"
   const [headLine1, headLine2] = rawHeadline.split('\n')
@@ -20,6 +21,9 @@ export function WhyDubai({ cms }: { cms?: Record<string, unknown> }) {
     <section className="relative py-28 overflow-hidden">
       {/* Background */}
       <div className="absolute inset-0 bg-gradient-to-br from-[#06090F] via-brand to-brand-section" />
+      {bgImage && (
+        <Image src={bgImage} alt="" fill className="object-cover opacity-15" unoptimized />
+      )}
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(201,168,76,0.08),transparent_60%)]" />
       <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-gold/30 to-transparent" />
       <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-gold/30 to-transparent" />

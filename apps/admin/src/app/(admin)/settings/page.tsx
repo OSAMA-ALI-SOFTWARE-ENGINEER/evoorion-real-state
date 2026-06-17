@@ -1,7 +1,8 @@
 'use client'
 
-import { useEffect, useState } from 'react'
-import { getSettings, updateSettings } from '@/lib/api'
+import { useEffect, useRef, useState } from 'react'
+import Image from 'next/image'
+import { getSettings, updateSettings, uploadMedia } from '@/lib/api'
 import { useAuth } from '@/context/AuthContext'
 import {
   IconUsers,
@@ -27,7 +28,8 @@ interface TabDef {
   label: string
   icon: React.ReactNode
   hint?: string
-  fields: FieldDef[]
+  fields?: FieldDef[]
+  custom?: boolean
 }
 
 const TABS: TabDef[] = [
@@ -60,6 +62,46 @@ const TABS: TabDef[] = [
       { key: 'social_linkedin',  label: 'LinkedIn URL',    placeholder: 'https://linkedin.com/…',  type: 'url' },
       { key: 'social_youtube',   label: 'YouTube URL',     placeholder: 'https://youtube.com/…',   type: 'url' },
     ],
+  },
+  {
+    id: 'theme',
+    label: 'Theme & Colors',
+    icon: (
+      <svg width={16} height={16} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.75} strokeLinecap="round" strokeLinejoin="round">
+        <circle cx="13.5" cy="6.5" r=".5" fill="currentColor"/><circle cx="17.5" cy="10.5" r=".5" fill="currentColor"/>
+        <circle cx="8.5" cy="7.5" r=".5" fill="currentColor"/><circle cx="6.5" cy="12.5" r=".5" fill="currentColor"/>
+        <path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"/>
+      </svg>
+    ),
+    custom: true,
+    hint: 'Customize the website colour palette. Changes are reflected immediately — no rebuild required.',
+  },
+  {
+    id: 'images',
+    label: 'Section Images',
+    icon: (
+      <svg width={16} height={16} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.75} strokeLinecap="round" strokeLinejoin="round">
+        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+        <circle cx="8.5" cy="8.5" r="1.5"/>
+        <polyline points="21 15 16 10 5 21"/>
+      </svg>
+    ),
+    custom: true,
+    hint: 'Upload background images for each homepage section. Leave blank to use the default CSS gradient.',
+  },
+  {
+    id: 'partners',
+    label: 'Partners & Strip',
+    icon: (
+      <svg width={16} height={16} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.75} strokeLinecap="round" strokeLinejoin="round">
+        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+        <circle cx="9" cy="7" r="4"/>
+        <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+        <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+      </svg>
+    ),
+    custom: true,
+    hint: 'Manage developer/partner logos shown in the scrolling trust strip on the homepage.',
   },
   {
     id: 'storage',
@@ -151,6 +193,26 @@ const TABS: TabDef[] = [
   },
 ]
 
+// ── Luxury colour presets ─────────────────────────────────────────────────────
+
+interface Palette {
+  name: string
+  brand: string
+  brandSection: string
+  gold: string
+  goldLight: string
+  muted: string
+}
+
+const PALETTES: Palette[] = [
+  { name: 'Navy & Gold',         brand: '#0A0F1E', brandSection: '#0D1526', gold: '#C9A84C', goldLight: '#D4B77A', muted: '#A0ABBB' },
+  { name: 'Emerald & Gold',      brand: '#0A1A10', brandSection: '#0D2218', gold: '#C9A84C', goldLight: '#D4B77A', muted: '#9AABAA' },
+  { name: 'Obsidian & Platinum', brand: '#0D0D0D', brandSection: '#181818', gold: '#E2E2E2', goldLight: '#F5F5F5', muted: '#909090' },
+  { name: 'Midnight & Rose Gold',brand: '#100A1E', brandSection: '#180D2A', gold: '#B76E79', goldLight: '#D4909A', muted: '#A09AAB' },
+  { name: 'Charcoal & Champagne',brand: '#1A1714', brandSection: '#231F1C', gold: '#D4AF8C', goldLight: '#E8CCB0', muted: '#A09890' },
+  { name: 'Forest & Bronze',     brand: '#0F1A0F', brandSection: '#162216', gold: '#8B6914', goldLight: '#A87E2A', muted: '#90A090' },
+]
+
 // ── Storage driver select ─────────────────────────────────────────────────────
 
 function StorageDriverSelect({ value, onChange }: { value: string; onChange: (v: string) => void }) {
@@ -165,6 +227,433 @@ function StorageDriverSelect({ value, onChange }: { value: string; onChange: (v:
       <option value="local">local — Server disk (dev only)</option>
       <option value="cloudinary">cloudinary — Cloudinary CDN</option>
     </select>
+  )
+}
+
+// ── Theme & Colors tab ────────────────────────────────────────────────────────
+
+const COLOR_FIELDS = [
+  { key: 'color_brand',         label: 'Primary Background',   hint: 'Main dark background used across all pages' },
+  { key: 'color_brand_section', label: 'Section Background',   hint: 'Slightly lighter background for alternate sections' },
+  { key: 'color_gold',          label: 'Accent / Gold',        hint: 'Primary accent — buttons, borders, highlights' },
+  { key: 'color_gold_light',    label: 'Accent Light',         hint: 'Hover state of the accent colour' },
+  { key: 'color_muted',         label: 'Muted Text',           hint: 'Secondary text — descriptions, captions' },
+]
+
+function ThemeTab({ values, set }: { values: Settings; set: (k: string, v: string) => void }) {
+  function applyPalette(p: Palette) {
+    set('color_brand', p.brand)
+    set('color_brand_section', p.brandSection)
+    set('color_gold', p.gold)
+    set('color_gold_light', p.goldLight)
+    set('color_muted', p.muted)
+  }
+
+  return (
+    <div className="p-6 space-y-8">
+      {/* Preset palettes */}
+      <div>
+        <p className="text-sm font-semibold text-slate-700 dark:text-slate-200 mb-3">Luxury Presets</p>
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+          {PALETTES.map(p => (
+            <button
+              key={p.name}
+              type="button"
+              onClick={() => applyPalette(p)}
+              className="group flex items-center gap-2.5 p-3 rounded-lg border border-slate-200 dark:border-slate-600 hover:border-[#C9A84C] transition-colors text-left"
+            >
+              {/* Colour swatches */}
+              <div className="flex shrink-0">
+                <div className="w-5 h-9 rounded-l" style={{ background: p.brand }} />
+                <div className="w-5 h-9"          style={{ background: p.gold }} />
+                <div className="w-5 h-9 rounded-r" style={{ background: p.muted }} />
+              </div>
+              <span className="text-xs font-medium text-slate-600 dark:text-slate-300 group-hover:text-[#C9A84C] transition-colors leading-tight">
+                {p.name}
+              </span>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div className="h-px bg-slate-100 dark:bg-slate-700" />
+
+      {/* Individual colour pickers */}
+      <div className="space-y-5">
+        <p className="text-sm font-semibold text-slate-700 dark:text-slate-200">Colours</p>
+        {COLOR_FIELDS.map(f => (
+          <div key={f.key} className="flex items-start gap-4">
+            <div className="shrink-0 flex flex-col items-center gap-2 mt-0.5">
+              <div
+                className="w-10 h-10 rounded-lg border border-slate-200 dark:border-slate-600 cursor-pointer relative overflow-hidden"
+                style={{ background: values[f.key] ?? '#000000' }}
+              >
+                <input
+                  type="color"
+                  value={values[f.key] ?? '#000000'}
+                  onChange={e => set(f.key, e.target.value)}
+                  className="absolute inset-0 opacity-0 w-full h-full cursor-pointer"
+                  aria-label={f.label}
+                />
+              </div>
+            </div>
+            <div className="flex-1 min-w-0">
+              <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">{f.label}</label>
+              <input
+                type="text"
+                value={values[f.key] ?? ''}
+                onChange={e => set(f.key, e.target.value)}
+                placeholder="#000000"
+                maxLength={7}
+                className="w-full px-3 py-2 rounded-lg border border-slate-200 dark:border-slate-600 text-sm font-mono focus:outline-none focus:border-[#C9A84C] focus:ring-1 focus:ring-[#C9A84C] bg-white dark:bg-slate-700 text-slate-800 dark:text-slate-100"
+              />
+              {f.hint && <p className="text-[11px] text-slate-400 dark:text-slate-500 mt-1">{f.hint}</p>}
+            </div>
+            {/* Live preview swatch */}
+            <div
+              className="shrink-0 w-16 h-10 rounded-lg mt-0.5 border border-slate-200 dark:border-slate-600 flex items-center justify-center"
+              style={{ background: values[f.key] ?? '#000' }}
+            >
+              <span className="text-[10px] font-mono" style={{ color: values[f.key] === values['color_brand'] ? (values['color_gold'] ?? '#C9A84C') : '#ffffff' }}>Aa</span>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Live preview bar */}
+      <div>
+        <p className="text-sm font-semibold text-slate-700 dark:text-slate-200 mb-3">Preview</p>
+        <div
+          className="rounded-xl overflow-hidden border border-slate-200 dark:border-slate-600"
+          style={{ background: values['color_brand'] ?? '#0A0F1E' }}
+        >
+          <div
+            className="px-6 py-4"
+            style={{ background: values['color_brand_section'] ?? '#0D1526' }}
+          >
+            <p className="text-xs tracking-widest uppercase mb-1" style={{ color: values['color_gold'] ?? '#C9A84C' }}>
+              Luxury Real Estate
+            </p>
+            <p className="text-xl font-bold" style={{ color: '#ffffff' }}>
+              Invest in Dubai.{' '}
+              <span style={{ color: values['color_gold'] ?? '#C9A84C' }}>Secure Your Legacy.</span>
+            </p>
+            <p className="text-sm mt-1" style={{ color: values['color_muted'] ?? '#A0ABBB' }}>
+              Exclusive off-market opportunities. High returns.
+            </p>
+          </div>
+          <div className="px-6 py-3 flex items-center gap-3">
+            <span
+              className="px-4 py-1.5 rounded text-xs font-semibold"
+              style={{ background: values['color_gold'] ?? '#C9A84C', color: values['color_brand'] ?? '#0A0F1E' }}
+            >
+              Explore
+            </span>
+            <span
+              className="px-4 py-1.5 rounded text-xs border"
+              style={{ borderColor: values['color_gold'] ?? '#C9A84C', color: '#ffffff' }}
+            >
+              Book Call
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+// ── Section Images tab ────────────────────────────────────────────────────────
+
+const IMAGE_SECTIONS = [
+  { key: 'image_hero',      label: 'Hero Section',    hint: 'Full-screen background image on the homepage hero. Recommended: 1920×1080px or larger.' },
+  { key: 'image_cta',       label: 'CTA Banner',      hint: 'Background for the "Ready to Build Your Portfolio?" call-to-action section.' },
+  { key: 'image_why_dubai', label: 'Why Dubai',       hint: 'Background for the "Why Invest in Dubai" statistics section.' },
+]
+
+function SectionImagesTab({ values, set }: { values: Settings; set: (k: string, v: string) => void }) {
+  const [uploading, setUploading] = useState<string | null>(null)
+  const refs = useRef<Record<string, HTMLInputElement | null>>({})
+
+  async function upload(key: string, file: File) {
+    setUploading(key)
+    try {
+      const res = await uploadMedia(file, 'general')
+      set(key, res.url)
+    } catch {
+      // upload failed — leave existing value
+    } finally {
+      setUploading(null)
+    }
+  }
+
+  return (
+    <div className="p-6 space-y-6">
+      {IMAGE_SECTIONS.map(s => {
+        const url = values[s.key] ?? ''
+        const busy = uploading === s.key
+        return (
+          <div key={s.key} className="border border-slate-200 dark:border-slate-600 rounded-xl overflow-hidden">
+            {/* Preview */}
+            <div
+              className="relative w-full h-40 bg-slate-100 dark:bg-slate-700 flex items-center justify-center overflow-hidden"
+            >
+              {url ? (
+                <Image src={url} alt={s.label} fill className="object-cover" unoptimized />
+              ) : (
+                <div className="flex flex-col items-center gap-2 text-slate-400">
+                  <svg width={32} height={32} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round">
+                    <rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/>
+                  </svg>
+                  <span className="text-xs">Using default gradient</span>
+                </div>
+              )}
+            </div>
+
+            <div className="p-4">
+              <p className="text-sm font-semibold text-slate-700 dark:text-slate-200">{s.label}</p>
+              {s.hint && <p className="text-[11px] text-slate-400 dark:text-slate-500 mt-0.5 mb-3">{s.hint}</p>}
+
+              <div className="flex items-center gap-3 flex-wrap">
+                <button
+                  type="button"
+                  disabled={busy}
+                  onClick={() => refs.current[s.key]?.click()}
+                  className="px-4 py-2 rounded-lg text-sm font-medium bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 disabled:opacity-50 transition-colors"
+                >
+                  {busy ? 'Uploading…' : 'Upload image'}
+                </button>
+
+                {url && (
+                  <button
+                    type="button"
+                    onClick={() => set(s.key, '')}
+                    className="px-4 py-2 rounded-lg text-sm font-medium text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
+                  >
+                    Remove
+                  </button>
+                )}
+
+                {url && (
+                  <a
+                    href={url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-xs text-slate-400 hover:text-[#C9A84C] transition-colors truncate max-w-[200px]"
+                  >
+                    {url.split('/').pop()}
+                  </a>
+                )}
+
+                <input
+                  ref={el => { refs.current[s.key] = el }}
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  aria-label={`Upload image for ${s.label}`}
+                  onChange={e => { const f = e.target.files?.[0]; if (f) upload(s.key, f); e.target.value = '' }}
+                />
+              </div>
+
+              {/* Or paste URL */}
+              <input
+                type="url"
+                value={url}
+                onChange={e => set(s.key, e.target.value)}
+                placeholder="Or paste an image URL…"
+                className="mt-3 w-full px-3 py-2 rounded-lg border border-slate-200 dark:border-slate-600 text-sm focus:outline-none focus:border-[#C9A84C] focus:ring-1 focus:ring-[#C9A84C] bg-white dark:bg-slate-700 text-slate-800 dark:text-slate-100 placeholder-slate-400"
+              />
+            </div>
+          </div>
+        )
+      })}
+    </div>
+  )
+}
+
+// ── Partners tab ──────────────────────────────────────────────────────────────
+
+interface Partner {
+  name: string
+  logo_url: string
+}
+
+function PartnersTab({ values, set }: { values: Settings; set: (k: string, v: string) => void }) {
+  const [partners, setPartners] = useState<Partner[]>([])
+  const [uploading, setUploading] = useState<number | null>(null)
+  const logoRefs = useRef<Record<number, HTMLInputElement | null>>({})
+
+  useEffect(() => {
+    try {
+      const parsed = JSON.parse(values['partners_list'] ?? '[]')
+      if (Array.isArray(parsed)) setPartners(parsed)
+    } catch { /* ignore */ }
+  }, [values['partners_list']])
+
+  function persist(updated: Partner[]) {
+    setPartners(updated)
+    set('partners_list', JSON.stringify(updated))
+  }
+
+  function updateName(i: number, name: string) {
+    const updated = [...partners]
+    updated[i] = { ...updated[i], name }
+    persist(updated)
+  }
+
+  function updateLogo(i: number, logo_url: string) {
+    const updated = [...partners]
+    updated[i] = { ...updated[i], logo_url }
+    persist(updated)
+  }
+
+  function move(i: number, dir: -1 | 1) {
+    const updated = [...partners]
+    const j = i + dir
+    if (j < 0 || j >= updated.length) return;
+    [updated[i], updated[j]] = [updated[j], updated[i]]
+    persist(updated)
+  }
+
+  function remove(i: number) {
+    persist(partners.filter((_, idx) => idx !== i))
+  }
+
+  function add() {
+    persist([...partners, { name: '', logo_url: '' }])
+  }
+
+  async function uploadLogo(i: number, file: File) {
+    setUploading(i)
+    try {
+      const res = await uploadMedia(file, 'general')
+      updateLogo(i, res.url)
+    } catch { /* ignore */ }
+    finally { setUploading(null) }
+  }
+
+  const speed = parseInt(values['trust_strip_speed'] ?? '25', 10) || 25
+  const label = values['trust_strip_label'] ?? 'Trusted by Leading Developers'
+
+  return (
+    <div className="p-6 space-y-8">
+      {/* Strip settings */}
+      <div className="grid gap-4 sm:grid-cols-2">
+        <div>
+          <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Strip Label</label>
+          <input
+            type="text"
+            value={label}
+            onChange={e => set('trust_strip_label', e.target.value)}
+            placeholder="Trusted by Leading Developers"
+            className="w-full px-3.5 py-2.5 rounded-lg border border-slate-200 dark:border-slate-600 text-sm focus:outline-none focus:border-[#C9A84C] focus:ring-1 focus:ring-[#C9A84C] bg-white dark:bg-slate-700 text-slate-800 dark:text-slate-100"
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
+            Scroll Speed — <span className="font-mono text-[#C9A84C]">{speed}s</span>
+          </label>
+          <input
+            type="range"
+            min={5}
+            max={60}
+            step={1}
+            value={speed}
+            onChange={e => set('trust_strip_speed', e.target.value)}
+            className="w-full accent-[#C9A84C]"
+            aria-label={`Scroll speed: ${speed} seconds`}
+          />
+          <div className="flex justify-between text-[10px] text-slate-400 mt-0.5">
+            <span>Fast (5s)</span>
+            <span>Slow (60s)</span>
+          </div>
+        </div>
+      </div>
+
+      <div className="h-px bg-slate-100 dark:bg-slate-700" />
+
+      {/* Partners list */}
+      <div>
+        <div className="flex items-center justify-between mb-4">
+          <p className="text-sm font-semibold text-slate-700 dark:text-slate-200">Partner Logos</p>
+          <button
+            type="button"
+            onClick={add}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-[#C9A84C]/10 text-[#C9A84C] hover:bg-[#C9A84C]/20 transition-colors"
+          >
+            <svg width={12} height={12} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Add Partner
+          </button>
+        </div>
+
+        <div className="space-y-3">
+          {partners.map((p, i) => (
+            <div key={i} className="flex items-center gap-3 p-3 border border-slate-200 dark:border-slate-600 rounded-xl">
+              {/* Logo preview / upload */}
+              <div
+                className="shrink-0 w-16 h-12 rounded-lg border border-slate-200 dark:border-slate-600 flex items-center justify-center bg-slate-50 dark:bg-slate-700 overflow-hidden cursor-pointer relative"
+                onClick={() => logoRefs.current[i]?.click()}
+                title="Click to upload logo"
+              >
+                {p.logo_url ? (
+                  <Image src={p.logo_url} alt={p.name} fill className="object-contain p-1" unoptimized />
+                ) : uploading === i ? (
+                  <div className="w-4 h-4 border-2 border-[#C9A84C] border-t-transparent rounded-full animate-spin" />
+                ) : (
+                  <svg width={20} height={20} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} className="text-slate-300">
+                    <rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/>
+                  </svg>
+                )}
+                <input
+                  ref={el => { logoRefs.current[i] = el }}
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  aria-label={`Upload logo for ${p.name || `partner ${i + 1}`}`}
+                  onChange={e => { const f = e.target.files?.[0]; if (f) uploadLogo(i, f); e.target.value = '' }}
+                />
+              </div>
+
+              {/* Name */}
+              <input
+                type="text"
+                value={p.name}
+                onChange={e => updateName(i, e.target.value)}
+                placeholder="Partner name"
+                className="flex-1 min-w-0 px-3 py-2 rounded-lg border border-slate-200 dark:border-slate-600 text-sm focus:outline-none focus:border-[#C9A84C] focus:ring-1 focus:ring-[#C9A84C] bg-white dark:bg-slate-700 text-slate-800 dark:text-slate-100"
+              />
+
+              {/* Reorder */}
+              <div className="flex flex-col gap-0.5">
+                <button type="button" aria-label="Move up" onClick={() => move(i, -1)} disabled={i === 0} className="p-1 rounded text-slate-400 hover:text-slate-600 disabled:opacity-20">
+                  <svg width={12} height={12} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}><polyline points="18 15 12 9 6 15"/></svg>
+                </button>
+                <button type="button" aria-label="Move down" onClick={() => move(i, 1)} disabled={i === partners.length - 1} className="p-1 rounded text-slate-400 hover:text-slate-600 disabled:opacity-20">
+                  <svg width={12} height={12} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}><polyline points="6 9 12 15 18 9"/></svg>
+                </button>
+              </div>
+
+              {/* Delete */}
+              <button
+                type="button"
+                aria-label="Remove partner"
+                onClick={() => remove(i)}
+                className="p-1.5 rounded-lg text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
+              >
+                <svg width={14} height={14} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+                  <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/>
+                </svg>
+              </button>
+            </div>
+          ))}
+
+          {partners.length === 0 && (
+            <p className="text-sm text-slate-400 text-center py-6 border border-dashed border-slate-200 dark:border-slate-600 rounded-xl">
+              No partners yet — click &quot;Add Partner&quot; to get started.
+            </p>
+          )}
+        </div>
+      </div>
+    </div>
   )
 }
 
@@ -241,7 +730,7 @@ export default function SettingsPage() {
       {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
 
       <div className="flex flex-col sm:flex-row gap-4 sm:gap-6">
-        {/* Tab nav — horizontal scroll on mobile, vertical sidebar on sm+ */}
+        {/* Tab nav */}
         <nav className="flex flex-row sm:flex-col gap-1 sm:gap-0.5 sm:w-48 sm:shrink-0 overflow-x-auto pb-1 sm:pb-0 sm:overflow-x-visible">
           {TABS.map(tab => (
             <button
@@ -277,57 +766,64 @@ export default function SettingsPage() {
               </div>
             </div>
 
-            {/* Fields */}
-            <div className="p-6 space-y-5">
-              {currentTab.fields.map(field => (
-                <div key={field.key}>
-                  <label htmlFor={field.key} className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
-                    {field.label}
-                  </label>
+            {/* Custom tab bodies */}
+            {currentTab.id === 'theme'    && <ThemeTab    values={values} set={set} />}
+            {currentTab.id === 'images'   && <SectionImagesTab values={values} set={set} />}
+            {currentTab.id === 'partners' && <PartnersTab values={values} set={set} />}
 
-                  {field.key === 'storage_driver' ? (
-                    <StorageDriverSelect value={values[field.key] ?? ''} onChange={v => set(field.key, v)} />
-                  ) : field.type === 'phone' ? (
-                    <PhoneSettingInput
-                      id={field.key}
-                      value={values[field.key] ?? ''}
-                      onChange={v => set(field.key, v)}
-                    />
-                  ) : field.type === 'toggle' ? (
-                    <label className="inline-flex items-center gap-3 cursor-pointer select-none">
-                      <div className="relative">
-                        <input
-                          id={field.key}
-                          type="checkbox"
-                          checked={values[field.key] === '1'}
-                          onChange={e => set(field.key, e.target.checked ? '1' : '0')}
-                          className="sr-only peer"
-                        />
-                        <div className="w-10 h-5 rounded-full bg-slate-200 dark:bg-slate-600 peer-checked:bg-[#C9A84C] transition-colors duration-200" />
-                        <div className="absolute left-0.5 top-0.5 w-4 h-4 rounded-full bg-white shadow transition-transform duration-200 peer-checked:translate-x-5" />
-                      </div>
-                      <span className="text-sm text-slate-600 dark:text-slate-400">
-                        {values[field.key] === '1' ? 'Enabled' : 'Disabled'}
-                      </span>
+            {/* Standard field tabs */}
+            {!currentTab.custom && (
+              <div className="p-6 space-y-5">
+                {currentTab.fields?.map(field => (
+                  <div key={field.key}>
+                    <label htmlFor={field.key} className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
+                      {field.label}
                     </label>
-                  ) : (
-                    <input
-                      id={field.key}
-                      type={field.type ?? 'text'}
-                      value={values[field.key] ?? ''}
-                      onChange={e => set(field.key, e.target.value)}
-                      placeholder={field.placeholder}
-                      className={inp}
-                      autoComplete="off"
-                    />
-                  )}
 
-                  {field.hint && (
-                    <p className="text-[11px] text-slate-400 dark:text-slate-500 mt-1">{field.hint}</p>
-                  )}
-                </div>
-              ))}
-            </div>
+                    {field.key === 'storage_driver' ? (
+                      <StorageDriverSelect value={values[field.key] ?? ''} onChange={v => set(field.key, v)} />
+                    ) : field.type === 'phone' ? (
+                      <PhoneSettingInput
+                        id={field.key}
+                        value={values[field.key] ?? ''}
+                        onChange={v => set(field.key, v)}
+                      />
+                    ) : field.type === 'toggle' ? (
+                      <label className="inline-flex items-center gap-3 cursor-pointer select-none">
+                        <div className="relative">
+                          <input
+                            id={field.key}
+                            type="checkbox"
+                            checked={values[field.key] === '1'}
+                            onChange={e => set(field.key, e.target.checked ? '1' : '0')}
+                            className="sr-only peer"
+                          />
+                          <div className="w-10 h-5 rounded-full bg-slate-200 dark:bg-slate-600 peer-checked:bg-[#C9A84C] transition-colors duration-200" />
+                          <div className="absolute left-0.5 top-0.5 w-4 h-4 rounded-full bg-white shadow transition-transform duration-200 peer-checked:translate-x-5" />
+                        </div>
+                        <span className="text-sm text-slate-600 dark:text-slate-400">
+                          {values[field.key] === '1' ? 'Enabled' : 'Disabled'}
+                        </span>
+                      </label>
+                    ) : (
+                      <input
+                        id={field.key}
+                        type={field.type ?? 'text'}
+                        value={values[field.key] ?? ''}
+                        onChange={e => set(field.key, e.target.value)}
+                        placeholder={field.placeholder}
+                        className={inp}
+                        autoComplete="off"
+                      />
+                    )}
+
+                    {field.hint && (
+                      <p className="text-[11px] text-slate-400 dark:text-slate-500 mt-1">{field.hint}</p>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
 
             {/* Save bar */}
             <div className="px-6 py-4 border-t border-slate-100 dark:border-slate-700 flex items-center gap-3 bg-slate-50/50 dark:bg-slate-700/30">

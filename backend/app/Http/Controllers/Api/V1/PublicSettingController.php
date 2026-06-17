@@ -22,6 +22,20 @@ class PublicSettingController
         'social_twitter',
         'social_linkedin',
         'social_youtube',
+        // Theme colours
+        'color_brand',
+        'color_brand_section',
+        'color_gold',
+        'color_gold_light',
+        'color_muted',
+        // Section images
+        'image_hero',
+        'image_cta',
+        'image_why_dubai',
+        // Partners strip
+        'trust_strip_label',
+        'trust_strip_speed',
+        'partners_list',
     ];
 
     public function index(): JsonResponse

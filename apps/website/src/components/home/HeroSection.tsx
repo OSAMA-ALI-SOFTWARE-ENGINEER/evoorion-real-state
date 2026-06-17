@@ -1,11 +1,12 @@
 'use client'
 
 import { useEffect, useRef } from 'react'
+import Image from 'next/image'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { ArrowRight, ChevronDown } from 'lucide-react'
 
-export function HeroSection({ cms }: { cms?: Record<string, unknown> }) {
+export function HeroSection({ cms, bgImage }: { cms?: Record<string, unknown>; bgImage?: string | null }) {
   const eyebrow   = (cms?.hero_eyebrow as string)        ?? 'Luxury Real Estate Investment'
   const line1     = (cms?.hero_headline_line1 as string) ?? 'Invest in Dubai.'
   const line2     = (cms?.hero_headline_line2 as string) ?? 'Secure Your Legacy.'
@@ -34,8 +35,18 @@ export function HeroSection({ cms }: { cms?: Record<string, unknown> }) {
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
       {/* Background layers */}
       <div ref={parallaxRef} className="absolute inset-0 will-change-transform">
-        {/* Dubai skyline silhouette via CSS */}
+        {/* Base gradient — always rendered; image overlays on top if provided */}
         <div className="absolute inset-0 bg-gradient-to-b from-[#06090F] via-[#0A0F1E] to-[#0D1526]" />
+        {bgImage && (
+          <Image
+            src={bgImage}
+            alt=""
+            fill
+            className="object-cover opacity-30"
+            priority
+            unoptimized
+          />
+        )}
         {/* Geometric gold lines — decorative */}
         <svg
           className="absolute inset-0 w-full h-full opacity-10"

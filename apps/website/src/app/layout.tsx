@@ -6,6 +6,7 @@ import { WhatsAppButton } from '@/components/ui/WhatsAppButton'
 import { AuthProvider } from '@/context/AuthContext'
 import { CountryProvider } from '@/context/CountryContext'
 import { HtmlLocale } from '@/components/ui/HtmlLocale'
+import { getPublicSettings } from '@/lib/api'
 
 export const metadata: Metadata = {
   title: {
@@ -28,7 +29,37 @@ export const metadata: Metadata = {
   },
 }
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+// Strict hex-color whitelist — only #rgb, #rrggbb, #rrggbbaa forms allowed.
+// This prevents any CSS injection even if the DB is compromised.
+const HEX_RE = /^#[0-9a-fA-F]{3}(?:[0-9a-fA-F]{3}(?:[0-9a-fA-F]{2})?)?$/
+
+function safeHex(v: string | null | undefined): string | null {
+  if (!v) return null
+  const trimmed = v.trim()
+  return HEX_RE.test(trimmed) ? trimmed : null
+}
+
+// Build a CSS :root override block from DB settings.
+// Only outputs variables that are non-empty so globals.css defaults remain
+// as the base and admin can selectively override individual tokens.
+function buildThemeCss(s: Record<string, string | null | undefined>): string {
+  const pairs: string[] = []
+  const add = (cssVar: string, key: string) => {
+    const v = safeHex(s[key])
+    if (v) pairs.push(`${cssVar}:${v}`)
+  }
+  add('--color-brand', 'color_brand')
+  add('--color-brand-section', 'color_brand_section')
+  add('--color-gold', 'color_gold')
+  add('--color-gold-light', 'color_gold_light')
+  add('--color-muted', 'color_muted')
+  return pairs.length ? `:root{${pairs.join(';')}}` : ''
+}
+
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const settings = await getPublicSettings()
+  const themeCss = buildThemeCss(settings)
+
   return (
     <html lang="en">
       <body className="min-h-screen flex flex-col bg-brand text-white antialiased">
@@ -40,6 +71,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           rel="stylesheet"
           precedence="default"
         />
+        {/* Dynamic theme override — CSS custom properties from admin settings */}
+        {themeCss && (
+          <style
+            dangerouslySetInnerHTML={{ __html: themeCss }}
+            precedence="high"
+          />
+        )}
         <CountryProvider>
           <HtmlLocale />
           <AuthProvider>
