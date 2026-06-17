@@ -22,6 +22,33 @@ class PublicSettingController
         'social_twitter',
         'social_linkedin',
         'social_youtube',
+        // Theme colours
+        'color_brand',
+        'color_brand_section',
+        'color_gold',
+        'color_gold_light',
+        'color_muted',
+        // Section images
+        'image_hero',
+        'image_cta',
+        'image_why_dubai',
+        // Partners strip
+        'trust_strip_label',
+        'trust_strip_speed',
+        'partners_list',
+        // Section backgrounds
+        'section_bg_what_we_do',
+        'section_bg_our_process',
+        'section_bg_trust_strip',
+        'section_bg_hero_about',
+        'section_bg_hero_contact',
+        'section_bg_hero_investments',
+        'section_bg_hero_properties',
+        'section_bg_hero_blog',
+        'section_bg_hero_locations',
+        'section_bg_about_difference',
+        'section_bg_about_cta',
+        'section_bg_investments_strategies',
     ];
 
     public function index(): JsonResponse

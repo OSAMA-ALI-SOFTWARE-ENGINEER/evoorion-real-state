@@ -1,4 +1,5 @@
 import { ScrollReveal } from '@/components/ui/ScrollReveal'
+import { SectionBackground } from '@/components/ui/SectionBackground'
 
 const DEFAULT_STEPS = [
   { number: '01', title: 'Discover', description: 'We conduct a thorough discovery session to understand your investment goals, risk profile, and preferences.' },
@@ -7,14 +8,15 @@ const DEFAULT_STEPS = [
   { number: '04', title: 'Manage',   description: 'Post-acquisition, our team ensures your asset is tenanted, managed, and optimised for maximum yield.' },
 ]
 
-export function OurProcess({ cms }: { cms?: Record<string, unknown> }) {
+export function OurProcess({ cms, bgJson }: { cms?: Record<string, unknown>; bgJson?: string | null }) {
   const eyebrow = (cms?.our_process_eyebrow as string) ?? 'The Process'
   const rawHeadline = (cms?.our_process_headline as string) ?? "A Seamless\nInvestment Journey"
   const [headLine1, headLine2] = rawHeadline.split('\n')
   const STEPS = (cms?.our_process_steps as typeof DEFAULT_STEPS) ?? DEFAULT_STEPS
   return (
-    <section className="py-24 bg-brand">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section className="py-24 bg-brand relative overflow-hidden">
+      <SectionBackground bgJson={bgJson} opacity={20} />
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <ScrollReveal>
           <div className="text-center mb-16">
             <div className="inline-flex items-center gap-3 mb-5">

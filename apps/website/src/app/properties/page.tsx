@@ -17,6 +17,7 @@ import { SkeletonCard } from '@/components/ui/SkeletonCard'
 import { ScrollReveal } from '@/components/ui/ScrollReveal'
 import { AuthModal } from '@/components/ui/AuthModal'
 import { useAuth } from '@/context/AuthContext'
+import { SectionBackground } from '@/components/ui/SectionBackground'
 import type { Area, OperationType, PropertySummary, PropertyType } from '@/types'
 import { BUDGET_RANGES } from '@/types'
 
@@ -52,7 +53,7 @@ function getPriceParams(key: string): { min_price?: number; max_price?: number }
 }
 
 const SELECT_CLS =
-  'bg-[#0A0F1E] border border-white/10 text-sm text-white rounded-sm px-3 py-2 outline-none focus:border-gold transition-colors cursor-pointer'
+  'bg-brand border border-white/10 text-sm text-white rounded-sm px-3 py-2 outline-none focus:border-gold transition-colors cursor-pointer'
 
 export default function PropertiesPage() {
   const { user } = useAuth()
@@ -67,6 +68,13 @@ export default function PropertiesPage() {
   const [priceKey, setPriceKey] = useState('')
   const [sortKey, setSortKey] = useState('')
   const [page, setPage] = useState(1)
+
+  const [heroBg, setHeroBg] = useState<string | null>(null)
+
+  useEffect(() => {
+    const api = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000/api/v1'
+    fetch(`${api}/settings`).then(r => r.json()).then(j => setHeroBg(j?.data?.section_bg_hero_properties ?? null)).catch(() => {})
+  }, [])
 
   // Data state
   const [properties, setProperties] = useState<PropertySummary[]>([])
@@ -194,6 +202,7 @@ export default function PropertiesPage() {
     <>
       {/* Hero */}
       <section className="pt-32 pb-16 bg-brand-section relative overflow-hidden">
+        <SectionBackground bgJson={heroBg} opacity={18} />
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(201,168,76,0.06),transparent_60%)]" />
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <div className="inline-flex items-center gap-3 mb-4">
@@ -430,7 +439,7 @@ export default function PropertiesPage() {
                   type="button"
                   disabled={compareList.length < 2}
                   onClick={() => router.push(`/compare?slugs=${compareList.map((p) => p.slug).join(',')}`)}
-                  className="px-5 py-2.5 bg-gold hover:bg-[#D4B668] text-brand text-sm font-semibold rounded-sm transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                  className="px-5 py-2.5 bg-gold hover:bg-gold-light text-brand text-sm font-semibold rounded-sm transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
                 >
                   Compare Now
                 </button>

@@ -2,7 +2,8 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { Shield, Star, HeartHandshake, BarChart3, ArrowRight } from 'lucide-react'
 import { ScrollReveal } from '@/components/ui/ScrollReveal'
-import { getCmsContent } from '@/lib/api'
+import { getCmsContent, getPublicSettings } from '@/lib/api'
+import { SectionBackground } from '@/components/ui/SectionBackground'
 
 const DIFF_ICONS = [Shield, Star, HeartHandshake, BarChart3]
 
@@ -29,7 +30,7 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function AboutPage() {
-  const cms = await getCmsContent('about')
+  const [cms, settings] = await Promise.all([getCmsContent('about'), getPublicSettings()])
 
   const heroEyebrow = (cms.hero_eyebrow as string)        ?? 'Our Story'
   const heroLine1   = (cms.hero_headline_line1 as string) ?? 'Built on Trust.'
@@ -64,6 +65,7 @@ export default async function AboutPage() {
     <>
       {/* Hero */}
       <section className="pt-32 pb-20 bg-brand-section relative overflow-hidden">
+        <SectionBackground bgJson={settings.section_bg_hero_about} opacity={18} />
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,rgba(201,168,76,0.06),transparent_60%)]" />
         <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-gold/20 to-transparent" />
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -127,8 +129,9 @@ export default async function AboutPage() {
       </section>
 
       {/* Why EVOORION */}
-      <section className="py-20 bg-brand">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <section className="py-20 bg-brand relative overflow-hidden">
+        <SectionBackground bgJson={settings.section_bg_about_difference} opacity={20} />
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <ScrollReveal>
             <div className="text-center mb-14">
               <div className="inline-flex items-center gap-3 mb-5">
@@ -169,8 +172,9 @@ export default async function AboutPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-20 bg-brand-section border-t border-gold-border">
-        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      <section className="py-20 bg-brand-section border-t border-gold-border relative overflow-hidden">
+        <SectionBackground bgJson={settings.section_bg_about_cta} opacity={18} />
+        <div className="relative z-10 max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <ScrollReveal>
             <h2 className="font-serif text-3xl sm:text-4xl font-bold text-white mb-4">
               {ctaHeadline}

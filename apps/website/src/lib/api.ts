@@ -173,6 +173,48 @@ export async function removeFavorite(propertySlug: string): Promise<ApiResponse<
   return res.data
 }
 
+// ── Public settings ───────────────────────────────────────────────────────────
+
+export interface PublicSettings {
+  color_brand?:         string | null
+  color_brand_section?: string | null
+  color_gold?:          string | null
+  color_gold_light?:    string | null
+  color_muted?:         string | null
+  image_hero?:          string | null
+  image_cta?:           string | null
+  image_why_dubai?:     string | null
+  trust_strip_label?:   string | null
+  trust_strip_speed?:   string | null
+  partners_list?:       string | null
+  // Section backgrounds (JSON blobs parsed by parseSectionBg)
+  section_bg_what_we_do?:             string | null
+  section_bg_our_process?:            string | null
+  section_bg_trust_strip?:            string | null
+  section_bg_hero_about?:             string | null
+  section_bg_hero_contact?:           string | null
+  section_bg_hero_investments?:       string | null
+  section_bg_hero_properties?:        string | null
+  section_bg_hero_blog?:              string | null
+  section_bg_hero_locations?:         string | null
+  section_bg_about_difference?:       string | null
+  section_bg_about_cta?:              string | null
+  section_bg_investments_strategies?: string | null
+  [key: string]:                      string | null | undefined
+}
+
+export async function getPublicSettings(): Promise<PublicSettings> {
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000/api/v1'
+  try {
+    const res = await fetch(`${apiUrl}/settings`, { next: { revalidate: 60 } })
+    if (!res.ok) return {}
+    const json = await res.json()
+    return (json?.data as PublicSettings) ?? {}
+  } catch {
+    return {}
+  }
+}
+
 // ── CMS (public) ─────────────────────────────────────────────────────────────
 
 export async function getCmsContent(slug: string): Promise<Record<string, unknown>> {

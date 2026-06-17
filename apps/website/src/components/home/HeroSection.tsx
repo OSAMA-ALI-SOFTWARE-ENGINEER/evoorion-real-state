@@ -1,11 +1,12 @@
 'use client'
 
 import { useEffect, useRef } from 'react'
+import Image from 'next/image'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { ArrowRight, ChevronDown } from 'lucide-react'
 
-export function HeroSection({ cms }: { cms?: Record<string, unknown> }) {
+export function HeroSection({ cms, bgImage }: { cms?: Record<string, unknown>; bgImage?: string | null }) {
   const eyebrow   = (cms?.hero_eyebrow as string)        ?? 'Luxury Real Estate Investment'
   const line1     = (cms?.hero_headline_line1 as string) ?? 'Invest in Dubai.'
   const line2     = (cms?.hero_headline_line2 as string) ?? 'Secure Your Legacy.'
@@ -34,8 +35,18 @@ export function HeroSection({ cms }: { cms?: Record<string, unknown> }) {
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
       {/* Background layers */}
       <div ref={parallaxRef} className="absolute inset-0 will-change-transform">
-        {/* Dubai skyline silhouette via CSS */}
-        <div className="absolute inset-0 bg-gradient-to-b from-[#06090F] via-[#0A0F1E] to-[#0D1526]" />
+        {/* Base gradient — uses CSS custom properties so admin theme colors apply */}
+        <div className="absolute inset-0 bg-gradient-to-b from-brand via-brand to-brand-section" />
+        {bgImage && (
+          <Image
+            src={bgImage}
+            alt=""
+            fill
+            className="object-cover opacity-30"
+            priority
+            unoptimized
+          />
+        )}
         {/* Geometric gold lines — decorative */}
         <svg
           className="absolute inset-0 w-full h-full opacity-10"
@@ -43,12 +54,12 @@ export function HeroSection({ cms }: { cms?: Record<string, unknown> }) {
           preserveAspectRatio="xMidYMid slice"
           xmlns="http://www.w3.org/2000/svg"
         >
-          <line x1="0" y1="900" x2="720" y2="0" stroke="#C9A84C" strokeWidth="1" />
-          <line x1="1440" y1="900" x2="720" y2="0" stroke="#C9A84C" strokeWidth="1" />
-          <line x1="400" y1="900" x2="900" y2="200" stroke="#C9A84C" strokeWidth="0.5" opacity="0.5" />
-          <line x1="1040" y1="900" x2="540" y2="200" stroke="#C9A84C" strokeWidth="0.5" opacity="0.5" />
-          <circle cx="720" cy="0" r="300" fill="none" stroke="#C9A84C" strokeWidth="0.5" opacity="0.3" />
-          <circle cx="720" cy="0" r="500" fill="none" stroke="#C9A84C" strokeWidth="0.3" opacity="0.2" />
+          <line x1="0" y1="900" x2="720" y2="0" stroke="var(--color-gold)" strokeWidth="1" />
+          <line x1="1440" y1="900" x2="720" y2="0" stroke="var(--color-gold)" strokeWidth="1" />
+          <line x1="400" y1="900" x2="900" y2="200" stroke="var(--color-gold)" strokeWidth="0.5" opacity="0.5" />
+          <line x1="1040" y1="900" x2="540" y2="200" stroke="var(--color-gold)" strokeWidth="0.5" opacity="0.5" />
+          <circle cx="720" cy="0" r="300" fill="none" stroke="var(--color-gold)" strokeWidth="0.5" opacity="0.3" />
+          <circle cx="720" cy="0" r="500" fill="none" stroke="var(--color-gold)" strokeWidth="0.3" opacity="0.2" />
         </svg>
         {/* Radial gold glow */}
         <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[600px] rounded-full bg-gold/5 blur-[120px]" />

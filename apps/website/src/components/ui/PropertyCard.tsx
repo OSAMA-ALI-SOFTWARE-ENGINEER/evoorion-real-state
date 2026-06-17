@@ -40,7 +40,7 @@ export function PropertyCard({
     <motion.div
       whileHover={{ y: -4 }}
       transition={{ duration: 0.3, ease: 'easeOut' }}
-      className="group relative h-full flex flex-col rounded-sm overflow-hidden border border-white/5 hover:border-gold-border bg-[#0d1526] transition-colors duration-300"
+      className="group relative h-full flex flex-col rounded-sm overflow-hidden border border-white/5 hover:border-gold-border bg-brand-section transition-colors duration-300"
     >
       {/* Heart button — sits above the Link so clicks don't navigate */}
       {onToggleFavorite && (

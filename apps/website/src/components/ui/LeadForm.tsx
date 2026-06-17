@@ -75,7 +75,7 @@ function BudgetSelect({
       </button>
 
       {open && (
-        <div className="absolute top-full left-0 right-0 z-50 mt-1 bg-[#0c1118] border border-white/10 rounded-sm shadow-2xl overflow-hidden">
+        <div className="absolute top-full left-0 right-0 z-50 mt-1 bg-brand border border-white/10 rounded-sm shadow-2xl overflow-hidden">
           {value && (
             <button
               type="button"

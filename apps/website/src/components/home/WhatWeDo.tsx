@@ -1,5 +1,6 @@
 import { TrendingUp, Home, Users } from 'lucide-react'
 import { ScrollReveal } from '@/components/ui/ScrollReveal'
+import { SectionBackground } from '@/components/ui/SectionBackground'
 
 const ICONS = [TrendingUp, Home, Users]
 
@@ -9,7 +10,7 @@ const DEFAULT_SERVICES = [
   { title: 'Private Advisory',     description: 'End-to-end investment management: market intelligence, legal structuring, property management, and portfolio optimisation — all handled by our expert team.' },
 ]
 
-export function WhatWeDo({ cms }: { cms?: Record<string, unknown> }) {
+export function WhatWeDo({ cms, bgJson }: { cms?: Record<string, unknown>; bgJson?: string | null }) {
   const eyebrow  = (cms?.what_we_do_eyebrow as string) ?? 'What We Do'
   const body     = (cms?.what_we_do_body as string)    ?? 'EVOORION is a Dubai-based luxury real estate investment firm dedicated to helping high-net-worth individuals build and grow their real estate portfolios with confidence and precision.'
   const rawHeadline = (cms?.what_we_do_headline as string) ?? "Strategic Investments.\nTailored for You."
@@ -17,8 +18,9 @@ export function WhatWeDo({ cms }: { cms?: Record<string, unknown> }) {
   const cmsServices = cms?.what_we_do_services as Array<{ title: string; description: string }> | undefined
   const services = (cmsServices ?? DEFAULT_SERVICES).map((s, i) => ({ ...s, icon: ICONS[i] ?? TrendingUp }))
   return (
-    <section className="py-24 bg-brand">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section className="py-24 bg-brand relative overflow-hidden">
+      <SectionBackground bgJson={bgJson} opacity={20} />
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-start">
           {/* Left heading */}
           <ScrollReveal>

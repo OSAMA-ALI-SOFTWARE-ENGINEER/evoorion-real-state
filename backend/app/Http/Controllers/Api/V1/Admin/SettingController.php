@@ -54,6 +54,33 @@ class SettingController
         'lead_notify_recipients',
         'lead_notify_agent',
         'lead_notify_developer',
+        // Theme colours
+        'color_brand',
+        'color_brand_section',
+        'color_gold',
+        'color_gold_light',
+        'color_muted',
+        // Section background images
+        'image_hero',
+        'image_cta',
+        'image_why_dubai',
+        // Partners / trust strip
+        'trust_strip_label',
+        'trust_strip_speed',
+        'partners_list',
+        // Section backgrounds (JSON: {type,color1,color2,dir,image_url})
+        'section_bg_what_we_do',
+        'section_bg_our_process',
+        'section_bg_trust_strip',
+        'section_bg_hero_about',
+        'section_bg_hero_contact',
+        'section_bg_hero_investments',
+        'section_bg_hero_properties',
+        'section_bg_hero_blog',
+        'section_bg_hero_locations',
+        'section_bg_about_difference',
+        'section_bg_about_cta',
+        'section_bg_investments_strategies',
     ];
 
     public function index(): JsonResponse
@@ -71,7 +98,7 @@ class SettingController
     {
         $data = $request->validate([
             'settings'   => 'required|array',
-            'settings.*' => 'nullable|string|max:1000',
+            'settings.*' => 'nullable|string|max:65535',
         ]);
 
         foreach ($data['settings'] as $key => $value) {
@@ -100,6 +127,11 @@ class SettingController
             str_starts_with($key, 'facebook_client_') => 'oauth',
             str_starts_with($key, 'mail_')        => 'email',
             str_starts_with($key, 'lead_notify_')  => 'leads',
+            str_starts_with($key, 'color_')        => 'theme',
+            str_starts_with($key, 'image_')        => 'images',
+            str_starts_with($key, 'trust_strip_')  => 'partners',
+            $key === 'partners_list'               => 'partners',
+            str_starts_with($key, 'section_bg_')  => 'sections',
             default                               => 'integrations',
         };
     }

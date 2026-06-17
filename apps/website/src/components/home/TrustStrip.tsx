@@ -1,16 +1,51 @@
 'use client'
 
+import Image from 'next/image'
 import { motion } from 'framer-motion'
 import { ScrollReveal } from '@/components/ui/ScrollReveal'
+import { SectionBackground } from '@/components/ui/SectionBackground'
 
-const DEFAULT_DEVELOPERS = ['EMAAR', 'DAMAC', 'SOBHA REALTY', 'NAKHEEL', 'MERAAS', 'SELECT GROUP']
+interface Partner {
+  name: string
+  logo_url: string
+}
 
-export function TrustStrip({ cms }: { cms?: Record<string, unknown> }) {
-  const label      = (cms?.trust_strip_label as string)      ?? 'Trusted by Leading Developers'
-  const DEVELOPERS = (cms?.trust_strip_developers as string[]) ?? DEFAULT_DEVELOPERS
+const DEFAULT_PARTNERS: Partner[] = [
+  { name: 'EMAAR',        logo_url: '' },
+  { name: 'DAMAC',        logo_url: '' },
+  { name: 'SOBHA REALTY', logo_url: '' },
+  { name: 'NAKHEEL',      logo_url: '' },
+  { name: 'MERAAS',       logo_url: '' },
+  { name: 'SELECT GROUP', logo_url: '' },
+]
+
+interface Props {
+  cms?: Record<string, unknown>
+  /** Raw JSON string from settings API — overrides cms trust_strip_developers */
+  partnersJson?: string | null
+  speedSeconds?: string | null
+  stripLabel?: string | null
+  bgJson?: string | null
+}
+
+export function TrustStrip({ cms, partnersJson, speedSeconds, stripLabel, bgJson }: Props) {
+  const label = stripLabel ?? (cms?.trust_strip_label as string) ?? 'Trusted by Leading Developers'
+  const duration = Math.max(5, Math.min(120, parseInt(speedSeconds ?? '25', 10) || 25))
+
+  let partners: Partner[] = DEFAULT_PARTNERS
+  if (partnersJson) {
+    try {
+      const parsed = JSON.parse(partnersJson)
+      if (Array.isArray(parsed) && parsed.length > 0) partners = parsed
+    } catch { /* fall back to defaults */ }
+  } else if (Array.isArray(cms?.trust_strip_developers)) {
+    partners = (cms.trust_strip_developers as string[]).map(name => ({ name, logo_url: '' }))
+  }
+
   return (
     <section className="bg-brand-section py-14 border-y border-gold-border relative overflow-hidden">
-      <div className="max-w-7xl mx-auto px-6">
+      <SectionBackground bgJson={bgJson} opacity={25} />
+      <div className="relative z-10 max-w-7xl mx-auto px-6">
         <ScrollReveal>
           <p className="text-center text-muted text-[10px] tracking-[0.4em] uppercase mb-8">
             {label}
@@ -25,15 +60,29 @@ export function TrustStrip({ cms }: { cms?: Record<string, unknown> }) {
           <motion.div
             className="flex items-center gap-12 sm:gap-20"
             animate={{ x: ['0%', '-50%'] }}
-            transition={{ duration: 25, ease: 'linear', repeat: Infinity }}
+            transition={{ duration, ease: 'linear', repeat: Infinity }}
           >
             {/* Duplicate for seamless loop */}
-            {[...DEVELOPERS, ...DEVELOPERS].map((name, i) => (
+            {[...partners, ...partners].map((partner, i) => (
               <div
-                key={`${name}-${i}`}
-                className="shrink-0 font-serif text-xl sm:text-2xl font-bold tracking-[0.12em] text-white/20 hover:text-white/50 transition-colors duration-300 cursor-default select-none"
+                key={`${partner.name}-${i}`}
+                className="shrink-0 flex items-center justify-center"
               >
-                {name}
+                {partner.logo_url ? (
+                  <div className="relative h-20 w-52 opacity-70 hover:opacity-95 transition-opacity duration-300">
+                    <Image
+                      src={partner.logo_url}
+                      alt={partner.name}
+                      fill
+                      className="object-contain"
+                      unoptimized
+                    />
+                  </div>
+                ) : (
+                  <div className="font-serif text-xl sm:text-2xl font-bold tracking-[0.12em] text-white/20 hover:text-white/50 transition-colors duration-300 cursor-default select-none whitespace-nowrap">
+                    {partner.name}
+                  </div>
+                )}
               </div>
             ))}
           </motion.div>
