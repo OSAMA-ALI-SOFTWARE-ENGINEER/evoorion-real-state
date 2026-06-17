@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react'
 import Image from 'next/image'
 import { getSettings, updateSettings, uploadMedia } from '@/lib/api'
 import { useAuth } from '@/context/AuthContext'
+import { ImageCropperModal } from '@/components/ui/ImageCropperModal'
 import {
   IconUsers,
   IconSettings,
@@ -365,13 +366,16 @@ function ThemeTab({ values, set }: { values: Settings; set: (k: string, v: strin
 // ── Section Images tab ────────────────────────────────────────────────────────
 
 const IMAGE_SECTIONS = [
-  { key: 'image_hero',      label: 'Hero Section',    hint: 'Full-screen background image on the homepage hero. Recommended: 1920×1080px or larger.' },
-  { key: 'image_cta',       label: 'CTA Banner',      hint: 'Background for the "Ready to Build Your Portfolio?" call-to-action section.' },
-  { key: 'image_why_dubai', label: 'Why Dubai',       hint: 'Background for the "Why Invest in Dubai" statistics section.' },
+  { key: 'image_hero',      label: 'Hero Section', aspect: 16 / 9, hint: 'Full-screen background image on the homepage hero. Recommended: 1920×1080px or larger.' },
+  { key: 'image_cta',       label: 'CTA Banner',   aspect: 21 / 9, hint: 'Background for the "Ready to Build Your Portfolio?" call-to-action section.' },
+  { key: 'image_why_dubai', label: 'Why Dubai',    aspect: 16 / 9, hint: 'Background for the "Why Invest in Dubai" statistics section.' },
 ]
 
+interface SectionCropState { file: File; key: string; aspect: number }
+
 function SectionImagesTab({ values, set }: { values: Settings; set: (k: string, v: string) => void }) {
-  const [uploading, setUploading] = useState<string | null>(null)
+  const [uploading,  setUploading]  = useState<string | null>(null)
+  const [cropState,  setCropState]  = useState<SectionCropState | null>(null)
   const refs = useRef<Record<string, HTMLInputElement | null>>({})
 
   async function upload(key: string, file: File) {
@@ -387,86 +391,101 @@ function SectionImagesTab({ values, set }: { values: Settings; set: (k: string, 
   }
 
   return (
-    <div className="p-6 space-y-6">
-      {IMAGE_SECTIONS.map(s => {
-        const url = values[s.key] ?? ''
-        const busy = uploading === s.key
-        return (
-          <div key={s.key} className="border border-slate-200 dark:border-slate-600 rounded-xl overflow-hidden">
-            {/* Preview */}
-            <div
-              className="relative w-full h-40 bg-slate-100 dark:bg-slate-700 flex items-center justify-center overflow-hidden"
-            >
-              {url ? (
-                <Image src={url} alt={s.label} fill className="object-cover" unoptimized />
-              ) : (
-                <div className="flex flex-col items-center gap-2 text-slate-400">
-                  <svg width={32} height={32} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round">
-                    <rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/>
-                  </svg>
-                  <span className="text-xs">Using default gradient</span>
-                </div>
-              )}
-            </div>
+    <>
+      {cropState && (
+        <ImageCropperModal
+          file={cropState.file}
+          aspect={cropState.aspect}
+          maxWidth={1920}
+          quality={0.82}
+          onDone={croppedFile => { const key = cropState.key; setCropState(null); upload(key, croppedFile) }}
+          onCancel={() => setCropState(null)}
+        />
+      )}
 
-            <div className="p-4">
-              <p className="text-sm font-semibold text-slate-700 dark:text-slate-200">{s.label}</p>
-              {s.hint && <p className="text-[11px] text-slate-400 dark:text-slate-500 mt-0.5 mb-3">{s.hint}</p>}
-
-              <div className="flex items-center gap-3 flex-wrap">
-                <button
-                  type="button"
-                  disabled={busy}
-                  onClick={() => refs.current[s.key]?.click()}
-                  className="px-4 py-2 rounded-lg text-sm font-medium bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 disabled:opacity-50 transition-colors"
-                >
-                  {busy ? 'Uploading…' : 'Upload image'}
-                </button>
-
-                {url && (
-                  <button
-                    type="button"
-                    onClick={() => set(s.key, '')}
-                    className="px-4 py-2 rounded-lg text-sm font-medium text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
-                  >
-                    Remove
-                  </button>
+      <div className="p-6 space-y-6">
+        {IMAGE_SECTIONS.map(s => {
+          const url = values[s.key] ?? ''
+          const busy = uploading === s.key
+          return (
+            <div key={s.key} className="border border-slate-200 dark:border-slate-600 rounded-xl overflow-hidden">
+              {/* Preview */}
+              <div className="relative w-full h-40 bg-slate-100 dark:bg-slate-700 flex items-center justify-center overflow-hidden">
+                {url ? (
+                  <Image src={url} alt={s.label} fill className="object-cover" unoptimized />
+                ) : (
+                  <div className="flex flex-col items-center gap-2 text-slate-400">
+                    <svg width={32} height={32} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round">
+                      <rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/>
+                    </svg>
+                    <span className="text-xs">Using default gradient</span>
+                  </div>
                 )}
-
-                {url && (
-                  <a
-                    href={url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-xs text-slate-400 hover:text-[#C9A84C] transition-colors truncate max-w-[200px]"
-                  >
-                    {url.split('/').pop()}
-                  </a>
-                )}
-
-                <input
-                  ref={el => { refs.current[s.key] = el }}
-                  type="file"
-                  accept="image/*"
-                  className="hidden"
-                  aria-label={`Upload image for ${s.label}`}
-                  onChange={e => { const f = e.target.files?.[0]; if (f) upload(s.key, f); e.target.value = '' }}
-                />
               </div>
 
-              {/* Or paste URL */}
-              <input
-                type="url"
-                value={url}
-                onChange={e => set(s.key, e.target.value)}
-                placeholder="Or paste an image URL…"
-                className="mt-3 w-full px-3 py-2 rounded-lg border border-slate-200 dark:border-slate-600 text-sm focus:outline-none focus:border-[#C9A84C] focus:ring-1 focus:ring-[#C9A84C] bg-white dark:bg-slate-700 text-slate-800 dark:text-slate-100 placeholder-slate-400"
-              />
+              <div className="p-4">
+                <p className="text-sm font-semibold text-slate-700 dark:text-slate-200">{s.label}</p>
+                {s.hint && <p className="text-[11px] text-slate-400 dark:text-slate-500 mt-0.5 mb-3">{s.hint}</p>}
+
+                <div className="flex items-center gap-3 flex-wrap">
+                  <button
+                    type="button"
+                    disabled={busy}
+                    onClick={() => refs.current[s.key]?.click()}
+                    className="px-4 py-2 rounded-lg text-sm font-medium bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 disabled:opacity-50 transition-colors"
+                  >
+                    {busy ? 'Uploading…' : 'Upload image'}
+                  </button>
+
+                  {url && (
+                    <button
+                      type="button"
+                      onClick={() => set(s.key, '')}
+                      className="px-4 py-2 rounded-lg text-sm font-medium text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
+                    >
+                      Remove
+                    </button>
+                  )}
+
+                  {url && (
+                    <a
+                      href={url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-xs text-slate-400 hover:text-[#C9A84C] transition-colors truncate max-w-[200px]"
+                    >
+                      {url.split('/').pop()}
+                    </a>
+                  )}
+
+                  <input
+                    ref={el => { refs.current[s.key] = el }}
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    aria-label={`Upload image for ${s.label}`}
+                    onChange={e => {
+                      const f = e.target.files?.[0]
+                      if (f) setCropState({ file: f, key: s.key, aspect: s.aspect })
+                      e.target.value = ''
+                    }}
+                  />
+                </div>
+
+                {/* Or paste URL */}
+                <input
+                  type="url"
+                  value={url}
+                  onChange={e => set(s.key, e.target.value)}
+                  placeholder="Or paste an image URL…"
+                  className="mt-3 w-full px-3 py-2 rounded-lg border border-slate-200 dark:border-slate-600 text-sm focus:outline-none focus:border-[#C9A84C] focus:ring-1 focus:ring-[#C9A84C] bg-white dark:bg-slate-700 text-slate-800 dark:text-slate-100 placeholder-slate-400"
+                />
+              </div>
             </div>
-          </div>
-        )
-      })}
-    </div>
+          )
+        })}
+      </div>
+    </>
   )
 }
 
@@ -477,9 +496,12 @@ interface Partner {
   logo_url: string
 }
 
+interface LogoCropState { file: File; index: number }
+
 function PartnersTab({ values, set }: { values: Settings; set: (k: string, v: string) => void }) {
-  const [partners, setPartners] = useState<Partner[]>([])
+  const [partners,  setPartners]  = useState<Partner[]>([])
   const [uploading, setUploading] = useState<number | null>(null)
+  const [cropState, setCropState] = useState<LogoCropState | null>(null)
   const logoRefs = useRef<Record<number, HTMLInputElement | null>>({})
 
   useEffect(() => {
@@ -531,10 +553,24 @@ function PartnersTab({ values, set }: { values: Settings; set: (k: string, v: st
     finally { setUploading(null) }
   }
 
+  function onLogoFileSelected(i: number, file: File) {
+    setCropState({ file, index: i })
+  }
+
   const speed = parseInt(values['trust_strip_speed'] ?? '25', 10) || 25
   const label = values['trust_strip_label'] ?? 'Trusted by Leading Developers'
 
   return (
+    <>
+    {cropState && (
+      <ImageCropperModal
+        file={cropState.file}
+        maxWidth={400}
+        quality={0.88}
+        onDone={croppedFile => { const idx = cropState.index; setCropState(null); uploadLogo(idx, croppedFile) }}
+        onCancel={() => setCropState(null)}
+      />
+    )}
     <div className="p-6 space-y-8">
       {/* Strip settings */}
       <div className="grid gap-4 sm:grid-cols-2">
@@ -609,7 +645,7 @@ function PartnersTab({ values, set }: { values: Settings; set: (k: string, v: st
                   accept="image/*"
                   className="hidden"
                   aria-label={`Upload logo for ${p.name || `partner ${i + 1}`}`}
-                  onChange={e => { const f = e.target.files?.[0]; if (f) uploadLogo(i, f); e.target.value = '' }}
+                  onChange={e => { const f = e.target.files?.[0]; if (f) onLogoFileSelected(i, f); e.target.value = '' }}
                 />
               </div>
 
@@ -654,6 +690,7 @@ function PartnersTab({ values, set }: { values: Settings; set: (k: string, v: st
         </div>
       </div>
     </div>
+    </>
   )
 }
 
