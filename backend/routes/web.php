@@ -29,6 +29,7 @@ Route::post('/deploy', function () {
         "cd $dir && git config core.sshCommand 'ssh -i /home/u121664729/.ssh/deploy_key' && git pull origin master 2>&1",
         "cd $dir && composer install --no-dev --optimize-autoloader --no-interaction 2>&1",
         "cd $dir && php artisan migrate --force 2>&1",
+        "cd $dir && php artisan db:seed --class=SiteSettingsSeeder --force 2>&1",
         "cd $dir && php artisan config:cache 2>&1",
         "cd $dir && php artisan route:cache 2>&1",
     ] as $cmd) {
