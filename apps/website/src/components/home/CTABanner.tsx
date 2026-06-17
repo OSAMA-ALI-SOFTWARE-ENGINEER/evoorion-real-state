@@ -11,7 +11,7 @@ export function CTABanner({ cms, bgImage }: { cms?: Record<string, unknown>; bgI
   const buttonText = (cms?.cta_button as string) ?? 'Book Private Consultation'
   return (
     <section className="relative py-24 overflow-hidden">
-      <div className="absolute inset-0 bg-gradient-to-r from-[#060A15] via-brand-section to-[#060A15]" />
+      <div className="absolute inset-0 bg-gradient-to-r from-brand via-brand-section to-brand" />
       {bgImage && (
         <Image src={bgImage} alt="" fill className="object-cover opacity-20" unoptimized />
       )}

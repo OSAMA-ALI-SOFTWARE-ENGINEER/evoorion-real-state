@@ -577,7 +577,7 @@ function PartnersTab({ values, set }: { values: Settings; set: (k: string, v: st
     {cropState && (
       <ImageCropperModal
         file={cropState.file}
-        maxWidth={400}
+        maxWidth={600}
         quality={0.88}
         onDone={croppedFile => { const idx = cropState.index; setCropState(null); uploadLogo(idx, croppedFile) }}
         onCancel={() => setCropState(null)}

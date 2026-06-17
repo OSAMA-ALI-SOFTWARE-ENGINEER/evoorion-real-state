@@ -165,7 +165,7 @@ export default function BlogPage() {
   return (
     <>
       {/* Hero */}
-      <section className="relative pt-32 pb-20 overflow-hidden">
+      <section className="relative pt-32 pb-20 overflow-hidden bg-brand">
         <SectionBackground bgJson={heroBg} opacity={18} />
         <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-transparent pointer-events-none" />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
@@ -233,7 +233,7 @@ export default function BlogPage() {
       </section>
 
       {/* Grid */}
-      <section className="py-16">
+      <section className="py-16 bg-brand">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {!loading && totalPosts > 0 && (
             <p className="text-muted text-sm mb-6">

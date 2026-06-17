@@ -53,7 +53,7 @@ function getPriceParams(key: string): { min_price?: number; max_price?: number }
 }
 
 const SELECT_CLS =
-  'bg-[#0A0F1E] border border-white/10 text-sm text-white rounded-sm px-3 py-2 outline-none focus:border-gold transition-colors cursor-pointer'
+  'bg-brand border border-white/10 text-sm text-white rounded-sm px-3 py-2 outline-none focus:border-gold transition-colors cursor-pointer'
 
 export default function PropertiesPage() {
   const { user } = useAuth()
@@ -439,7 +439,7 @@ export default function PropertiesPage() {
                   type="button"
                   disabled={compareList.length < 2}
                   onClick={() => router.push(`/compare?slugs=${compareList.map((p) => p.slug).join(',')}`)}
-                  className="px-5 py-2.5 bg-gold hover:bg-[#D4B668] text-brand text-sm font-semibold rounded-sm transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                  className="px-5 py-2.5 bg-gold hover:bg-gold-light text-brand text-sm font-semibold rounded-sm transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
                 >
                   Compare Now
                 </button>

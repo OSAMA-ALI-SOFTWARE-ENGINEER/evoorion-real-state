@@ -69,7 +69,7 @@ export function TrustStrip({ cms, partnersJson, speedSeconds, stripLabel, bgJson
                 className="shrink-0 flex items-center justify-center"
               >
                 {partner.logo_url ? (
-                  <div className="relative h-8 w-28 opacity-40 hover:opacity-70 transition-opacity duration-300">
+                  <div className="relative h-20 w-52 opacity-70 hover:opacity-95 transition-opacity duration-300">
                     <Image
                       src={partner.logo_url}
                       alt={partner.name}

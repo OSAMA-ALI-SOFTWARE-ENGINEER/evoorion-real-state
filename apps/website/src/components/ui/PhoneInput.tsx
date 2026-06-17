@@ -124,7 +124,7 @@ export function PhoneInput({ value, onChange, placeholder }: Props) {
 
       {/* Dropdown */}
       {open && (
-        <div className="absolute top-full left-0 z-50 w-72 mt-1 bg-[#0c1118] border border-white/10 rounded-sm shadow-2xl overflow-hidden">
+        <div className="absolute top-full left-0 z-50 w-72 mt-1 bg-brand border border-white/10 rounded-sm shadow-2xl overflow-hidden">
           <div className="p-2 border-b border-white/5">
             <input
               ref={searchRef}

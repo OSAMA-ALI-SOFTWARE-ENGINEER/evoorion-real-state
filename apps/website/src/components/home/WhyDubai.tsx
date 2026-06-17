@@ -20,7 +20,7 @@ export function WhyDubai({ cms, bgImage }: { cms?: Record<string, unknown>; bgIm
   return (
     <section className="relative py-28 overflow-hidden">
       {/* Background */}
-      <div className="absolute inset-0 bg-gradient-to-br from-[#06090F] via-brand to-brand-section" />
+      <div className="absolute inset-0 bg-gradient-to-br from-brand via-brand to-brand-section" />
       {bgImage && (
         <Image src={bgImage} alt="" fill className="object-cover opacity-15" unoptimized />
       )}

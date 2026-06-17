@@ -16,7 +16,7 @@ function AreaCard({ area, index }: { area: Area; index: number }) {
     <ScrollReveal delay={index * 0.07} className="h-full">
       <Link
         href={`/locations/${area.slug}`}
-        className="group relative flex flex-col h-full rounded-sm overflow-hidden border border-white/5 hover:border-gold-border bg-[#0d1526] transition-all duration-300"
+        className="group relative flex flex-col h-full rounded-sm overflow-hidden border border-white/5 hover:border-gold-border bg-brand-section transition-all duration-300"
       >
         {/* Hero image */}
         <div className="relative h-52 overflow-hidden shrink-0">
@@ -27,7 +27,7 @@ function AreaCard({ area, index }: { area: Area; index: number }) {
             className="object-cover transition-transform duration-700 group-hover:scale-105"
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-[#0d1526] via-[#0d1526]/20 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-brand-section via-brand-section/20 to-transparent" />
           <div className="absolute bottom-0 left-0 right-0 p-4">
             <h3 className="font-serif text-white text-xl font-bold group-hover:text-gold transition-colors">
               {area.name}

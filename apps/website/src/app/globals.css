@@ -23,7 +23,7 @@ html {
 }
 
 body {
-  background-color: #0A0F1E;
+  background-color: var(--color-brand);
   color: #ffffff;
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
@@ -31,7 +31,7 @@ body {
 
 /* Gold gradient text utility */
 .text-gold-gradient {
-  background: linear-gradient(135deg, #C9A84C 0%, #F0D080 50%, #C9A84C 100%);
+  background: linear-gradient(135deg, var(--color-gold) 0%, #F0D080 50%, var(--color-gold) 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -55,11 +55,11 @@ body {
 .gold-shimmer {
   background: linear-gradient(
     90deg,
-    #C9A84C 0%,
+    var(--color-gold) 0%,
     #F0D080 25%,
-    #C9A84C 50%,
+    var(--color-gold) 50%,
     #F0D080 75%,
-    #C9A84C 100%
+    var(--color-gold) 100%
   );
   background-size: 200% auto;
   -webkit-background-clip: text;
@@ -78,12 +78,12 @@ body {
   width: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: #0A0F1E;
+  background: var(--color-brand);
 }
 ::-webkit-scrollbar-thumb {
-  background: rgba(201, 168, 76, 0.3);
+  background: color-mix(in srgb, var(--color-gold) 30%, transparent);
   border-radius: 3px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(201, 168, 76, 0.6);
+  background: color-mix(in srgb, var(--color-gold) 60%, transparent);
 }
