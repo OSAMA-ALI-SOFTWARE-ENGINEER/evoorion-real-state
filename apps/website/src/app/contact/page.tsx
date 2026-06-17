@@ -5,6 +5,7 @@ import { LeadForm } from '@/components/ui/LeadForm'
 import { ScrollReveal } from '@/components/ui/ScrollReveal'
 import { ContactAddressMap } from '@/components/ui/ContactAddressMap'
 import { getCmsContent } from '@/lib/api'
+import { SectionBackground } from '@/components/ui/SectionBackground'
 
 export async function generateMetadata(): Promise<Metadata> {
   const cms = await getCmsContent('contact')
@@ -26,6 +27,7 @@ type ContactSettings = {
   social_twitter?: string | null
   social_linkedin?: string | null
   social_youtube?: string | null
+  section_bg_hero_contact?: string | null
 }
 
 async function getContactSettings(): Promise<ContactSettings> {
@@ -60,6 +62,7 @@ export default async function ContactPage() {
     <>
       {/* Hero */}
       <section className="pt-32 pb-16 bg-brand-section relative overflow-hidden">
+        <SectionBackground bgJson={s.section_bg_hero_contact} opacity={18} />
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(201,168,76,0.06),transparent_60%)]" />
         <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-gold/20 to-transparent" />
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">

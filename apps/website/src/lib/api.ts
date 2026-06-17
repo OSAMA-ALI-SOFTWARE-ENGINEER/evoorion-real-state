@@ -187,7 +187,20 @@ export interface PublicSettings {
   trust_strip_label?:   string | null
   trust_strip_speed?:   string | null
   partners_list?:       string | null
-  [key: string]:        string | null | undefined
+  // Section backgrounds (JSON blobs parsed by parseSectionBg)
+  section_bg_what_we_do?:             string | null
+  section_bg_our_process?:            string | null
+  section_bg_trust_strip?:            string | null
+  section_bg_hero_about?:             string | null
+  section_bg_hero_contact?:           string | null
+  section_bg_hero_investments?:       string | null
+  section_bg_hero_properties?:        string | null
+  section_bg_hero_blog?:              string | null
+  section_bg_hero_locations?:         string | null
+  section_bg_about_difference?:       string | null
+  section_bg_about_cta?:              string | null
+  section_bg_investments_strategies?: string | null
+  [key: string]:                      string | null | undefined
 }
 
 export async function getPublicSettings(): Promise<PublicSettings> {

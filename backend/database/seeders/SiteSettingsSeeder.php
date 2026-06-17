@@ -22,6 +22,20 @@ class SiteSettingsSeeder extends Seeder
             ['key' => 'image_cta',       'value' => '', 'group' => 'images'],
             ['key' => 'image_why_dubai', 'value' => '', 'group' => 'images'],
 
+            // ── Section backgrounds (JSON blobs) ─────────────────────────
+            ['key' => 'section_bg_what_we_do',            'value' => '{"type":"default"}', 'group' => 'sections'],
+            ['key' => 'section_bg_our_process',           'value' => '{"type":"default"}', 'group' => 'sections'],
+            ['key' => 'section_bg_trust_strip',           'value' => '{"type":"default"}', 'group' => 'sections'],
+            ['key' => 'section_bg_hero_about',            'value' => '{"type":"default"}', 'group' => 'sections'],
+            ['key' => 'section_bg_hero_contact',          'value' => '{"type":"default"}', 'group' => 'sections'],
+            ['key' => 'section_bg_hero_investments',      'value' => '{"type":"default"}', 'group' => 'sections'],
+            ['key' => 'section_bg_hero_properties',       'value' => '{"type":"default"}', 'group' => 'sections'],
+            ['key' => 'section_bg_hero_blog',             'value' => '{"type":"default"}', 'group' => 'sections'],
+            ['key' => 'section_bg_hero_locations',        'value' => '{"type":"default"}', 'group' => 'sections'],
+            ['key' => 'section_bg_about_difference',      'value' => '{"type":"default"}', 'group' => 'sections'],
+            ['key' => 'section_bg_about_cta',             'value' => '{"type":"default"}', 'group' => 'sections'],
+            ['key' => 'section_bg_investments_strategies','value' => '{"type":"default"}', 'group' => 'sections'],
+
             // ── Partners / trust strip ────────────────────────────────────
             ['key' => 'trust_strip_label', 'value' => 'Trusted by Leading Developers', 'group' => 'partners'],
             ['key' => 'trust_strip_speed', 'value' => '25', 'group' => 'partners'],

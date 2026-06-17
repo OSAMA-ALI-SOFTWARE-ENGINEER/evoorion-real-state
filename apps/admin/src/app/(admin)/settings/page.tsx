@@ -5,6 +5,7 @@ import Image from 'next/image'
 import { getSettings, updateSettings, uploadMedia } from '@/lib/api'
 import { useAuth } from '@/context/AuthContext'
 import { ImageCropperModal } from '@/components/ui/ImageCropperModal'
+import { SectionBgEditor } from '@/components/ui/SectionBgEditor'
 import {
   IconUsers,
   IconSettings,
@@ -89,6 +90,17 @@ const TABS: TabDef[] = [
     ),
     custom: true,
     hint: 'Upload background images for each homepage section. Leave blank to use the default CSS gradient.',
+  },
+  {
+    id: 'sections',
+    label: 'Section Backgrounds',
+    icon: (
+      <svg width={16} height={16} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.75} strokeLinecap="round" strokeLinejoin="round">
+        <rect x="3" y="3" width="18" height="5" rx="1"/><rect x="3" y="11" width="18" height="5" rx="1"/><rect x="3" y="19" width="18" height="2" rx="1"/>
+      </svg>
+    ),
+    custom: true,
+    hint: 'Set a solid colour, gradient, or image background for any section — homepage or inner pages.',
   },
   {
     id: 'partners',
@@ -694,6 +706,67 @@ function PartnersTab({ values, set }: { values: Settings; set: (k: string, v: st
   )
 }
 
+// ── Section Backgrounds tab ───────────────────────────────────────────────────
+
+const SECTION_GROUPS = [
+  {
+    label: 'Homepage',
+    sections: [
+      { key: 'section_bg_what_we_do',  label: 'What We Do',  hint: 'Service cards section.',        aspect: 21 / 9 },
+      { key: 'section_bg_our_process', label: 'Our Process', hint: '4-step process section.',       aspect: 21 / 9 },
+      { key: 'section_bg_trust_strip', label: 'Trust Strip', hint: 'Developer logos scroll strip.', aspect: 21 / 9 },
+    ],
+  },
+  {
+    label: 'Page Heroes',
+    sections: [
+      { key: 'section_bg_hero_about',       label: 'About',       hint: 'Hero banner on the About page.',       aspect: 21 / 9 },
+      { key: 'section_bg_hero_contact',     label: 'Contact',     hint: 'Hero banner on the Contact page.',     aspect: 21 / 9 },
+      { key: 'section_bg_hero_investments', label: 'Investments', hint: 'Hero banner on the Investments page.', aspect: 21 / 9 },
+      { key: 'section_bg_hero_properties',  label: 'Properties',  hint: 'Hero banner on the Properties page.',  aspect: 21 / 9 },
+      { key: 'section_bg_hero_blog',        label: 'Blog',        hint: 'Hero banner on the Blog page.',        aspect: 21 / 9 },
+      { key: 'section_bg_hero_locations',   label: 'Locations',   hint: 'Hero banner on the Locations page.',   aspect: 21 / 9 },
+    ],
+  },
+  {
+    label: 'About Page',
+    sections: [
+      { key: 'section_bg_about_difference', label: 'Our Difference', hint: 'Feature cards mid-page.', aspect: 21 / 9 },
+      { key: 'section_bg_about_cta',        label: 'Bottom CTA',     hint: '"Let\'s build" banner.',  aspect: 21 / 9 },
+    ],
+  },
+  {
+    label: 'Investments Page',
+    sections: [
+      { key: 'section_bg_investments_strategies', label: 'Strategy Cards', hint: 'Investment type cards section.', aspect: 21 / 9 },
+    ],
+  },
+]
+
+function SectionsBgTab({ values, set }: { values: Settings; set: (k: string, v: string) => void }) {
+  return (
+    <div className="p-6 space-y-8">
+      {SECTION_GROUPS.map(group => (
+        <div key={group.label}>
+          <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-widest mb-3">{group.label}</p>
+          <div className="grid gap-4 sm:grid-cols-2">
+            {group.sections.map(s => (
+              <SectionBgEditor
+                key={s.key}
+                label={s.label}
+                hint={s.hint}
+                aspect={s.aspect}
+                value={values[s.key] ?? null}
+                onChange={v => set(s.key, v)}
+              />
+            ))}
+          </div>
+        </div>
+      ))}
+    </div>
+  )
+}
+
 // ── Page ──────────────────────────────────────────────────────────────────────
 
 const inp = 'w-full px-3.5 py-2.5 rounded-lg border border-slate-200 dark:border-slate-600 text-sm focus:outline-none focus:border-[#C9A84C] focus:ring-1 focus:ring-[#C9A84C] bg-white dark:bg-slate-700 text-slate-800 dark:text-slate-100 placeholder-slate-400'
@@ -806,6 +879,7 @@ export default function SettingsPage() {
             {/* Custom tab bodies */}
             {currentTab.id === 'theme'    && <ThemeTab    values={values} set={set} />}
             {currentTab.id === 'images'   && <SectionImagesTab values={values} set={set} />}
+            {currentTab.id === 'sections' && <SectionsBgTab values={values} set={set} />}
             {currentTab.id === 'partners' && <PartnersTab values={values} set={set} />}
 
             {/* Standard field tabs */}

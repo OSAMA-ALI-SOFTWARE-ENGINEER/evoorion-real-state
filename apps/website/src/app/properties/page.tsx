@@ -17,6 +17,7 @@ import { SkeletonCard } from '@/components/ui/SkeletonCard'
 import { ScrollReveal } from '@/components/ui/ScrollReveal'
 import { AuthModal } from '@/components/ui/AuthModal'
 import { useAuth } from '@/context/AuthContext'
+import { SectionBackground } from '@/components/ui/SectionBackground'
 import type { Area, OperationType, PropertySummary, PropertyType } from '@/types'
 import { BUDGET_RANGES } from '@/types'
 
@@ -67,6 +68,13 @@ export default function PropertiesPage() {
   const [priceKey, setPriceKey] = useState('')
   const [sortKey, setSortKey] = useState('')
   const [page, setPage] = useState(1)
+
+  const [heroBg, setHeroBg] = useState<string | null>(null)
+
+  useEffect(() => {
+    const api = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000/api/v1'
+    fetch(`${api}/settings`).then(r => r.json()).then(j => setHeroBg(j?.data?.section_bg_hero_properties ?? null)).catch(() => {})
+  }, [])
 
   // Data state
   const [properties, setProperties] = useState<PropertySummary[]>([])
@@ -194,6 +202,7 @@ export default function PropertiesPage() {
     <>
       {/* Hero */}
       <section className="pt-32 pb-16 bg-brand-section relative overflow-hidden">
+        <SectionBackground bgJson={heroBg} opacity={18} />
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(201,168,76,0.06),transparent_60%)]" />
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <div className="inline-flex items-center gap-3 mb-4">

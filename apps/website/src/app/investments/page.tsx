@@ -4,7 +4,8 @@ import { TrendingUp, Home, Users, ArrowRight } from 'lucide-react'
 import { WhyDubai } from '@/components/home/WhyDubai'
 import { LeadForm } from '@/components/ui/LeadForm'
 import { ScrollReveal } from '@/components/ui/ScrollReveal'
-import { getCmsContent } from '@/lib/api'
+import { getCmsContent, getPublicSettings } from '@/lib/api'
+import { SectionBackground } from '@/components/ui/SectionBackground'
 
 const TYPE_ICONS = [TrendingUp, Home, Users]
 
@@ -38,7 +39,7 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function InvestmentsPage() {
-  const cms = await getCmsContent('investments')
+  const [cms, settings] = await Promise.all([getCmsContent('investments'), getPublicSettings()])
 
   const heroEyebrow  = (cms.hero_eyebrow as string)  ?? 'Opportunities'
   const heroHeadline = (cms.hero_headline as string)  ?? 'Investment Pathways'
@@ -56,6 +57,7 @@ export default async function InvestmentsPage() {
     <>
       {/* Hero */}
       <section className="pt-32 pb-20 bg-brand-section relative overflow-hidden">
+        <SectionBackground bgJson={settings.section_bg_hero_investments} opacity={18} />
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(201,168,76,0.06),transparent_60%)]" />
         <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-gold/20 to-transparent" />
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
@@ -77,8 +79,9 @@ export default async function InvestmentsPage() {
       </section>
 
       {/* Investment type cards */}
-      <section className="py-20 bg-brand">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+      <section className="py-20 bg-brand relative overflow-hidden">
+        <SectionBackground bgJson={settings.section_bg_investments_strategies} opacity={20} />
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
           {investmentTypes.map((type, i) => {
             const Icon = type.icon
             const isReversed = i % 2 === 1

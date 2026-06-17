@@ -6,6 +6,7 @@ import Image from 'next/image'
 import { MapPin, TrendingUp, ArrowRight } from 'lucide-react'
 import { getAreas } from '@/lib/api'
 import { ScrollReveal } from '@/components/ui/ScrollReveal'
+import { SectionBackground } from '@/components/ui/SectionBackground'
 import type { Area } from '@/types'
 
 const PLACEHOLDER = 'https://images.unsplash.com/photo-1512453979798-5ea266f8880c?auto=format&fit=crop&w=800&q=80'
@@ -78,18 +79,22 @@ function AreaCard({ area, index }: { area: Area; index: number }) {
 export default function LocationsPage() {
   const [areas, setAreas] = useState<Area[]>([])
   const [loading, setLoading] = useState(true)
+  const [heroBg, setHeroBg] = useState<string | null>(null)
 
   useEffect(() => {
     getAreas()
       .then((res) => setAreas(res.data ?? []))
       .catch(() => {})
       .finally(() => setLoading(false))
+    const api = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000/api/v1'
+    fetch(`${api}/settings`).then(r => r.json()).then(j => setHeroBg(j?.data?.section_bg_hero_locations ?? null)).catch(() => {})
   }, [])
 
   return (
     <>
       {/* Hero */}
       <section className="pt-32 pb-16 bg-brand-section relative overflow-hidden">
+        <SectionBackground bgJson={heroBg} opacity={18} />
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(201,168,76,0.06),transparent_60%)]" />
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <div className="inline-flex items-center gap-3 mb-4">

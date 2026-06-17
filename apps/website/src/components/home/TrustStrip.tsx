@@ -3,6 +3,7 @@
 import Image from 'next/image'
 import { motion } from 'framer-motion'
 import { ScrollReveal } from '@/components/ui/ScrollReveal'
+import { SectionBackground } from '@/components/ui/SectionBackground'
 
 interface Partner {
   name: string
@@ -24,9 +25,10 @@ interface Props {
   partnersJson?: string | null
   speedSeconds?: string | null
   stripLabel?: string | null
+  bgJson?: string | null
 }
 
-export function TrustStrip({ cms, partnersJson, speedSeconds, stripLabel }: Props) {
+export function TrustStrip({ cms, partnersJson, speedSeconds, stripLabel, bgJson }: Props) {
   const label = stripLabel ?? (cms?.trust_strip_label as string) ?? 'Trusted by Leading Developers'
   const duration = Math.max(5, Math.min(120, parseInt(speedSeconds ?? '25', 10) || 25))
 
@@ -42,7 +44,8 @@ export function TrustStrip({ cms, partnersJson, speedSeconds, stripLabel }: Prop
 
   return (
     <section className="bg-brand-section py-14 border-y border-gold-border relative overflow-hidden">
-      <div className="max-w-7xl mx-auto px-6">
+      <SectionBackground bgJson={bgJson} opacity={25} />
+      <div className="relative z-10 max-w-7xl mx-auto px-6">
         <ScrollReveal>
           <p className="text-center text-muted text-[10px] tracking-[0.4em] uppercase mb-8">
             {label}

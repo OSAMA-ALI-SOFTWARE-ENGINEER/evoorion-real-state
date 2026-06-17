@@ -21,11 +21,12 @@ export default async function HomePage() {
         partnersJson={settings.partners_list}
         speedSeconds={settings.trust_strip_speed}
         stripLabel={settings.trust_strip_label}
+        bgJson={settings.section_bg_trust_strip}
       />
-      <WhatWeDo cms={cms} />
+      <WhatWeDo cms={cms} bgJson={settings.section_bg_what_we_do} />
       <FeaturedProperties />
       <WhyDubai cms={cms} bgImage={settings.image_why_dubai} />
-      <OurProcess cms={cms} />
+      <OurProcess cms={cms} bgJson={settings.section_bg_our_process} />
       <CTABanner cms={cms} bgImage={settings.image_cta} />
     </>
   )
