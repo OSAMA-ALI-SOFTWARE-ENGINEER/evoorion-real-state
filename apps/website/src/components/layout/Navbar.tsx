@@ -5,10 +5,11 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { usePathname } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Menu, X, Phone, ChevronDown, LogOut, User, Heart, Building2, MapPin } from 'lucide-react'
+import { Menu, X, Phone, ChevronDown, LogOut, User, Heart, Building2, MapPin, Search } from 'lucide-react'
 import { useAuth } from '@/context/AuthContext'
 import { AuthModal } from '@/components/ui/AuthModal'
 import { CountrySelector } from '@/components/ui/CountrySelector'
+import { GlobalSearch, GlobalSearchButton } from '@/components/ui/GlobalSearch'
 
 // Top-level nav links (Properties/Locations handled by dropdown)
 const NAV_LINKS = [
@@ -181,6 +182,7 @@ export function Navbar() {
   const [scrolled, setScrolled]     = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
   const [authModal, setAuthModal]   = useState(false)
+  const [searchOpen, setSearchOpen] = useState(false)
   const { user, isLoading }         = useAuth()
   const pathname = usePathname()
 
@@ -259,6 +261,9 @@ export function Navbar() {
               ))}
             </nav>
 
+            {/* Search button */}
+            <GlobalSearchButton onClick={() => setSearchOpen(true)} />
+
             {/* Right: auth + CTA + hamburger */}
             <div className="flex items-center gap-3">
               {!isLoading && (
@@ -283,6 +288,14 @@ export function Navbar() {
                 <Phone size={14} />
                 Book Call
               </Link>
+              <button
+                type="button"
+                onClick={() => setSearchOpen(true)}
+                className="lg:hidden p-2 text-white/80 hover:text-white transition-colors"
+                aria-label="Search"
+              >
+                <Search size={20} />
+              </button>
               <button
                 type="button"
                 onClick={() => setMobileOpen((v) => !v)}
@@ -341,6 +354,7 @@ export function Navbar() {
       </AnimatePresence>
 
       {authModal && <AuthModal onClose={() => setAuthModal(false)} />}
+      <GlobalSearch open={searchOpen} onClose={() => setSearchOpen(false)} />
     </>
   )
 }
