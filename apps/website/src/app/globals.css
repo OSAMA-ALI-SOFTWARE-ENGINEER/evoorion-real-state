@@ -17,6 +17,12 @@
   --font-serif: 'Playfair Display', Georgia, 'Times New Roman', serif;
 }
 
+/* Derived tokens — re-computed whenever the parent variable changes (e.g. admin theme override) */
+:root {
+  --color-overlay: color-mix(in srgb, var(--color-brand) 80%, transparent);
+  --color-gold-border: color-mix(in srgb, var(--color-gold) 20%, transparent);
+}
+
 /* Base */
 html {
   scroll-behavior: smooth;
