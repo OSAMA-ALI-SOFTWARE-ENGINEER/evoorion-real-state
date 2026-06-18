@@ -1,10 +1,18 @@
 'use client'
 
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { ArrowRight, ChevronDown } from 'lucide-react'
+
+type OperationTab = 'buy' | 'rent' | 'off-plan'
+
+const OP_TABS: { key: OperationTab; label: string }[] = [
+  { key: 'buy',      label: 'Buy'      },
+  { key: 'rent',     label: 'Rent'     },
+  { key: 'off-plan', label: 'Off-Plan' },
+]
 
 export function HeroSection({ cms, bgImage }: { cms?: Record<string, unknown>; bgImage?: string | null }) {
   const eyebrow   = (cms?.hero_eyebrow as string)        ?? 'Luxury Real Estate Investment'
@@ -18,6 +26,8 @@ export function HeroSection({ cms, bgImage }: { cms?: Record<string, unknown>; b
     { value: 'AED 2B+', label: 'Transactions' },
     { value: '98%',     label: 'Client Satisfaction' },
   ]
+
+  const [operationTab, setOperationTab] = useState<OperationTab>('buy')
 
   const parallaxRef = useRef<HTMLDivElement>(null)
 
@@ -102,6 +112,29 @@ export function HeroSection({ cms, bgImage }: { cms?: Record<string, unknown>; b
           {subtext}
         </motion.p>
 
+        {/* Operation tabs */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.78 }}
+          className="flex items-center justify-center gap-2 mb-8"
+        >
+          {OP_TABS.map((tab) => (
+            <button
+              key={tab.key}
+              type="button"
+              onClick={() => setOperationTab(tab.key)}
+              className={`px-7 py-2.5 text-xs tracking-widest uppercase rounded-sm border transition-all duration-200 ${
+                operationTab === tab.key
+                  ? 'bg-gold text-brand border-gold font-semibold'
+                  : 'border-white/25 text-white/70 hover:border-gold/50 hover:text-white'
+              }`}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </motion.div>
+
         {/* CTAs */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -110,7 +143,7 @@ export function HeroSection({ cms, bgImage }: { cms?: Record<string, unknown>; b
           className="flex flex-col sm:flex-row items-center justify-center gap-4"
         >
           <Link
-            href="/properties"
+            href={`/properties?operation=${operationTab}`}
             className="group flex items-center gap-2.5 px-8 py-4 bg-gold text-brand font-semibold text-sm tracking-widest uppercase rounded-sm hover:bg-gold-light transition-colors duration-300"
           >
             {ctaPrimary}
