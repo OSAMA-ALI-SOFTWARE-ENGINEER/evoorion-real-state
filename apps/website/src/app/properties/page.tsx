@@ -18,6 +18,7 @@ import { ScrollReveal } from '@/components/ui/ScrollReveal'
 import { AuthModal } from '@/components/ui/AuthModal'
 import { useAuth } from '@/context/AuthContext'
 import { SectionBackground } from '@/components/ui/SectionBackground'
+import { CantFindCTA } from '@/components/ui/CantFindCTA'
 import type { Area, OperationType, PropertySummary, PropertyType } from '@/types'
 import { BUDGET_RANGES } from '@/types'
 
@@ -505,6 +506,7 @@ function PropertiesPageInner() {
       </AnimatePresence>
 
       {showAuth && <AuthModal onClose={() => setShowAuth(false)} />}
+      <CantFindCTA />
     </>
   )
 }

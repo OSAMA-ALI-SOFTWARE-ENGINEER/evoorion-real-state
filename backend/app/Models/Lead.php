@@ -22,13 +22,16 @@ class Lead extends Model
         'budget_max',
         'message',
         'source',
+        'type',
+        'requirement_data',
         'status',
         'assigned_to',
     ];
 
     protected $casts = [
-        'budget_min' => 'decimal:2',
-        'budget_max' => 'decimal:2',
+        'budget_min'       => 'decimal:2',
+        'budget_max'       => 'decimal:2',
+        'requirement_data' => 'array',
     ];
 
     public function property(): BelongsTo
