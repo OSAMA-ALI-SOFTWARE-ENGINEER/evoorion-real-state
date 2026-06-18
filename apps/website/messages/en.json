@@ -1,0 +1,91 @@
+{
+  "nav": {
+    "home": "Home",
+    "investments": "Investments",
+    "portfolio": "Portfolio",
+    "browseProperties": "Browse Properties",
+    "browsePropertiesDesc": "View all listings",
+    "exploreLocations": "Explore Locations",
+    "exploreLocationsDesc": "Dubai investment hotspots",
+    "blog": "Blog",
+    "about": "About",
+    "contact": "Contact",
+    "signIn": "Sign In",
+    "signInRegister": "Sign In / Register",
+    "bookCall": "Book Call",
+    "bookPrivateCall": "Book Private Call",
+    "search": "Search",
+    "searchPlaceholder": "Search area, development or property…",
+    "searchButton": "Area, development…"
+  },
+  "hero": {
+    "eyebrow": "Luxury Real Estate Investment",
+    "results": "{count} Results"
+  },
+  "search": {
+    "buy": "Buy",
+    "rent": "Rent",
+    "offPlan": "Off-Plan",
+    "areas": "Areas",
+    "properties": "Properties",
+    "properties_count": "{count} properties"
+  },
+  "cantFind": {
+    "buttonTitle": "Can't find what you need?",
+    "buttonSub": "We'll match you in 24h",
+    "modalEyebrow": "Personalised Match",
+    "modalTitle": "Can't find what you're looking for?",
+    "modalSubtitle": "Tell us your requirements and we'll match you with suitable properties within 24 hours.",
+    "fullName": "Full Name",
+    "emailAddress": "Email Address",
+    "phoneNumber": "Phone Number",
+    "preferredLocations": "Preferred Locations",
+    "budgetRange": "Budget Range",
+    "propertyType": "Property Type",
+    "bedrooms": "Bedrooms",
+    "additionalNotes": "Additional Notes",
+    "notesPlaceholder": "Any specific requirements — floor level, view, furnishing, etc.",
+    "submit": "Send My Requirements",
+    "submitting": "Sending…",
+    "successTitle": "We'll be in touch",
+    "successBody": "Our advisors have received your requirements and will match you with the most suitable properties within 24 hours.",
+    "close": "Close"
+  },
+  "properties": {
+    "bedrooms": "Bedrooms",
+    "bathrooms": "Bathrooms",
+    "sqft": "sqft",
+    "price": "Price",
+    "aed": "AED",
+    "viewDetails": "View Details",
+    "saveProperty": "Save property",
+    "compare": "Compare",
+    "readyToMove": "Ready",
+    "offPlan": "Off-Plan",
+    "sold": "Sold",
+    "rented": "Rented"
+  },
+  "contact": {
+    "title": "Get in Touch",
+    "subtitle": "Speak with our investment advisors"
+  },
+  "footer": {
+    "newsletter": "Stay informed on exclusive Dubai real estate opportunities.",
+    "subscribe": "Subscribe",
+    "subscribePlaceholder": "Your email address",
+    "rights": "All rights reserved.",
+    "privacy": "Privacy Policy",
+    "terms": "Terms of Service"
+  },
+  "common": {
+    "loading": "Loading…",
+    "error": "Something went wrong. Please try again.",
+    "noResults": "No results found.",
+    "viewAll": "View All",
+    "learnMore": "Learn More",
+    "getInTouch": "Get in Touch",
+    "signOut": "Sign Out",
+    "savedProperties": "Saved Properties",
+    "myEnquiries": "My Enquiries"
+  }
+}

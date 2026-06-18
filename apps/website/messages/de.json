@@ -1,0 +1,91 @@
+{
+  "nav": {
+    "home": "Startseite",
+    "investments": "Investitionen",
+    "portfolio": "Portfolio",
+    "browseProperties": "Immobilien durchsuchen",
+    "browsePropertiesDesc": "Alle Angebote anzeigen",
+    "exploreLocations": "Lagen entdecken",
+    "exploreLocationsDesc": "Dubai Investitionsstandorte",
+    "blog": "Blog",
+    "about": "Über uns",
+    "contact": "Kontakt",
+    "signIn": "Anmelden",
+    "signInRegister": "Anmelden / Registrieren",
+    "bookCall": "Termin buchen",
+    "bookPrivateCall": "Privates Gespräch buchen",
+    "search": "Suchen",
+    "searchPlaceholder": "Gebiet, Projekt oder Immobilie suchen…",
+    "searchButton": "Gebiet, Projekt…"
+  },
+  "hero": {
+    "eyebrow": "Luxus-Immobilieninvestitionen",
+    "results": "{count} Ergebnisse"
+  },
+  "search": {
+    "buy": "Kaufen",
+    "rent": "Mieten",
+    "offPlan": "Vorverkauf",
+    "areas": "Gebiete",
+    "properties": "Immobilien",
+    "properties_count": "{count} Immobilien"
+  },
+  "cantFind": {
+    "buttonTitle": "Nichts Passendes gefunden?",
+    "buttonSub": "Wir finden es in 24h",
+    "modalEyebrow": "Persönliche Suche",
+    "modalTitle": "Nicht gefunden, was Sie suchen?",
+    "modalSubtitle": "Teilen Sie uns Ihre Anforderungen mit und wir finden passende Immobilien innerhalb von 24 Stunden.",
+    "fullName": "Vollständiger Name",
+    "emailAddress": "E-Mail-Adresse",
+    "phoneNumber": "Telefonnummer",
+    "preferredLocations": "Bevorzugte Lagen",
+    "budgetRange": "Budgetrahmen",
+    "propertyType": "Immobilientyp",
+    "bedrooms": "Schlafzimmer",
+    "additionalNotes": "Zusätzliche Hinweise",
+    "notesPlaceholder": "Besondere Anforderungen — Etage, Aussicht, Einrichtung usw.",
+    "submit": "Anforderungen senden",
+    "submitting": "Wird gesendet…",
+    "successTitle": "Wir melden uns",
+    "successBody": "Unsere Berater haben Ihre Anforderungen erhalten und werden sich innerhalb von 24 Stunden mit passenden Angeboten bei Ihnen melden.",
+    "close": "Schließen"
+  },
+  "properties": {
+    "bedrooms": "Schlafzimmer",
+    "bathrooms": "Badezimmer",
+    "sqft": "Quadratfuß",
+    "price": "Preis",
+    "aed": "AED",
+    "viewDetails": "Details ansehen",
+    "saveProperty": "Immobilie speichern",
+    "compare": "Vergleichen",
+    "readyToMove": "Bezugsfertig",
+    "offPlan": "Vorverkauf",
+    "sold": "Verkauft",
+    "rented": "Vermietet"
+  },
+  "contact": {
+    "title": "Kontakt aufnehmen",
+    "subtitle": "Sprechen Sie mit unseren Investitionsberatern"
+  },
+  "footer": {
+    "newsletter": "Bleiben Sie über exklusive Dubai-Immobilien informiert.",
+    "subscribe": "Abonnieren",
+    "subscribePlaceholder": "Ihre E-Mail-Adresse",
+    "rights": "Alle Rechte vorbehalten.",
+    "privacy": "Datenschutzrichtlinie",
+    "terms": "Nutzungsbedingungen"
+  },
+  "common": {
+    "loading": "Wird geladen…",
+    "error": "Etwas ist schiefgelaufen. Bitte versuchen Sie es erneut.",
+    "noResults": "Keine Ergebnisse gefunden.",
+    "viewAll": "Alle anzeigen",
+    "learnMore": "Mehr erfahren",
+    "getInTouch": "Kontakt aufnehmen",
+    "signOut": "Abmelden",
+    "savedProperties": "Gespeicherte Immobilien",
+    "myEnquiries": "Meine Anfragen"
+  }
+}
