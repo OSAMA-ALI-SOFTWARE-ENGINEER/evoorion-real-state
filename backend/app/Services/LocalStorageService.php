@@ -21,9 +21,8 @@ class LocalStorageService
         }
 
         $filename  = Str::uuid() . '.' . $ext;
-        $storedAt  = $file->storeAs("public/{$folder}", $filename);
-        // public_id = path relative to storage/app/public (used for deletion)
-        $publicId  = str_replace('public/', '', $storedAt);
+        $file->storeAs($folder, $filename, 'public');
+        $publicId  = "{$folder}/{$filename}";
         $url       = url("storage/{$publicId}");
 
         return ['url' => $url, 'public_id' => $publicId];
@@ -39,8 +38,8 @@ class LocalStorageService
         }
 
         $filename = Str::uuid() . '.' . $ext;
-        $storedAt = $file->storeAs("public/{$folder}", $filename);
-        $publicId = str_replace('public/', '', $storedAt);
+        $file->storeAs($folder, $filename, 'public');
+        $publicId = "{$folder}/{$filename}";
         $url      = url("storage/{$publicId}");
 
         return ['url' => $url, 'public_id' => $publicId];
@@ -48,6 +47,6 @@ class LocalStorageService
 
     public function deleteMedia(string $publicId): void
     {
-        Storage::delete("public/{$publicId}");
+        Storage::disk('public')->delete($publicId);
     }
 }
