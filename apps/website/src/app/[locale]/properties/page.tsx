@@ -2,8 +2,9 @@
 
 import { Suspense, useCallback, useEffect, useRef, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
+import dynamic from 'next/dynamic'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Search, SlidersHorizontal, X } from 'lucide-react'
+import { Search, SlidersHorizontal, X, LayoutGrid, Map } from 'lucide-react'
 import {
   getProperties,
   getAreas,
@@ -13,6 +14,11 @@ import {
   removeFavorite,
 } from '@/lib/api'
 import { PropertyCard } from '@/components/ui/PropertyCard'
+
+const PropertyMapView = dynamic(
+  () => import('@/components/ui/PropertyMapView').then((m) => m.PropertyMapView),
+  { ssr: false, loading: () => <div className="w-full h-[60vh] min-h-[420px] rounded-sm border border-gold-border bg-brand-section/40 animate-pulse" /> },
+)
 import { SkeletonCard } from '@/components/ui/SkeletonCard'
 import { ScrollReveal } from '@/components/ui/ScrollReveal'
 import { AuthModal } from '@/components/ui/AuthModal'
@@ -92,6 +98,9 @@ function PropertiesPageInner() {
   const [totalPages, setTotalPages] = useState(1)
   const [areas, setAreas] = useState<Area[]>([])
   const [opTypes, setOpTypes] = useState<OperationType[]>([])
+
+  // View mode: grid or map
+  const [viewMode, setViewMode] = useState<'grid' | 'map'>('grid')
 
   // Filter panel toggle
   const [showAdvanced, setShowAdvanced] = useState(false)
@@ -291,6 +300,30 @@ function PropertiesPageInner() {
             </div>
 
             <div className="flex items-center gap-2 w-full sm:w-auto">
+              {/* View mode toggle */}
+              <div className="flex rounded-sm border border-white/10 overflow-hidden shrink-0">
+                <button
+                  type="button"
+                  onClick={() => setViewMode('grid')}
+                  title="Grid view"
+                  className={`flex items-center justify-center w-9 h-9 transition-colors ${
+                    viewMode === 'grid' ? 'bg-gold text-brand' : 'text-muted hover:text-white'
+                  }`}
+                >
+                  <LayoutGrid size={14} />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setViewMode('map')}
+                  title="Map view"
+                  className={`flex items-center justify-center w-9 h-9 border-l border-white/10 transition-colors ${
+                    viewMode === 'map' ? 'bg-gold text-brand' : 'text-muted hover:text-white'
+                  }`}
+                >
+                  <Map size={14} />
+                </button>
+              </div>
+
               {/* Search */}
               <div className="relative flex-1 sm:w-56">
                 <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted pointer-events-none" />
@@ -396,35 +429,43 @@ function PropertiesPageInner() {
         </div>
       </section>
 
-      {/* Grid */}
+      {/* Grid / Map */}
       <section className={`py-16 bg-brand min-h-[60vh] ${compareList.length > 0 ? 'pb-36' : ''}`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          {loading ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {Array.from({ length: 9 }).map((_, i) => <SkeletonCard key={i} />)}
-            </div>
-          ) : properties.length === 0 ? (
-            <div className="text-center py-24">
-              <SlidersHorizontal size={40} className="text-gold/30 mx-auto mb-4" />
-              <p className="text-muted text-lg mb-2">No properties found</p>
-              <p className="text-muted/60 text-sm">Try adjusting your filters</p>
-            </div>
-          ) : (
-            <AnimatePresence mode="popLayout">
-              <motion.div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" layout>
-                {properties.map((p, i) => (
-                  <ScrollReveal key={p.id} delay={i * 0.05} className="h-full">
-                    <PropertyCard
-                      property={p}
-                      isFavorited={favoriteIds.has(p.id)}
-                      onToggleFavorite={toggleFavorite}
-                      isComparing={!!compareList.find((c) => c.id === p.id)}
-                      onToggleCompare={toggleCompare}
-                    />
-                  </ScrollReveal>
-                ))}
-              </motion.div>
-            </AnimatePresence>
+          {/* Map view */}
+          {viewMode === 'map' && (
+            <PropertyMapView properties={properties} areas={areas} />
+          )}
+
+          {/* Grid view */}
+          {viewMode === 'grid' && (
+            loading ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {Array.from({ length: 9 }).map((_, i) => <SkeletonCard key={i} />)}
+              </div>
+            ) : properties.length === 0 ? (
+              <div className="text-center py-24">
+                <SlidersHorizontal size={40} className="text-gold/30 mx-auto mb-4" />
+                <p className="text-muted text-lg mb-2">No properties found</p>
+                <p className="text-muted/60 text-sm">Try adjusting your filters</p>
+              </div>
+            ) : (
+              <AnimatePresence mode="popLayout">
+                <motion.div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" layout>
+                  {properties.map((p, i) => (
+                    <ScrollReveal key={p.id} delay={i * 0.05} className="h-full">
+                      <PropertyCard
+                        property={p}
+                        isFavorited={favoriteIds.has(p.id)}
+                        onToggleFavorite={toggleFavorite}
+                        isComparing={!!compareList.find((c) => c.id === p.id)}
+                        onToggleCompare={toggleCompare}
+                      />
+                    </ScrollReveal>
+                  ))}
+                </motion.div>
+              </AnimatePresence>
+            )
           )}
 
           {totalPages > 1 && !loading && (
