@@ -15,13 +15,23 @@ class SettingController
     public function __construct(protected SettingService $settingService) {}
 
     private const ALLOWED_KEYS = [
-        // Contact
+        // Contact — UAE (default)
         'contact_whatsapp',
         'contact_email',
         'contact_phone',
         'contact_address',
         'contact_hours_weekdays',
         'contact_hours_sunday',
+        // Contact — Germany office
+        'contact_phone_de',
+        'contact_email_de',
+        'contact_address_de',
+        'contact_hours_de',
+        // Contact — UK office
+        'contact_phone_gb',
+        'contact_email_gb',
+        'contact_address_gb',
+        'contact_hours_gb',
         // Social media
         'social_facebook',
         'social_instagram',

@@ -39,6 +39,16 @@ class SiteSettingsSeeder extends Seeder
             // ── Partners / trust strip ────────────────────────────────────
             ['key' => 'trust_strip_label', 'value' => 'Trusted by Leading Developers', 'group' => 'partners'],
             ['key' => 'trust_strip_speed', 'value' => '25', 'group' => 'partners'],
+            // ── Locale-specific offices ────────────────────────────────────
+            ['key' => 'contact_phone_de',   'value' => '', 'group' => 'contact'],
+            ['key' => 'contact_email_de',   'value' => '', 'group' => 'contact'],
+            ['key' => 'contact_address_de', 'value' => '', 'group' => 'contact'],
+            ['key' => 'contact_hours_de',   'value' => '', 'group' => 'contact'],
+            ['key' => 'contact_phone_gb',   'value' => '', 'group' => 'contact'],
+            ['key' => 'contact_email_gb',   'value' => '', 'group' => 'contact'],
+            ['key' => 'contact_address_gb', 'value' => '', 'group' => 'contact'],
+            ['key' => 'contact_hours_gb',   'value' => '', 'group' => 'contact'],
+
             [
                 'key'   => 'partners_list',
                 'value' => json_encode([

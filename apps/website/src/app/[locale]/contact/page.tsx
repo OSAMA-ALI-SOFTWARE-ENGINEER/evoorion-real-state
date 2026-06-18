@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import { MapPin, Phone, Mail, Clock } from 'lucide-react'
+import { getLocale } from 'next-intl/server'
 import { SocialIcon } from '@/components/ui/SocialIcon'
 import { LeadForm } from '@/components/ui/LeadForm'
 import { ScrollReveal } from '@/components/ui/ScrollReveal'
@@ -22,6 +23,14 @@ type ContactSettings = {
   contact_whatsapp?: string | null
   contact_hours_weekdays?: string | null
   contact_hours_sunday?: string | null
+  contact_phone_de?: string | null
+  contact_email_de?: string | null
+  contact_address_de?: string | null
+  contact_hours_de?: string | null
+  contact_phone_gb?: string | null
+  contact_email_gb?: string | null
+  contact_address_gb?: string | null
+  contact_hours_gb?: string | null
   social_facebook?: string | null
   social_instagram?: string | null
   social_twitter?: string | null
@@ -42,14 +51,33 @@ async function getContactSettings(): Promise<ContactSettings> {
   }
 }
 
-export default async function ContactPage() {
-  const [s, cms] = await Promise.all([getContactSettings(), getCmsContent('contact')])
+// Locale → office label and flag
+const OFFICE_LABELS: Record<string, { label: string; flag: string }> = {
+  de:    { label: 'Germany Office',      flag: '🇩🇪' },
+  'en-gb': { label: 'United Kingdom Office', flag: '🇬🇧' },
+}
 
-  const address     = s.contact_address        ?? 'Office 2402, Burj Al Salam Tower, Sheikh Zayed Road, Dubai, UAE'
-  const phone       = s.contact_phone          ?? '+971 00 000 0000'
-  const email       = s.contact_email          ?? 'invest@evoorion.com'
-  const hoursWeek   = s.contact_hours_weekdays ?? 'Monday – Saturday: 9:00 AM – 7:00 PM'
-  const hoursSun    = s.contact_hours_sunday   ?? 'Sunday: By Appointment'
+export default async function ContactPage() {
+  const [s, cms, locale] = await Promise.all([
+    getContactSettings(),
+    getCmsContent('contact'),
+    getLocale(),
+  ])
+
+  // Locale-specific office fallbacks
+  const suffix = locale === 'de' ? '_de' : locale === 'en-gb' ? '_gb' : ''
+
+  const address   = (suffix && s[`contact_address${suffix}` as keyof ContactSettings]) || s.contact_address   || 'Office 2402, Burj Al Salam Tower, Sheikh Zayed Road, Dubai, UAE'
+  const phone     = (suffix && s[`contact_phone${suffix}` as keyof ContactSettings])   || s.contact_phone     || '+971 00 000 0000'
+  const email     = (suffix && s[`contact_email${suffix}` as keyof ContactSettings])   || s.contact_email     || 'invest@evoorion.com'
+  const hours     = (suffix && s[`contact_hours${suffix}` as keyof ContactSettings])   || s.contact_hours_weekdays || 'Monday – Saturday: 9:00 AM – 7:00 PM'
+  const hoursSun  = suffix ? null : (s.contact_hours_sunday ?? 'Sunday: By Appointment')
+
+  const officeLabel = (suffix && OFFICE_LABELS[locale]?.label) ? OFFICE_LABELS[locale].label : 'Dubai Office'
+  const officeFlag  = (suffix && OFFICE_LABELS[locale]?.flag)  ? OFFICE_LABELS[locale].flag  : '🇦🇪'
+
+  // Show both offices when on a locale-specific office page and a UAE office also exists
+  const showUaeOffice = !!suffix && !!(s.contact_phone || s.contact_address)
 
   const socials = [
     { name: 'instagram' as const, label: 'Instagram', href: s.social_instagram ?? '#' },
@@ -87,10 +115,15 @@ export default async function ContactPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-5 gap-12">
             {/* Left: Contact info + map */}
-            <div className="lg:col-span-2">
+            <div className="lg:col-span-2 space-y-10">
               <ScrollReveal>
+                {/* Office label */}
+                <div className="flex items-center gap-2 mb-6">
+                  <span className="text-lg">{officeFlag}</span>
+                  <span className="text-gold text-xs tracking-[0.2em] uppercase font-semibold">{officeLabel}</span>
+                </div>
+
                 <div className="space-y-8">
-                  {/* Address */}
                   <div className="flex gap-4">
                     <div className="w-10 h-10 rounded-sm border border-gold-border bg-gold/5 flex items-center justify-center shrink-0">
                       <MapPin size={16} className="text-gold" />
@@ -101,7 +134,6 @@ export default async function ContactPage() {
                     </div>
                   </div>
 
-                  {/* Phone */}
                   <div className="flex gap-4">
                     <div className="w-10 h-10 rounded-sm border border-gold-border bg-gold/5 flex items-center justify-center shrink-0">
                       <Phone size={16} className="text-gold" />
@@ -114,7 +146,6 @@ export default async function ContactPage() {
                     </div>
                   </div>
 
-                  {/* Email */}
                   <div className="flex gap-4">
                     <div className="w-10 h-10 rounded-sm border border-gold-border bg-gold/5 flex items-center justify-center shrink-0">
                       <Mail size={16} className="text-gold" />
@@ -127,19 +158,17 @@ export default async function ContactPage() {
                     </div>
                   </div>
 
-                  {/* Working hours */}
                   <div className="flex gap-4">
                     <div className="w-10 h-10 rounded-sm border border-gold-border bg-gold/5 flex items-center justify-center shrink-0">
                       <Clock size={16} className="text-gold" />
                     </div>
                     <div>
                       <p className="text-white/40 text-xs tracking-wider uppercase mb-1">Office Hours</p>
-                      <p className="text-muted text-sm">{hoursWeek}</p>
+                      <p className="text-muted text-sm">{hours}</p>
                       {hoursSun && <p className="text-muted text-sm">{hoursSun}</p>}
                     </div>
                   </div>
 
-                  {/* Social */}
                   <div>
                     <p className="text-white/40 text-xs tracking-wider uppercase mb-3">Follow Us</p>
                     <div className="flex gap-3">
@@ -158,7 +187,24 @@ export default async function ContactPage() {
                 </div>
               </ScrollReveal>
 
-              {/* Map */}
+              {/* Also show UAE office if on a locale-specific page */}
+              {showUaeOffice && (
+                <ScrollReveal delay={0.1}>
+                  <div className="p-5 border border-white/5 rounded-sm bg-brand-section/40">
+                    <div className="flex items-center gap-2 mb-4">
+                      <span className="text-lg">🇦🇪</span>
+                      <span className="text-gold text-xs tracking-[0.2em] uppercase font-semibold">Dubai HQ</span>
+                    </div>
+                    <p className="text-muted text-sm mb-2">{s.contact_address ?? 'Office 2402, Burj Al Salam Tower, Dubai, UAE'}</p>
+                    {s.contact_phone && (
+                      <a href={`tel:${s.contact_phone.replace(/\s/g, '')}`} className="text-white hover:text-gold text-sm transition-colors block">
+                        {s.contact_phone}
+                      </a>
+                    )}
+                  </div>
+                </ScrollReveal>
+              )}
+
               <ScrollReveal delay={0.2}>
                 <ContactAddressMap address={address} />
               </ScrollReveal>

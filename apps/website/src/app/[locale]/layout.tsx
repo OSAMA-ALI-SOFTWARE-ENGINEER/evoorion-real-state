@@ -26,7 +26,7 @@ export default async function LocaleLayout({
 
   return (
     <NextIntlClientProvider messages={messages}>
-      <CountryProvider>
+      <CountryProvider locale={locale}>
         <HtmlLocale />
         <AuthProvider>
           <Navbar />
