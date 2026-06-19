@@ -273,6 +273,24 @@ export async function getCurrencies(): Promise<ApiResponse<ApiCurrency[]>> {
   return res.data
 }
 
+// ── Agents ────────────────────────────────────────────────────────────────────
+
+export interface PublicAgent {
+  id: number
+  name: string
+  email: string
+  phone?: string
+  whatsapp?: string
+  avatar_url?: string | null
+  agency?: { id: number; name: string } | null
+  listings: number
+}
+
+export async function getAgents(): Promise<PublicAgent[]> {
+  const res = await api.get<ApiResponse<PublicAgent[]>>('/agents')
+  return res.data.data
+}
+
 // ── Newsletter ─────────────────────────────────────────────────────────────────
 
 export async function subscribeNewsletter(email: string, name?: string): Promise<void> {

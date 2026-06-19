@@ -40,6 +40,7 @@ use App\Http\Controllers\Api\V1\UserPreferenceController;
 use App\Http\Controllers\Api\V1\SearchSuggestionController;
 use App\Http\Controllers\Api\V1\SavedSearchController;
 use App\Http\Controllers\Api\V1\NewsletterController;
+use App\Http\Controllers\Api\V1\PublicAgentController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')->group(function () {
@@ -81,6 +82,7 @@ Route::prefix('v1')->group(function () {
         Route::get('developers', [DeveloperController::class, 'index']);
         Route::get('developers/{developer}', [DeveloperController::class, 'show']);
         Route::get('operation-types', [OperationTypeController::class, 'index']);
+        Route::get('agents', [PublicAgentController::class, 'index']);
 
         // Public property endpoints
         Route::get('properties', [PropertyController::class, 'index']);
