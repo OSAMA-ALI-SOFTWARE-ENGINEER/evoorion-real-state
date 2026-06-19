@@ -26,6 +26,8 @@ class PropertyFilterRequest extends FormRequest
             'bedrooms_max'       => 'nullable|integer|min:0',
             'bathrooms_min'      => 'nullable|integer|min:0',
             'bathrooms_max'      => 'nullable|integer|min:0',
+            'min_area_sqft'      => 'nullable|numeric|min:0',
+            'max_area_sqft'      => 'nullable|numeric|min:0',
             'sort_by'            => 'nullable|in:price,created_at,views_count,area_sqft,bedrooms',
             'sort_direction'     => 'nullable|in:asc,desc',
             'page'               => 'nullable|integer|min:1',

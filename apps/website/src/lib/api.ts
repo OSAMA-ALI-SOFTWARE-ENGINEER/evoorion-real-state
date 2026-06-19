@@ -44,6 +44,8 @@ export interface PropertyFilters {
   operation_type_id?: number
   min_price?: number
   max_price?: number
+  min_area_sqft?: number
+  max_area_sqft?: number
   sort_by?: string
   sort_direction?: 'asc' | 'desc'
   per_page?: number

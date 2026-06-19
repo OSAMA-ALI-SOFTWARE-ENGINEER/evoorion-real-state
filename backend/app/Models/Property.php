@@ -20,6 +20,7 @@ class Property extends Model
         'description',
         'type',
         'price',
+        'previous_price',
         'currency',
         'area_id',
         'location',
@@ -42,8 +43,9 @@ class Property extends Model
     protected $casts = [
         'is_active'   => 'boolean',
         'is_featured' => 'boolean',
-        'price' => 'decimal:2',
-        'area_sqft' => 'decimal:2',
+        'price'          => 'decimal:2',
+        'previous_price' => 'decimal:2',
+        'area_sqft'      => 'decimal:2',
         'roi_min' => 'decimal:2',
         'roi_max' => 'decimal:2',
     ];

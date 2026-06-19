@@ -76,6 +76,13 @@ export function PropertyCard({
           >
             {badge.label}
           </span>
+
+          {/* Price reduced badge */}
+          {property.previous_price && parseFloat(property.previous_price) > parseFloat(property.price) && (
+            <span className="absolute top-3 right-3 text-[10px] font-bold tracking-[0.12em] px-2.5 py-1 rounded-sm bg-red-500/90 text-white">
+              Price Reduced
+            </span>
+          )}
         </div>
 
         {/* Content */}
@@ -108,9 +115,14 @@ export function PropertyCard({
           </div>
 
           <div className="flex items-end justify-between">
-            <p className="text-gold font-semibold text-lg leading-tight">
-              {formatPrice(property.price)}
-            </p>
+            <div>
+              {property.previous_price && parseFloat(property.previous_price) > parseFloat(property.price) && (
+                <p className="text-muted text-xs line-through mb-0.5">{formatPrice(property.previous_price)}</p>
+              )}
+              <p className="text-gold font-semibold text-lg leading-tight">
+                {formatPrice(property.price)}
+              </p>
+            </div>
             {property.roi_min && property.roi_max && (
               <div className="flex items-center gap-1 text-emerald-400 text-xs">
                 <TrendingUp size={12} />

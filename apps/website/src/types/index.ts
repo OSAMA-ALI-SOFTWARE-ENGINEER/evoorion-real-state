@@ -40,6 +40,7 @@ export interface PropertySummary {
   slug: string
   type: PropertyType
   price: string
+  previous_price?: string | null
   currency: string
   bedrooms: number
   bathrooms: number
