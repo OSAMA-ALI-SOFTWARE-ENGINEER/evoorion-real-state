@@ -63,7 +63,10 @@ function PropertiesPageInner() {
   const { user } = useAuth()
   const router = useRouter()
   const searchParams = useSearchParams()
-  const urlParamsApplied = useRef(false)
+  // Tracks which param string was last applied — re-fires on navigation to a new URL
+  const lastAppliedParams = useRef<string | null>(null)
+  // Gates the property fetch until URL params are resolved (prevents flash of unfiltered results)
+  const [initialized, setInitialized] = useState(false)
 
   // Filter state
   const [activeType, setActiveType] = useState<'' | PropertyType>('')
@@ -110,29 +113,43 @@ function PropertiesPageInner() {
     })
   }, [])
 
-  // Apply URL params once master data is available
+  // Sync URL params → filter state whenever the URL or master data changes
   useEffect(() => {
-    if (urlParamsApplied.current) return
+    const key = searchParams.toString()
     const paramOp  = searchParams.get('operation')
     const paramLoc = searchParams.get('location')
     const paramQ   = searchParams.get('q')
-    if (!paramOp && !paramLoc && !paramQ) { urlParamsApplied.current = true; return }
-    // Wait for whichever master sets are needed
-    if (paramOp  && opTypes.length === 0) return
-    if (paramLoc && areas.length  === 0)  return
-    urlParamsApplied.current = true
-    if (paramQ) setSearch(paramQ)
-    if (paramOp) {
-      const match = opTypes.find(o =>
-        o.name.toLowerCase().replace(/[\s-]+/g, '-') === paramOp.toLowerCase()
-      )
-      if (match) setOpTypeId(match.id)
+
+    // No URL params — initialise immediately with cleared filters
+    if (!paramOp && !paramLoc && !paramQ) {
+      if (lastAppliedParams.current === key) return
+      lastAppliedParams.current = key
+      setOpTypeId(0); setAreaId(0); setSearch('')
+      setInitialized(true)
+      return
     }
-    if (paramLoc) {
-      const match = areas.find(a => a.slug === paramLoc)
-      if (match) setAreaId(match.id)
-    }
-  }, [opTypes, areas, searchParams])
+
+    // Wait for master data before resolving slugs
+    if (opTypes.length === 0 || areas.length === 0) return
+
+    // Same params already applied — don't overwrite manual filter changes
+    if (lastAppliedParams.current === key) return
+    lastAppliedParams.current = key
+
+    setSearch(paramQ ?? '')
+
+    const opMatch = paramOp
+      ? opTypes.find(o => o.name.toLowerCase().replace(/[\s-]+/g, '-') === paramOp.toLowerCase())
+      : undefined
+    setOpTypeId(opMatch?.id ?? 0)
+
+    const areaMatch = paramLoc
+      ? areas.find(a => a.slug === paramLoc)
+      : undefined
+    setAreaId(areaMatch?.id ?? 0)
+
+    setInitialized(true)
+  }, [searchParams, opTypes, areas])
 
   // Load favorites when user is logged in
   useEffect(() => {
@@ -182,8 +199,9 @@ function PropertiesPageInner() {
   )
 
   useEffect(() => {
+    if (!initialized) return
     fetchProperties(page, debouncedSearch, activeType, areaId, opTypeId, priceKey, sortKey)
-  }, [page, debouncedSearch, activeType, areaId, opTypeId, priceKey, sortKey, fetchProperties])
+  }, [page, debouncedSearch, activeType, areaId, opTypeId, priceKey, sortKey, fetchProperties, initialized])
 
   // Reset to page 1 when filters change
   useEffect(() => {
