@@ -37,6 +37,7 @@ use App\Http\Controllers\Api\V1\Admin\CmsController as AdminCmsController;
 use App\Http\Controllers\Api\V1\CmsController;
 use App\Http\Controllers\Api\V1\PublicSettingController;
 use App\Http\Controllers\Api\V1\UserPreferenceController;
+use App\Http\Controllers\Api\V1\SearchSuggestionController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')->group(function () {
@@ -60,6 +61,9 @@ Route::prefix('v1')->group(function () {
         // Exchange a one-time 30s code (from OAuth redirect) for the actual bearer token
         Route::post('social/exchange', [SocialAuthController::class, 'exchange']);
     });
+
+    // Search suggestions (areas + properties, public)
+    Route::middleware('throttle:120,1')->get('search/suggestions', SearchSuggestionController::class);
 
     // Public settings (contact info, social links, hours)
     Route::middleware('throttle:60,1')->get('settings', [PublicSettingController::class, 'index']);

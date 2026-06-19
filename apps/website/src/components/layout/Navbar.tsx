@@ -5,171 +5,142 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { usePathname } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Menu, X, Phone, ChevronDown, LogOut, User, Heart, Building2, MapPin } from 'lucide-react'
+import { Menu, X, Phone, LogOut, User, Heart, ChevronRight, MapPin } from 'lucide-react'
 import { useAuth } from '@/context/AuthContext'
 import { AuthModal } from '@/components/ui/AuthModal'
 import { CountrySelector } from '@/components/ui/CountrySelector'
+import { GlobalSearch, GlobalSearchButton } from '@/components/ui/GlobalSearch'
 
-// Top-level nav links (Properties/Locations handled by dropdown)
-const NAV_LINKS = [
-  { label: 'Home', href: '/' },
-  { label: 'Investments', href: '/investments' },
-  { label: 'Blog', href: '/blog' },
-  { label: 'About', href: '/about' },
-  { label: 'Contact', href: '/contact' },
+const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000/api/v1'
+
+type OpType = { id: number; name: string; property_count: number }
+type AreaItem = { id: number; name: string; slug: string; properties_count: number }
+
+function opSlug(name: string) {
+  return name.toLowerCase().replace(/\s+/g, '-')
+}
+
+function opHref(op: OpType) {
+  const key = opSlug(op.name)
+  if (key === 'off-plan') return '/off-plan'
+  return `/properties?operation=${key}`
+}
+
+const COMPANY_LINKS = [
+  { label: 'Investments',  href: '/investments' },
+  { label: 'Blog',         href: '/blog' },
+  { label: 'About',        href: '/about' },
 ]
 
-const PROPERTY_DROPDOWN = [
-  { label: 'Browse Properties', href: '/properties', icon: Building2, desc: 'View all listings' },
-  { label: 'Explore Locations', href: '/locations', icon: MapPin, desc: 'Dubai investment hotspots' },
-]
-
-// Mobile menu: all links flat
-const MOBILE_LINKS = [
-  { label: 'Home', href: '/' },
-  { label: 'Investments', href: '/investments' },
-  { label: 'Properties', href: '/properties' },
-  { label: 'Locations', href: '/locations' },
-  { label: 'Blog', href: '/blog' },
-  { label: 'About', href: '/about' },
-  { label: 'Contact', href: '/contact' },
-]
-
-function PropertyDropdown({ pathname }: { pathname: string }) {
-  const [open, setOpen] = useState(false)
-  const ref = useRef<HTMLDivElement>(null)
-  const isActive = pathname.startsWith('/properties') || pathname.startsWith('/locations')
-
-  useEffect(() => {
-    const handler = (e: MouseEvent) => {
-      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false)
-    }
-    document.addEventListener('mousedown', handler)
-    return () => document.removeEventListener('mousedown', handler)
-  }, [])
-
+function DrawerLink({ href, label, pathname, onClick }: { href: string; label: string; pathname: string; onClick: () => void }) {
+  const base   = href.split('?')[0]
+  const active = pathname === base || (base !== '/' && pathname.startsWith(base + '/'))
   return (
-    <div ref={ref} className="relative" onMouseEnter={() => setOpen(true)} onMouseLeave={() => setOpen(false)}>
-      <button
-        type="button"
-        onClick={() => setOpen((v) => !v)}
-        className={`flex items-center gap-1 text-sm tracking-widest uppercase transition-colors duration-300 relative group ${
-          isActive ? 'text-gold' : 'text-white/80 hover:text-white'
-        }`}
-      >
-        Portfolio
-        <ChevronDown size={12} className={`transition-transform duration-200 ${open ? 'rotate-180' : ''}`} />
-        <span className={`absolute -bottom-1 left-0 h-px bg-gold transition-all duration-300 ${isActive ? 'w-full' : 'w-0 group-hover:w-full'}`} />
-      </button>
-
-      <AnimatePresence>
-        {open && (
-          <motion.div
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 8 }}
-            transition={{ duration: 0.15 }}
-            className="absolute top-full left-1/2 -translate-x-1/2 pt-3 z-50 min-w-[220px]"
-          >
-            <div className="bg-brand-section border border-gold-border rounded-sm shadow-2xl overflow-hidden">
-              {PROPERTY_DROPDOWN.map((item) => {
-                const Icon = item.icon
-                const active = pathname === item.href || pathname.startsWith(item.href + '/')
-                return (
-                  <Link
-                    key={item.href}
-                    href={item.href}
-                    onClick={() => setOpen(false)}
-                    className={`flex items-center gap-3 px-4 py-3.5 border-b border-white/5 last:border-0 transition-colors group/item ${
-                      active ? 'bg-gold/5 text-gold' : 'text-muted hover:text-white hover:bg-white/5'
-                    }`}
-                  >
-                    <div className={`w-8 h-8 rounded-sm flex items-center justify-center shrink-0 transition-colors ${
-                      active ? 'bg-gold/10' : 'bg-white/5 group-hover/item:bg-gold/10'
-                    }`}>
-                      <Icon size={14} className={active ? 'text-gold' : 'text-muted group-hover/item:text-gold'} />
-                    </div>
-                    <div>
-                      <p className="text-xs font-semibold tracking-wider uppercase">{item.label}</p>
-                      <p className="text-[11px] text-muted/60 mt-0.5">{item.desc}</p>
-                    </div>
-                  </Link>
-                )
-              })}
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </div>
+    <Link
+      href={href}
+      onClick={onClick}
+      className={`group flex items-center justify-between py-3 border-b border-white/5 transition-colors duration-200 ${
+        active ? 'text-gold' : 'text-white/70 hover:text-white'
+      }`}
+    >
+      <span className="text-sm tracking-widest uppercase">{label}</span>
+      <ChevronRight size={14} className={`transition-transform duration-200 group-hover:translate-x-1 ${active ? 'text-gold' : 'text-white/20'}`} />
+    </Link>
   )
 }
 
-function UserMenu() {
-  const { user, logout } = useAuth()
-  const [open, setOpen]  = useState(false)
-  const ref              = useRef<HTMLDivElement>(null)
+function OpLinkWithLocations({ op, pathname, onClose }: { op: OpType; pathname: string; onClose: () => void }) {
+  const [hovered, setHovered]         = useState(false)
+  const [areas, setAreas]             = useState<AreaItem[]>([])
+  const [fetched, setFetched]         = useState(false)
+  const [flyoutY, setFlyoutY]         = useState(0)
+  const [flyoutRight, setFlyoutRight] = useState(0)
+  const triggerRef                    = useRef<HTMLDivElement>(null)
+  const timerRef                      = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const href                          = opHref(op)
+  const key                           = opSlug(op.name)
 
-  useEffect(() => {
-    const handler = (e: MouseEvent) => {
-      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false)
+  // Active: match pathname for off-plan, or match pathname + ?operation= for others
+  const currentOp = typeof window !== 'undefined'
+    ? new URLSearchParams(window.location.search).get('operation') ?? ''
+    : ''
+  const active = key === 'off-plan'
+    ? pathname === '/off-plan'
+    : pathname === '/properties' && currentOp === key
+
+  function handleMouseEnter() {
+    // Capture trigger position for fixed flyout before overflow clips it
+    if (triggerRef.current) {
+      const rect = triggerRef.current.getBoundingClientRect()
+      setFlyoutY(rect.top)
+      setFlyoutRight(window.innerWidth - rect.left + 8)
     }
-    document.addEventListener('mousedown', handler)
-    return () => document.removeEventListener('mousedown', handler)
-  }, [])
+    timerRef.current = setTimeout(() => setHovered(true), 120)
+    if (!fetched) {
+      setFetched(true)
+      fetch(`${API_BASE}/areas?operation_type_id=${op.id}`)
+        .then(r => r.json())
+        .then(d => setAreas((d.data ?? []).slice(0, 6)))
+        .catch(() => {})
+    }
+  }
 
-  if (!user) return null
-
-  const initials = user.name.split(' ').map((w) => w[0]).slice(0, 2).join('').toUpperCase()
+  function handleMouseLeave() {
+    if (timerRef.current) clearTimeout(timerRef.current)
+    setHovered(false)
+  }
 
   return (
-    <div ref={ref} className="relative">
-      <button
-        type="button"
-        onClick={() => setOpen((v) => !v)}
-        className="flex items-center gap-2 py-1.5 px-3 rounded-full border border-gold-border hover:border-gold/50 transition-colors"
+    <div ref={triggerRef} onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
+      <Link
+        href={href}
+        onClick={onClose}
+        className={`group flex items-center justify-between py-3 border-b border-white/5 transition-colors duration-200 ${
+          active ? 'text-gold' : 'text-white/70 hover:text-white'
+        }`}
       >
-        {user.avatar_url ? (
-          <Image src={user.avatar_url} alt={user.name} width={28} height={28} className="rounded-full object-cover" />
-        ) : (
-          <div className="w-7 h-7 rounded-full bg-gold/20 border border-gold/30 flex items-center justify-center text-gold text-xs font-semibold">
-            {initials}
-          </div>
-        )}
-        <span className="text-white text-sm max-w-[100px] truncate hidden xl:block">{user.name}</span>
-        <ChevronDown size={14} className={`text-muted transition-transform ${open ? 'rotate-180' : ''}`} />
-      </button>
+        <span className="flex items-center gap-2 text-sm tracking-widest uppercase">
+          {op.name}
+          <span className="text-[10px] text-muted/50 font-normal normal-case tracking-normal">
+            {op.property_count}
+          </span>
+        </span>
+        <ChevronRight size={14} className={`transition-transform duration-200 group-hover:translate-x-1 ${active ? 'text-gold' : 'text-white/20'}`} />
+      </Link>
 
+      {/* Nested locations flyout — fixed so drawer overflow-y-auto cannot clip it */}
       <AnimatePresence>
-        {open && (
+        {hovered && areas.length > 0 && (
           <motion.div
-            initial={{ opacity: 0, y: 6 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 6 }}
+            initial={{ opacity: 0, x: -8 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -8 }}
             transition={{ duration: 0.15 }}
-            className="absolute right-0 top-full mt-2 w-52 bg-brand-section border border-gold-border rounded-xl shadow-xl overflow-hidden z-50"
+            style={{ top: flyoutY, right: flyoutRight }}
+            className="fixed w-56 bg-brand-section border border-gold-border rounded-sm shadow-2xl overflow-hidden z-[60]"
           >
-            <div className="px-4 py-3 border-b border-white/5">
-              <p className="text-white text-sm font-medium truncate">{user.name}</p>
-              <p className="text-muted text-xs truncate">{user.email}</p>
-            </div>
-            <div className="p-1">
+            <p className="px-3 pt-3 pb-1 text-[10px] text-gold/50 tracking-[0.2em] uppercase font-medium">Locations</p>
+            {areas.map((area) => (
               <Link
-                href="/favorites"
-                onClick={() => setOpen(false)}
-                className="w-full flex items-center gap-2.5 px-3 py-2 text-sm text-muted hover:text-white hover:bg-white/5 rounded-lg transition-colors"
+                key={area.slug}
+                href={`/properties?operation=${key}&location=${area.slug}`}
+                onClick={onClose}
+                className="flex items-center gap-2.5 px-3 py-2.5 border-b border-white/5 last:border-0 text-white/60 hover:text-white hover:bg-white/5 transition-colors"
               >
-                <Heart size={15} />
-                Saved Properties
+                <MapPin size={11} className="text-gold/60 shrink-0" />
+                <span className="text-xs truncate">{area.name}</span>
+                {area.properties_count > 0 && (
+                  <span className="ml-auto text-[10px] text-muted/40 shrink-0">{area.properties_count}</span>
+                )}
               </Link>
-              <button
-                type="button"
-                onClick={async () => { setOpen(false); await logout() }}
-                className="w-full flex items-center gap-2.5 px-3 py-2 text-sm text-muted hover:text-white hover:bg-white/5 rounded-lg transition-colors"
-              >
-                <LogOut size={15} />
-                Sign Out
-              </button>
-            </div>
+            ))}
+            <Link
+              href={href}
+              onClick={onClose}
+              className="flex items-center justify-center gap-1 px-3 py-2.5 text-gold text-xs hover:bg-gold/5 transition-colors"
+            >
+              View all <ChevronRight size={11} />
+            </Link>
           </motion.div>
         )}
       </AnimatePresence>
@@ -179,10 +150,20 @@ function UserMenu() {
 
 export function Navbar() {
   const [scrolled, setScrolled]     = useState(false)
-  const [mobileOpen, setMobileOpen] = useState(false)
+  const [drawerOpen, setDrawerOpen] = useState(false)
   const [authModal, setAuthModal]   = useState(false)
-  const { user, isLoading }         = useAuth()
+  const [searchOpen, setSearchOpen] = useState(false)
+  const [opTypes, setOpTypes]       = useState<OpType[]>([])
+  const { user, isLoading, logout } = useAuth()
   const pathname = usePathname()
+
+  // Load operation types once for drawer
+  useEffect(() => {
+    fetch(`${API_BASE}/operation-types`)
+      .then(r => r.json())
+      .then(d => setOpTypes(d.data ?? []))
+      .catch(() => {})
+  }, [])
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 60)
@@ -190,19 +171,29 @@ export function Navbar() {
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
 
-  useEffect(() => { setMobileOpen(false) }, [pathname])
+  // Close drawer on route change
+  useEffect(() => { setDrawerOpen(false) }, [pathname])
+
+  // Lock body scroll when drawer is open
+  useEffect(() => {
+    document.body.style.overflow = drawerOpen ? 'hidden' : ''
+    return () => { document.body.style.overflow = '' }
+  }, [drawerOpen])
+
+  const initials = user ? user.name.split(' ').map((w: string) => w[0]).slice(0, 2).join('').toUpperCase() : ''
 
   return (
     <>
       <header
         className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
-          scrolled || mobileOpen
+          scrolled || drawerOpen
             ? 'bg-brand/95 backdrop-blur-md border-b border-gold-border shadow-lg shadow-black/30'
             : 'bg-transparent'
         }`}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-20">
+
             {/* Logo */}
             <Link href="/" className="relative block h-10 w-44 shrink-0">
               <Image
@@ -215,132 +206,186 @@ export function Navbar() {
               />
             </Link>
 
-            {/* Desktop nav */}
-            <nav className="hidden lg:flex items-center gap-6">
-              {/* Home */}
-              <Link
-                href="/"
-                className={`text-sm tracking-widest uppercase transition-colors duration-300 relative group ${
-                  pathname === '/' ? 'text-gold' : 'text-white/80 hover:text-white'
-                }`}
-              >
-                Home
-                <span className={`absolute -bottom-1 left-0 h-px bg-gold transition-all duration-300 ${pathname === '/' ? 'w-full' : 'w-0 group-hover:w-full'}`} />
-              </Link>
+            {/* Right cluster */}
+            <div className="flex items-center gap-2 sm:gap-3">
+              {/* Search */}
+              <GlobalSearchButton onClick={() => setSearchOpen(true)} />
 
-              {/* Investments */}
-              <Link
-                href="/investments"
-                className={`text-sm tracking-widest uppercase transition-colors duration-300 relative group ${
-                  pathname.startsWith('/investments') ? 'text-gold' : 'text-white/80 hover:text-white'
-                }`}
-              >
-                Investments
-                <span className={`absolute -bottom-1 left-0 h-px bg-gold transition-all duration-300 ${pathname.startsWith('/investments') ? 'w-full' : 'w-0 group-hover:w-full'}`} />
-              </Link>
-
-              {/* Properties + Locations dropdown */}
-              <PropertyDropdown pathname={pathname} />
-
-              {/* Blog, About, Contact */}
-              {NAV_LINKS.slice(2).map((link) => (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  className={`text-sm tracking-widest uppercase transition-colors duration-300 relative group ${
-                    pathname === link.href || pathname.startsWith(link.href + '/') ? 'text-gold' : 'text-white/80 hover:text-white'
-                  }`}
-                >
-                  {link.label}
-                  <span className={`absolute -bottom-1 left-0 h-px bg-gold transition-all duration-300 ${
-                    pathname === link.href || pathname.startsWith(link.href + '/') ? 'w-full' : 'w-0 group-hover:w-full'
-                  }`} />
-                </Link>
-              ))}
-            </nav>
-
-            {/* Right: auth + CTA + hamburger */}
-            <div className="flex items-center gap-3">
-              {!isLoading && (
-                user ? (
-                  <UserMenu />
-                ) : (
-                  <button
-                    type="button"
-                    onClick={() => setAuthModal(true)}
-                    className="hidden lg:flex items-center gap-1.5 py-2 px-4 rounded-full border border-gold-border text-white/80 hover:text-white hover:border-gold/50 text-sm transition-colors"
-                  >
-                    <User size={14} />
-                    Sign In
-                  </button>
-                )
-              )}
+              {/* Country */}
               <CountrySelector />
+
+              {/* Book Call — hidden on small mobile */}
               <Link
                 href="/contact"
-                className="hidden lg:flex items-center gap-2 px-5 py-2.5 bg-gold text-brand text-sm font-semibold tracking-wider uppercase rounded-sm hover:bg-gold-light transition-colors duration-300"
+                className="hidden sm:flex items-center gap-2 px-4 py-2.5 bg-gold text-brand text-xs font-semibold tracking-wider uppercase rounded-sm hover:bg-gold-light transition-colors duration-300"
               >
-                <Phone size={14} />
+                <Phone size={13} />
                 Book Call
               </Link>
+
+              {/* Hamburger */}
               <button
                 type="button"
-                onClick={() => setMobileOpen((v) => !v)}
-                className="lg:hidden p-2 text-white/80 hover:text-white transition-colors"
-                aria-label="Toggle menu"
+                onClick={() => setDrawerOpen((v) => !v)}
+                aria-label={drawerOpen ? 'Close menu' : 'Open menu'}
+                className="flex items-center justify-center w-10 h-10 rounded-sm border border-white/10 hover:border-gold/40 text-white/80 hover:text-white transition-colors"
               >
-                {mobileOpen ? <X size={22} /> : <Menu size={22} />}
+                <AnimatePresence mode="wait" initial={false}>
+                  {drawerOpen ? (
+                    <motion.span key="x" initial={{ rotate: -90, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: 90, opacity: 0 }} transition={{ duration: 0.15 }}>
+                      <X size={18} />
+                    </motion.span>
+                  ) : (
+                    <motion.span key="menu" initial={{ rotate: 90, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: -90, opacity: 0 }} transition={{ duration: 0.15 }}>
+                      <Menu size={18} />
+                    </motion.span>
+                  )}
+                </AnimatePresence>
               </button>
             </div>
+
           </div>
         </div>
       </header>
 
-      {/* Mobile menu */}
+      {/* Drawer backdrop */}
       <AnimatePresence>
-        {mobileOpen && (
+        {drawerOpen && (
           <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
+            key="backdrop"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
             transition={{ duration: 0.25 }}
-            className="fixed top-20 left-0 right-0 z-40 bg-brand/98 backdrop-blur-md border-b border-gold-border lg:hidden"
+            className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm"
+            onClick={() => setDrawerOpen(false)}
+          />
+        )}
+      </AnimatePresence>
+
+      {/* Side drawer */}
+      <AnimatePresence>
+        {drawerOpen && (
+          <motion.aside
+            key="drawer"
+            initial={{ x: '100%' }}
+            animate={{ x: 0 }}
+            exit={{ x: '100%' }}
+            transition={{ type: 'tween', duration: 0.3, ease: [0.32, 0.72, 0, 1] }}
+            className="fixed top-0 right-0 bottom-0 z-50 w-80 max-w-[90vw] bg-brand border-l border-gold-border flex flex-col shadow-2xl"
           >
-            <nav className="max-w-7xl mx-auto px-6 py-6 flex flex-col gap-1">
-              {MOBILE_LINKS.map((link) => (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  className={`text-sm tracking-widest uppercase py-3.5 border-b border-white/5 transition-colors ${
-                    pathname === link.href || pathname.startsWith(link.href + '/') ? 'text-gold' : 'text-white/80'
-                  }`}
-                >
-                  {link.label}
-                </Link>
-              ))}
-              {!isLoading && !user && (
-                <button
-                  type="button"
-                  onClick={() => { setMobileOpen(false); setAuthModal(true) }}
-                  className="flex items-center gap-2 py-3.5 text-sm text-white/80 border-b border-white/5"
-                >
-                  <User size={15} />
-                  Sign In / Register
-                </button>
+            {/* Drawer header */}
+            <div className="flex items-center justify-between px-6 py-5 border-b border-white/5">
+              <Link href="/" onClick={() => setDrawerOpen(false)} className="relative block h-8 w-36">
+                <Image src="/logos/primary-logo.png" alt="EVOORION" fill className="object-contain object-left" sizes="144px" />
+              </Link>
+              <button
+                type="button"
+                onClick={() => setDrawerOpen(false)}
+                aria-label="Close menu"
+                className="w-8 h-8 flex items-center justify-center text-muted hover:text-white transition-colors"
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            {/* Drawer body — scrollable */}
+            <div className="flex-1 overflow-y-auto px-6 py-4">
+
+              {/* Properties — dynamic op types with nested location hover */}
+              {opTypes.length > 0 && (
+                <div className="mb-6">
+                  <p className="text-gold/60 text-[10px] tracking-[0.25em] uppercase mb-1 font-medium">Properties</p>
+                  {opTypes.map((op) => (
+                    <OpLinkWithLocations key={op.id} op={op} pathname={pathname} onClose={() => setDrawerOpen(false)} />
+                  ))}
+                  <DrawerLink href="/properties" label="All Listings" pathname={pathname} onClick={() => setDrawerOpen(false)} />
+                  <DrawerLink href="/locations"  label="Explore Locations" pathname={pathname} onClick={() => setDrawerOpen(false)} />
+                </div>
               )}
+
+              {/* Company links */}
+              <div className="mb-6">
+                <p className="text-gold/60 text-[10px] tracking-[0.25em] uppercase mb-1 font-medium">Company</p>
+                {COMPANY_LINKS.map((link) => (
+                  <DrawerLink key={link.href} {...link} pathname={pathname} onClick={() => setDrawerOpen(false)} />
+                ))}
+              </div>
+
+              {/* Account section */}
+              <div className="mb-6">
+                <p className="text-gold/60 text-[10px] tracking-[0.25em] uppercase mb-1 font-medium">Account</p>
+                {!isLoading && (
+                  user ? (
+                    <>
+                      {/* User identity */}
+                      <div className="flex items-center gap-3 py-3 border-b border-white/5">
+                        <div className="w-9 h-9 rounded-full bg-gold/20 border border-gold/30 flex items-center justify-center text-gold text-xs font-semibold shrink-0">
+                          {user.avatar_url
+                            ? <Image src={user.avatar_url} alt={user.name} width={36} height={36} className="rounded-full object-cover" />
+                            : initials
+                          }
+                        </div>
+                        <div className="min-w-0">
+                          <p className="text-white text-sm font-medium truncate">{user.name}</p>
+                          <p className="text-muted text-xs truncate">{user.email}</p>
+                        </div>
+                      </div>
+                      <Link
+                        href="/favorites"
+                        onClick={() => setDrawerOpen(false)}
+                        className="group flex items-center justify-between py-3 border-b border-white/5 text-white/70 hover:text-white transition-colors"
+                      >
+                        <span className="flex items-center gap-2.5 text-sm tracking-widest uppercase">
+                          <Heart size={13} className="text-gold" /> Saved Properties
+                        </span>
+                        <ChevronRight size={14} className="text-white/20 group-hover:translate-x-1 transition-transform" />
+                      </Link>
+                      <button
+                        type="button"
+                        onClick={async () => { setDrawerOpen(false); await logout() }}
+                        className="group flex items-center justify-between w-full py-3 border-b border-white/5 text-white/70 hover:text-white transition-colors"
+                      >
+                        <span className="flex items-center gap-2.5 text-sm tracking-widest uppercase">
+                          <LogOut size={13} className="text-gold" /> Sign Out
+                        </span>
+                        <ChevronRight size={14} className="text-white/20 group-hover:translate-x-1 transition-transform" />
+                      </button>
+                    </>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => { setDrawerOpen(false); setAuthModal(true) }}
+                      className="group flex items-center justify-between w-full py-3 border-b border-white/5 text-white/70 hover:text-white transition-colors"
+                    >
+                      <span className="flex items-center gap-2.5 text-sm tracking-widest uppercase">
+                        <User size={13} className="text-gold" /> Sign In / Register
+                      </span>
+                      <ChevronRight size={14} className="text-white/20 group-hover:translate-x-1 transition-transform" />
+                    </button>
+                  )
+                )}
+              </div>
+
+            </div>
+
+            {/* Drawer footer CTA */}
+            <div className="px-6 py-5 border-t border-white/5">
               <Link
                 href="/contact"
-                className="mt-3 flex items-center justify-center gap-2 px-5 py-3 bg-gold text-brand text-sm font-semibold tracking-wider uppercase rounded-sm"
+                onClick={() => setDrawerOpen(false)}
+                className="flex items-center justify-center gap-2 w-full py-3.5 bg-gold text-brand text-sm font-semibold tracking-widest uppercase rounded-sm hover:bg-gold-light transition-colors"
               >
                 <Phone size={14} />
-                Book Private Call
+                Book a Private Call
               </Link>
-            </nav>
-          </motion.div>
+            </div>
+          </motion.aside>
         )}
       </AnimatePresence>
 
       {authModal && <AuthModal onClose={() => setAuthModal(false)} />}
+      <GlobalSearch open={searchOpen} onClose={() => setSearchOpen(false)} />
     </>
   )
 }

@@ -11,6 +11,8 @@ import { useTheme, type Theme } from '@/context/ThemeContext'
 import {
   IconBell,
   IconMenu,
+  IconPanelLeft,
+  IconPanelLeftOpen,
   IconSun,
   IconMoon,
   IconMonitor,
@@ -275,10 +277,12 @@ function UserMenu() {
 // ── Topbar ────────────────────────────────────────────────────────────────────
 
 interface TopbarProps {
-  onMenuClick: () => void
+  onMenuClick:       () => void
+  onCollapseClick?:  () => void
+  sidebarCollapsed?: boolean
 }
 
-export function Topbar({ onMenuClick }: TopbarProps) {
+export function Topbar({ onMenuClick, onCollapseClick, sidebarCollapsed }: TopbarProps) {
   const pathname = usePathname()
   const title    = getTitle(pathname)
 
@@ -307,16 +311,29 @@ export function Topbar({ onMenuClick }: TopbarProps) {
   }, [])
 
   return (
-    <header className="h-16 flex items-center gap-4 px-6 bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 shrink-0">
+    <header className="h-16 flex items-center gap-3 px-4 bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 shrink-0">
       {/* Mobile menu */}
       <button
         type="button"
         onClick={onMenuClick}
-        className="lg:hidden p-2 -ml-2 text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200"
+        className="lg:hidden p-2 -ml-1 text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200"
         aria-label="Open menu"
       >
         <IconMenu size={20} />
       </button>
+
+      {/* Desktop sidebar collapse toggle */}
+      {onCollapseClick && (
+        <button
+          type="button"
+          onClick={onCollapseClick}
+          className="hidden lg:flex p-2 -ml-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-colors"
+          aria-label={sidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+          title={sidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+        >
+          {sidebarCollapsed ? <IconPanelLeftOpen size={20} /> : <IconPanelLeft size={20} />}
+        </button>
+      )}
 
       {/* Page title */}
       <h1 className="text-base font-semibold text-slate-800 dark:text-slate-100 flex-1">{title}</h1>

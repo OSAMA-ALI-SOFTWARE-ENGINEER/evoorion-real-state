@@ -24,6 +24,7 @@ const COUNTRIES: Country[] = [
   { code: '+86',  flag: '🇨🇳', name: 'China' },
   { code: '+33',  flag: '🇫🇷', name: 'France' },
   { code: '+49',  flag: '🇩🇪', name: 'Germany' },
+  { code: '+39',  flag: '🇮🇹', name: 'Italy' },
   { code: '+90',  flag: '🇹🇷', name: 'Turkey' },
   { code: '+20',  flag: '🇪🇬', name: 'Egypt' },
   { code: '+962', flag: '🇯🇴', name: 'Jordan' },

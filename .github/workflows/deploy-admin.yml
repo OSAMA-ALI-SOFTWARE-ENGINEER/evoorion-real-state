@@ -1,11 +1,7 @@
 name: Deploy Admin
 
 on:
-  push:
-    branches: [master]
-    paths:
-      - 'apps/admin/**'
-      - '.github/workflows/deploy-admin.yml'
+  workflow_dispatch:
 
 jobs:
   deploy:

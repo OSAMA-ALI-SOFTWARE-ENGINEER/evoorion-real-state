@@ -10,7 +10,8 @@ import { IconLoader } from '@/components/ui/icons'
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const { user, isLoading } = useAuth()
   const router = useRouter()
-  const [sidebarOpen, setSidebarOpen] = useState(false)
+  const [sidebarOpen, setSidebarOpen]         = useState(false)
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
 
   useEffect(() => {
     if (!isLoading && !user) router.replace('/login')
@@ -29,8 +30,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   return (
     <div className="flex h-screen overflow-hidden bg-slate-100 dark:bg-slate-900">
       {/* Desktop sidebar */}
-      <div className="hidden lg:flex">
-        <Sidebar />
+      <div className={`hidden lg:flex transition-all duration-300 ${sidebarCollapsed ? 'w-16' : 'w-64'}`}>
+        <Sidebar collapsed={sidebarCollapsed} />
       </div>
 
       {/* Mobile sidebar overlay */}
@@ -48,7 +49,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
       {/* Main area */}
       <div className="flex flex-col flex-1 overflow-hidden">
-        <Topbar onMenuClick={() => setSidebarOpen(v => !v)} />
+        <Topbar onMenuClick={() => setSidebarOpen(v => !v)} onCollapseClick={() => setSidebarCollapsed(v => !v)} sidebarCollapsed={sidebarCollapsed} />
         <main className="flex-1 overflow-y-auto p-6">{children}</main>
       </div>
     </div>

@@ -1,7 +1,7 @@
 'use client'
 
-import { useCallback, useEffect, useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { Suspense, useCallback, useEffect, useRef, useState } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Search, SlidersHorizontal, X } from 'lucide-react'
 import {
@@ -56,8 +56,17 @@ const SELECT_CLS =
   'bg-brand border border-white/10 text-sm text-white rounded-sm px-3 py-2 outline-none focus:border-gold transition-colors cursor-pointer'
 
 export default function PropertiesPage() {
+  return <Suspense><PropertiesPageInner /></Suspense>
+}
+
+function PropertiesPageInner() {
   const { user } = useAuth()
   const router = useRouter()
+  const searchParams = useSearchParams()
+  // Tracks which param string was last applied — re-fires on navigation to a new URL
+  const lastAppliedParams = useRef<string | null>(null)
+  // Gates the property fetch until URL params are resolved (prevents flash of unfiltered results)
+  const [initialized, setInitialized] = useState(false)
 
   // Filter state
   const [activeType, setActiveType] = useState<'' | PropertyType>('')
@@ -103,6 +112,44 @@ export default function PropertiesPage() {
       setOpTypes(opTypesRes.data ?? [])
     })
   }, [])
+
+  // Sync URL params → filter state whenever the URL or master data changes
+  useEffect(() => {
+    const key = searchParams.toString()
+    const paramOp  = searchParams.get('operation')
+    const paramLoc = searchParams.get('location')
+    const paramQ   = searchParams.get('q')
+
+    // No URL params — initialise immediately with cleared filters
+    if (!paramOp && !paramLoc && !paramQ) {
+      if (lastAppliedParams.current === key) return
+      lastAppliedParams.current = key
+      setOpTypeId(0); setAreaId(0); setSearch('')
+      setInitialized(true)
+      return
+    }
+
+    // Wait for master data before resolving slugs
+    if (opTypes.length === 0 || areas.length === 0) return
+
+    // Same params already applied — don't overwrite manual filter changes
+    if (lastAppliedParams.current === key) return
+    lastAppliedParams.current = key
+
+    setSearch(paramQ ?? '')
+
+    const opMatch = paramOp
+      ? opTypes.find(o => o.name.toLowerCase().replace(/[\s-]+/g, '-') === paramOp.toLowerCase())
+      : undefined
+    setOpTypeId(opMatch?.id ?? 0)
+
+    const areaMatch = paramLoc
+      ? areas.find(a => a.slug === paramLoc)
+      : undefined
+    setAreaId(areaMatch?.id ?? 0)
+
+    setInitialized(true)
+  }, [searchParams, opTypes, areas])
 
   // Load favorites when user is logged in
   useEffect(() => {
@@ -152,8 +199,9 @@ export default function PropertiesPage() {
   )
 
   useEffect(() => {
+    if (!initialized) return
     fetchProperties(page, debouncedSearch, activeType, areaId, opTypeId, priceKey, sortKey)
-  }, [page, debouncedSearch, activeType, areaId, opTypeId, priceKey, sortKey, fetchProperties])
+  }, [page, debouncedSearch, activeType, areaId, opTypeId, priceKey, sortKey, fetchProperties, initialized])
 
   // Reset to page 1 when filters change
   useEffect(() => {

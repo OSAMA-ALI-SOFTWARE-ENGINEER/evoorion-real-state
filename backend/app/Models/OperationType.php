@@ -10,7 +10,9 @@ class OperationType extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['name'];
+    protected $fillable = ['name', 'is_active'];
+
+    protected $casts = ['is_active' => 'boolean'];
 
     public function properties(): HasMany
     {
