@@ -9,6 +9,7 @@ import { AuthProvider } from '@/context/AuthContext'
 import { CountryProvider } from '@/context/CountryContext'
 import { HtmlLocale } from '@/components/ui/HtmlLocale'
 import { getPublicSettings } from '@/lib/api'
+import { AgentationWidget } from '@/components/ui/AgentationWidget'
 
 export const metadata: Metadata = {
   title: {
@@ -88,6 +89,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             <main className="flex-1">{children}</main>
             <Footer />
             <WhatsAppButton />
+            <AgentationWidget />
           </AuthProvider>
         </CountryProvider>
       </body>
