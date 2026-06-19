@@ -1,7 +1,7 @@
 'use client'
 
-import { useCallback, useEffect, useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { Suspense, useCallback, useEffect, useRef, useState } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Search, SlidersHorizontal, X } from 'lucide-react'
 import {
@@ -56,8 +56,14 @@ const SELECT_CLS =
   'bg-brand border border-white/10 text-sm text-white rounded-sm px-3 py-2 outline-none focus:border-gold transition-colors cursor-pointer'
 
 export default function PropertiesPage() {
+  return <Suspense><PropertiesPageInner /></Suspense>
+}
+
+function PropertiesPageInner() {
   const { user } = useAuth()
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const urlParamsApplied = useRef(false)
 
   // Filter state
   const [activeType, setActiveType] = useState<'' | PropertyType>('')
@@ -103,6 +109,30 @@ export default function PropertiesPage() {
       setOpTypes(opTypesRes.data ?? [])
     })
   }, [])
+
+  // Apply URL params once master data is available
+  useEffect(() => {
+    if (urlParamsApplied.current) return
+    const paramOp  = searchParams.get('operation')
+    const paramLoc = searchParams.get('location')
+    const paramQ   = searchParams.get('q')
+    if (!paramOp && !paramLoc && !paramQ) { urlParamsApplied.current = true; return }
+    // Wait for whichever master sets are needed
+    if (paramOp  && opTypes.length === 0) return
+    if (paramLoc && areas.length  === 0)  return
+    urlParamsApplied.current = true
+    if (paramQ) setSearch(paramQ)
+    if (paramOp) {
+      const match = opTypes.find(o =>
+        o.name.toLowerCase().replace(/[\s-]+/g, '-') === paramOp.toLowerCase()
+      )
+      if (match) setOpTypeId(match.id)
+    }
+    if (paramLoc) {
+      const match = areas.find(a => a.slug === paramLoc)
+      if (match) setAreaId(match.id)
+    }
+  }, [opTypes, areas, searchParams])
 
   // Load favorites when user is logged in
   useEffect(() => {
