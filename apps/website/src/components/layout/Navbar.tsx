@@ -50,15 +50,31 @@ function DrawerLink({ href, label, pathname, onClick }: { href: string; label: s
 }
 
 function OpLinkWithLocations({ op, pathname, onClose }: { op: OpType; pathname: string; onClose: () => void }) {
-  const [hovered, setHovered]   = useState(false)
-  const [areas, setAreas]       = useState<AreaItem[]>([])
-  const [fetched, setFetched]   = useState(false)
-  const timerRef                = useRef<ReturnType<typeof setTimeout> | null>(null)
-  const href                    = opHref(op)
-  const base                    = href.split('?')[0]
-  const active                  = pathname === base || (base !== '/' && pathname.startsWith(base + '/'))
+  const [hovered, setHovered]         = useState(false)
+  const [areas, setAreas]             = useState<AreaItem[]>([])
+  const [fetched, setFetched]         = useState(false)
+  const [flyoutY, setFlyoutY]         = useState(0)
+  const [flyoutRight, setFlyoutRight] = useState(0)
+  const triggerRef                    = useRef<HTMLDivElement>(null)
+  const timerRef                      = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const href                          = opHref(op)
+  const key                           = opSlug(op.name)
+
+  // Active: match pathname for off-plan, or match pathname + ?operation= for others
+  const currentOp = typeof window !== 'undefined'
+    ? new URLSearchParams(window.location.search).get('operation') ?? ''
+    : ''
+  const active = key === 'off-plan'
+    ? pathname === '/off-plan'
+    : pathname === '/properties' && currentOp === key
 
   function handleMouseEnter() {
+    // Capture trigger position for fixed flyout before overflow clips it
+    if (triggerRef.current) {
+      const rect = triggerRef.current.getBoundingClientRect()
+      setFlyoutY(rect.top)
+      setFlyoutRight(window.innerWidth - rect.left + 8)
+    }
     timerRef.current = setTimeout(() => setHovered(true), 120)
     if (!fetched) {
       setFetched(true)
@@ -75,7 +91,7 @@ function OpLinkWithLocations({ op, pathname, onClose }: { op: OpType; pathname: 
   }
 
   return (
-    <div className="relative" onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
+    <div ref={triggerRef} onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
       <Link
         href={href}
         onClick={onClose}
@@ -92,7 +108,7 @@ function OpLinkWithLocations({ op, pathname, onClose }: { op: OpType; pathname: 
         <ChevronRight size={14} className={`transition-transform duration-200 group-hover:translate-x-1 ${active ? 'text-gold' : 'text-white/20'}`} />
       </Link>
 
-      {/* Nested locations flyout */}
+      {/* Nested locations flyout — fixed so drawer overflow-y-auto cannot clip it */}
       <AnimatePresence>
         {hovered && areas.length > 0 && (
           <motion.div
@@ -100,13 +116,14 @@ function OpLinkWithLocations({ op, pathname, onClose }: { op: OpType; pathname: 
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -8 }}
             transition={{ duration: 0.15 }}
-            className="absolute right-full top-0 mr-2 w-56 bg-brand-section border border-gold-border rounded-sm shadow-2xl overflow-hidden z-10"
+            style={{ top: flyoutY, right: flyoutRight }}
+            className="fixed w-56 bg-brand-section border border-gold-border rounded-sm shadow-2xl overflow-hidden z-[60]"
           >
             <p className="px-3 pt-3 pb-1 text-[10px] text-gold/50 tracking-[0.2em] uppercase font-medium">Locations</p>
             {areas.map((area) => (
               <Link
                 key={area.slug}
-                href={`/properties?operation=${opSlug(op.name)}&location=${area.slug}`}
+                href={`/properties?operation=${key}&location=${area.slug}`}
                 onClick={onClose}
                 className="flex items-center gap-2.5 px-3 py-2.5 border-b border-white/5 last:border-0 text-white/60 hover:text-white hover:bg-white/5 transition-colors"
               >
