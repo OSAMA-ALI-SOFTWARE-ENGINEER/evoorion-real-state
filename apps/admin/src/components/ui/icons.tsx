@@ -84,6 +84,14 @@ export function IconChevronRight(p: IconProps) {
   return <Icon {...p}><polyline points="9 18 15 12 9 6"/></Icon>
 }
 
+export function IconPanelLeft(p: IconProps) {
+  return <Icon {...p}><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="9" y1="3" x2="9" y2="21"/><polyline points="15 9 12 12 15 15"/></Icon>
+}
+
+export function IconPanelLeftOpen(p: IconProps) {
+  return <Icon {...p}><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="9" y1="3" x2="9" y2="21"/><polyline points="12 9 15 12 12 15"/></Icon>
+}
+
 export function IconTrendingUp(p: IconProps) {
   return <Icon {...p}><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></Icon>
 }

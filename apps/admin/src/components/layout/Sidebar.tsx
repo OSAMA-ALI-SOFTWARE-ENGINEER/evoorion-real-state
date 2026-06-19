@@ -1,5 +1,6 @@
 'use client'
 
+import Image from 'next/image'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useAuth } from '@/context/AuthContext'
@@ -82,10 +83,11 @@ const NAV: Array<{ group?: string; items: NavItem[] }> = [
 ]
 
 interface SidebarProps {
-  onClose?: () => void
+  onClose?:   () => void
+  collapsed?: boolean
 }
 
-export function Sidebar({ onClose }: SidebarProps) {
+export function Sidebar({ onClose, collapsed = false }: SidebarProps) {
   const pathname = usePathname()
   const { user, logout } = useAuth()
 
@@ -99,25 +101,34 @@ export function Sidebar({ onClose }: SidebarProps) {
     href === '/dashboard' ? pathname === '/dashboard' : pathname.startsWith(href)
 
   return (
-    <aside className="flex flex-col h-full bg-[#0F172A] w-64 shrink-0">
+    <aside className={`flex flex-col h-full bg-[#0F172A] shrink-0 overflow-hidden transition-all duration-300 ${collapsed ? 'w-16' : 'w-64'}`}>
       {/* Logo */}
-      <div className="flex items-center h-16 px-6 border-b border-white/5 shrink-0">
-        <span className="text-xl font-bold tracking-wider text-white">
-          EV<span className="text-[#C9A84C]">OO</span>RION
-        </span>
+      <div className={`flex items-center h-16 border-b border-white/5 shrink-0 ${collapsed ? 'justify-center px-2' : 'px-5'}`}>
+        {collapsed ? (
+          <div className="relative w-8 h-8">
+            <Image src="/logos/logomark.png" alt="EVOORION" fill className="object-contain" sizes="32px" />
+          </div>
+        ) : (
+          <div className="relative h-8 w-36">
+            <Image src="/logos/primary-logo.png" alt="EVOORION" fill className="object-contain object-left" sizes="144px" />
+          </div>
+        )}
       </div>
 
       {/* Nav */}
-      <nav className="flex-1 overflow-y-auto py-4 px-3 space-y-6">
+      <nav className="flex-1 overflow-y-auto py-4 px-2 space-y-5">
         {NAV.map((section, si) => {
           const visibleItems = section.items.filter(canSee)
           if (!visibleItems.length) return null
           return (
             <div key={si}>
-              {section.group && (
+              {section.group && !collapsed && (
                 <p className="px-3 mb-1.5 text-[10px] font-semibold uppercase tracking-widest text-slate-500">
                   {section.group}
                 </p>
+              )}
+              {section.group && collapsed && (
+                <div className="mx-2 mb-1.5 h-px bg-white/5" />
               )}
               <ul className="space-y-0.5">
                 {visibleItems.map(item => {
@@ -127,17 +138,19 @@ export function Sidebar({ onClose }: SidebarProps) {
                       <Link
                         href={item.href}
                         onClick={onClose}
+                        title={collapsed ? item.label : undefined}
                         className={[
-                          'flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors',
+                          'flex items-center rounded-lg text-sm transition-colors',
+                          collapsed ? 'justify-center p-2.5' : 'gap-3 px-3 py-2',
                           active
                             ? 'bg-[#C9A84C]/15 text-[#C9A84C] font-medium'
                             : 'text-slate-400 hover:bg-white/5 hover:text-slate-200',
                         ].join(' ')}
                       >
-                        <span className={active ? 'text-[#C9A84C]' : 'text-slate-500'}>
+                        <span className={`shrink-0 ${active ? 'text-[#C9A84C]' : 'text-slate-500'}`}>
                           {item.icon}
                         </span>
-                        {item.label}
+                        {!collapsed && item.label}
                       </Link>
                     </li>
                   )
@@ -149,26 +162,44 @@ export function Sidebar({ onClose }: SidebarProps) {
       </nav>
 
       {/* User footer */}
-      <div className="shrink-0 border-t border-white/5 p-3">
-        <div className="flex items-center gap-3 px-2 py-2">
-          <div className="w-8 h-8 rounded-full bg-[#C9A84C]/20 border border-[#C9A84C]/30 flex items-center justify-center shrink-0">
-            <span className="text-[#C9A84C] text-xs font-semibold">
-              {user?.name?.charAt(0).toUpperCase() ?? 'A'}
-            </span>
+      <div className="shrink-0 border-t border-white/5 p-2">
+        {collapsed ? (
+          <div className="flex flex-col items-center gap-2 py-1">
+            <div className="w-8 h-8 rounded-full bg-[#C9A84C]/20 border border-[#C9A84C]/30 flex items-center justify-center">
+              <span className="text-[#C9A84C] text-xs font-semibold">
+                {user?.name?.charAt(0).toUpperCase() ?? 'A'}
+              </span>
+            </div>
+            <button
+              type="button"
+              onClick={() => logout()}
+              className="p-1.5 text-slate-500 hover:text-red-400 transition-colors"
+              aria-label="Sign out"
+            >
+              <IconLogOut size={15} />
+            </button>
           </div>
-          <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium text-slate-200 truncate">{user?.name ?? 'Admin'}</p>
-            <p className="text-xs text-slate-500 truncate capitalize">{user?.role?.replace('_', ' ')}</p>
+        ) : (
+          <div className="flex items-center gap-3 px-2 py-2">
+            <div className="w-8 h-8 rounded-full bg-[#C9A84C]/20 border border-[#C9A84C]/30 flex items-center justify-center shrink-0">
+              <span className="text-[#C9A84C] text-xs font-semibold">
+                {user?.name?.charAt(0).toUpperCase() ?? 'A'}
+              </span>
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-medium text-slate-200 truncate">{user?.name ?? 'Admin'}</p>
+              <p className="text-xs text-slate-500 truncate capitalize">{user?.role?.replace('_', ' ')}</p>
+            </div>
+            <button
+              type="button"
+              onClick={() => logout()}
+              className="p-1.5 text-slate-500 hover:text-red-400 transition-colors shrink-0"
+              aria-label="Sign out"
+            >
+              <IconLogOut size={16} />
+            </button>
           </div>
-          <button
-            type="button"
-            onClick={() => logout()}
-            className="p-1.5 text-slate-500 hover:text-red-400 transition-colors shrink-0"
-            aria-label="Sign out"
-          >
-            <IconLogOut size={16} />
-          </button>
-        </div>
+        )}
       </div>
     </aside>
   )
