@@ -39,6 +39,7 @@ use App\Http\Controllers\Api\V1\PublicSettingController;
 use App\Http\Controllers\Api\V1\UserPreferenceController;
 use App\Http\Controllers\Api\V1\SearchSuggestionController;
 use App\Http\Controllers\Api\V1\SavedSearchController;
+use App\Http\Controllers\Api\V1\NewsletterController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')->group(function () {
@@ -93,6 +94,9 @@ Route::prefix('v1')->group(function () {
         Route::get('blog/tags', [BlogController::class, 'tags']);
         Route::get('blog/{slug}', [BlogController::class, 'show']);
     });
+
+    // Newsletter subscription
+    Route::middleware('throttle:5,1')->post('newsletter/subscribe', [NewsletterController::class, 'subscribe']);
 
     // Public lead submission (stricter rate limit)
     Route::middleware('throttle:10,1')->post('leads', [LeadController::class, 'store']);

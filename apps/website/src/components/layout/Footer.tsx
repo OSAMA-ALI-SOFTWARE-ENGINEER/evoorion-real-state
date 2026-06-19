@@ -3,6 +3,7 @@ import Image from 'next/image'
 import { MapPin, Mail, Phone } from 'lucide-react'
 import { getTranslations } from 'next-intl/server'
 import { SocialIcon } from '@/components/ui/SocialIcon'
+import { NewsletterSignup } from '@/components/ui/NewsletterSignup'
 
 const SOCIALS: { label: string; name: 'instagram' | 'linkedin' | 'twitter' | 'facebook'; href: string }[] = [
   { label: 'Instagram', name: 'instagram', href: '#' },
@@ -131,8 +132,15 @@ export async function Footer() {
           </div>
         </div>
 
-        {/* Locations strip */}
+        {/* Newsletter */}
         <div className="mt-12 pt-8 border-t border-white/5">
+          <div className="max-w-md">
+            <NewsletterSignup />
+          </div>
+        </div>
+
+        {/* Locations strip */}
+        <div className="mt-8 pt-8 border-t border-white/5">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
             <p className="text-muted text-xs tracking-widest uppercase">
               {t('serving')}

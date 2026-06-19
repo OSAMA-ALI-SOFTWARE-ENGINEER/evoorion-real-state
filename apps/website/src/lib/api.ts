@@ -273,4 +273,10 @@ export async function getCurrencies(): Promise<ApiResponse<ApiCurrency[]>> {
   return res.data
 }
 
+// ── Newsletter ─────────────────────────────────────────────────────────────────
+
+export async function subscribeNewsletter(email: string, name?: string): Promise<void> {
+  await api.post('/newsletter/subscribe', { email, name })
+}
+
 export default api
