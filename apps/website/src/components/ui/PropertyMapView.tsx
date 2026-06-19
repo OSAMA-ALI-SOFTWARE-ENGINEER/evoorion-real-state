@@ -118,47 +118,96 @@ export function PropertyMapView({ properties, areas }: PropertyMapViewProps) {
 
       const marker = L.marker([lat, lng], { icon }).addTo(map)
 
-      // Popup content
-      const popupItems = props.slice(0, 3).map((p) => {
-        const img = p.images?.[0]?.url ?? ''
-        return `
-          <a href="/properties/${p.slug}" target="_blank" rel="noopener" style="
-            display:flex;gap:10px;align-items:flex-start;
-            padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.06);
-            text-decoration:none;
-            &:last-child{border:none}
-          ">
-            ${img ? `<img src="${img}" alt="" style="width:52px;height:40px;object-fit:cover;border-radius:2px;flex-shrink:0">` : ''}
-            <div style="min-width:0">
-              <div style="color:#fff;font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:160px">${p.title}</div>
-              <div style="color:#C9A84C;font-size:11px;margin-top:2px">${formatPrice(p.price)}</div>
-              <div style="color:#A0ABBB;font-size:10px;margin-top:1px;text-transform:capitalize">${p.type} · ${p.bedrooms ?? '—'} bed</div>
-            </div>
-          </a>
-        `
-      }).join('')
+      // Build popup as a real DOM tree — no HTML string interpolation,
+      // so user-controlled values (title, slug, area name, image URLs)
+      // are always assigned via textContent or validated attributes.
+      const popup = document.createElement('div')
+      Object.assign(popup.style, {
+        background: '#0D1526', color: '#fff',
+        padding: '12px', borderRadius: '2px',
+        minWidth: '240px', maxWidth: '280px',
+        fontFamily: 'inherit',
+      })
 
-      const moreLink = props.length > 3
-        ? `<a href="/properties?area=${encodeURIComponent(area.slug)}" target="_blank" style="display:block;margin-top:8px;color:#C9A84C;font-size:11px;text-decoration:none;letter-spacing:0.05em">+${props.length - 3} more in ${area.name} →</a>`
-        : ''
+      const areaLabel = document.createElement('div')
+      Object.assign(areaLabel.style, {
+        color: '#C9A84C', fontSize: '10px',
+        letterSpacing: '0.2em', textTransform: 'uppercase',
+        marginBottom: '8px', fontWeight: '600',
+      })
+      areaLabel.textContent = area.name
+      popup.appendChild(areaLabel)
 
-      marker.bindPopup(
-        `<div style="
-          background:#0D1526;color:#fff;
-          padding:12px;border-radius:2px;
-          min-width:240px;max-width:280px;
-          font-family:inherit;
-        ">
-          <div style="color:#C9A84C;font-size:10px;letter-spacing:0.2em;text-transform:uppercase;margin-bottom:8px;font-weight:600">${area.name}</div>
-          ${popupItems}
-          ${moreLink}
-        </div>`,
-        {
-          closeButton: false,
-          className: 'ev-popup',
-          maxWidth: 300,
-        },
-      )
+      props.slice(0, 3).forEach((p, idx) => {
+        const link = document.createElement('a')
+        link.href = `/properties/${encodeURIComponent(p.slug)}`
+        link.target = '_blank'
+        link.rel = 'noopener noreferrer'
+        Object.assign(link.style, {
+          display: 'flex', gap: '10px', alignItems: 'flex-start',
+          padding: '8px 0',
+          borderBottom: idx < Math.min(props.length, 3) - 1 ? '1px solid rgba(255,255,255,0.06)' : 'none',
+          textDecoration: 'none',
+        })
+
+        const rawImg = p.images?.[0]?.url ?? ''
+        if (rawImg && /^https?:\/\//.test(rawImg)) {
+          const img = document.createElement('img')
+          img.src = rawImg          // validated scheme — safe as attribute value
+          img.alt = ''
+          Object.assign(img.style, {
+            width: '52px', height: '40px',
+            objectFit: 'cover', borderRadius: '2px', flexShrink: '0',
+          })
+          link.appendChild(img)
+        }
+
+        const info = document.createElement('div')
+        info.style.minWidth = '0'
+
+        const title = document.createElement('div')
+        Object.assign(title.style, {
+          color: '#fff', fontSize: '12px', fontWeight: '600',
+          whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '160px',
+        })
+        title.textContent = p.title
+        info.appendChild(title)
+
+        const price = document.createElement('div')
+        Object.assign(price.style, { color: '#C9A84C', fontSize: '11px', marginTop: '2px' })
+        price.textContent = formatPrice(p.price)
+        info.appendChild(price)
+
+        const meta = document.createElement('div')
+        Object.assign(meta.style, {
+          color: '#A0ABBB', fontSize: '10px', marginTop: '1px', textTransform: 'capitalize',
+        })
+        meta.textContent = `${p.type} · ${p.bedrooms ?? '—'} bed`
+        info.appendChild(meta)
+
+        link.appendChild(info)
+        popup.appendChild(link)
+      })
+
+      if (props.length > 3) {
+        const more = document.createElement('a')
+        more.href = `/properties?area=${encodeURIComponent(area.slug)}`
+        more.target = '_blank'
+        more.rel = 'noopener noreferrer'
+        Object.assign(more.style, {
+          display: 'block', marginTop: '8px',
+          color: '#C9A84C', fontSize: '11px',
+          textDecoration: 'none', letterSpacing: '0.05em',
+        })
+        more.textContent = `+${props.length - 3} more in ${area.name} →`
+        popup.appendChild(more)
+      }
+
+      marker.bindPopup(popup, {
+        closeButton: false,
+        className: 'ev-popup',
+        maxWidth: 300,
+      })
     })
 
     if (bounds.length > 0) {
