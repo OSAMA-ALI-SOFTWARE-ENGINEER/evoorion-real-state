@@ -38,6 +38,7 @@ use App\Http\Controllers\Api\V1\CmsController;
 use App\Http\Controllers\Api\V1\PublicSettingController;
 use App\Http\Controllers\Api\V1\UserPreferenceController;
 use App\Http\Controllers\Api\V1\SearchSuggestionController;
+use App\Http\Controllers\Api\V1\SavedSearchController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')->group(function () {
@@ -104,6 +105,10 @@ Route::prefix('v1')->group(function () {
 
         Route::get('user/preferences',  [UserPreferenceController::class, 'show']);
         Route::put('user/preferences',  [UserPreferenceController::class, 'update']);
+
+        Route::get('saved-searches',              [SavedSearchController::class, 'index']);
+        Route::post('saved-searches',             [SavedSearchController::class, 'store']);
+        Route::delete('saved-searches/{savedSearch}', [SavedSearchController::class, 'destroy']);
     });
 
     // Admin endpoints

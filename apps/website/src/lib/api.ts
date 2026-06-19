@@ -173,6 +173,30 @@ export async function removeFavorite(propertySlug: string): Promise<ApiResponse<
   return res.data
 }
 
+// ── Saved Searches ────────────────────────────────────────────────────────────
+
+export interface SavedSearch {
+  id: number
+  name: string
+  filters: Record<string, unknown>
+  created_at: string
+}
+
+export async function getSavedSearches(): Promise<ApiResponse<SavedSearch[]>> {
+  const res = await api.get<ApiResponse<SavedSearch[]>>('/saved-searches')
+  return res.data
+}
+
+export async function createSavedSearch(name: string, filters: Record<string, unknown>): Promise<ApiResponse<SavedSearch>> {
+  const res = await api.post<ApiResponse<SavedSearch>>('/saved-searches', { name, filters })
+  return res.data
+}
+
+export async function deleteSavedSearch(id: number): Promise<ApiResponse<null>> {
+  const res = await api.delete<ApiResponse<null>>(`/saved-searches/${id}`)
+  return res.data
+}
+
 // ── Public settings ───────────────────────────────────────────────────────────
 
 export interface PublicSettings {

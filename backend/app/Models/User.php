@@ -78,6 +78,11 @@ class User extends Authenticatable
         )->withTimestamps();
     }
 
+    public function savedSearches(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(\App\Models\SavedSearch::class);
+    }
+
     public function hasRole(string $role): bool
     {
         return $this->role === $role || $this->role === 'super_admin';

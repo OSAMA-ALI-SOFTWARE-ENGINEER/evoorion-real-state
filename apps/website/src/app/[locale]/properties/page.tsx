@@ -4,7 +4,7 @@ import { Suspense, useCallback, useEffect, useRef, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import dynamic from 'next/dynamic'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Search, SlidersHorizontal, X, LayoutGrid, Map } from 'lucide-react'
+import { Search, SlidersHorizontal, X, LayoutGrid, Map, Bell } from 'lucide-react'
 import {
   getProperties,
   getAreas,
@@ -12,7 +12,10 @@ import {
   getFavorites,
   addFavorite,
   removeFavorite,
+  getSavedSearches,
+  type SavedSearch,
 } from '@/lib/api'
+import { SavedSearchModal } from '@/components/ui/SavedSearchModal'
 import { PropertyCard } from '@/components/ui/PropertyCard'
 
 const PropertyMapView = dynamic(
@@ -102,6 +105,10 @@ function PropertiesPageInner() {
   // View mode: grid or map
   const [viewMode, setViewMode] = useState<'grid' | 'map'>('grid')
 
+  // Saved searches
+  const [savedSearches, setSavedSearches] = useState<SavedSearch[]>([])
+  const [showSaveModal, setShowSaveModal] = useState(false)
+
   // Filter panel toggle
   const [showAdvanced, setShowAdvanced] = useState(false)
 
@@ -161,11 +168,14 @@ function PropertiesPageInner() {
     setInitialized(true)
   }, [searchParams, opTypes, areas])
 
-  // Load favorites when user is logged in
+  // Load favorites and saved searches when user is logged in
   useEffect(() => {
-    if (!user) { setFavoriteIds(new Set()); return }
+    if (!user) { setFavoriteIds(new Set()); setSavedSearches([]); return }
     getFavorites()
       .then((res) => setFavoriteIds(new Set(res.data.map((p) => p.id))))
+      .catch(() => {})
+    getSavedSearches()
+      .then((res) => setSavedSearches(res.data ?? []))
       .catch(() => {})
   }, [user])
 
@@ -256,6 +266,26 @@ function PropertiesPageInner() {
 
   const hasAdvancedFilters = !!(areaId || opTypeId || priceKey || sortKey)
 
+  // Build a plain object of current filters suitable for saving
+  const currentFiltersObj: Record<string, unknown> = {
+    ...(opName !== 'all' ? { operation: opName } : {}),
+    ...(activeType ? { type: activeType } : {}),
+    ...(areaId ? { area_id: areaId } : {}),
+    ...(priceKey ? { price_range: priceKey } : {}),
+    ...(debouncedSearch ? { search: debouncedSearch } : {}),
+    ...(sortKey ? { sort: sortKey } : {}),
+  }
+
+  function buildFilterSummary(): string {
+    const parts: string[] = []
+    if (opName !== 'all') parts.push(opName.charAt(0).toUpperCase() + opName.slice(1))
+    if (activeType) parts.push(activeType.charAt(0).toUpperCase() + activeType.slice(1))
+    if (areaId) { const a = areas.find(x => x.id === areaId); if (a) parts.push(a.name) }
+    if (priceKey) parts.push(priceKey.replace(/_/g, ' '))
+    if (debouncedSearch) parts.push(`"${debouncedSearch}"`)
+    return parts.length ? parts.join(' · ') : 'All properties'
+  }
+
   return (
     <>
       {/* Hero */}
@@ -300,6 +330,16 @@ function PropertiesPageInner() {
             </div>
 
             <div className="flex items-center gap-2 w-full sm:w-auto">
+              {/* Save search */}
+              <button
+                type="button"
+                title="Save this search"
+                onClick={() => { if (!user) setShowAuth(true); else setShowSaveModal(true) }}
+                className="flex items-center justify-center w-9 h-9 border border-white/10 rounded-sm text-muted hover:text-gold hover:border-gold/40 transition-colors shrink-0"
+              >
+                <Bell size={14} />
+              </button>
+
               {/* View mode toggle */}
               <div className="flex rounded-sm border border-white/10 overflow-hidden shrink-0">
                 <button
@@ -547,6 +587,16 @@ function PropertiesPageInner() {
       </AnimatePresence>
 
       {showAuth && <AuthModal onClose={() => setShowAuth(false)} />}
+      {showSaveModal && (
+        <SavedSearchModal
+          onClose={() => setShowSaveModal(false)}
+          currentFilters={currentFiltersObj}
+          filterSummary={buildFilterSummary()}
+          savedSearches={savedSearches}
+          onSaved={(s) => setSavedSearches((prev) => [s, ...prev])}
+          onDeleted={(id) => setSavedSearches((prev) => prev.filter((s) => s.id !== id))}
+        />
+      )}
       <CantFindCTA />
     </>
   )
