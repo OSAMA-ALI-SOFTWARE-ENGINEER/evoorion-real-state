@@ -66,7 +66,7 @@ export function HeroSection({ cms, bgImage }: { cms?: Record<string, unknown>; b
       </div>
 
       {/* Content — pt-24 clears the 80px fixed navbar */}
-      <div className="relative z-10 max-w-5xl mx-auto px-6 text-center pt-24">
+      <div className="relative z-10 max-w-5xl mx-auto px-6 text-center pt-24 pb-28">
         {/* Eyebrow */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
