@@ -291,6 +291,24 @@ export async function getAgents(): Promise<PublicAgent[]> {
   return res.data.data
 }
 
+// ── Jobs ──────────────────────────────────────────────────────────────────────
+
+export interface JobListing {
+  id: number
+  title: string
+  department: string
+  location: string
+  type: 'full_time' | 'part_time' | 'contract' | 'internship'
+  description: string
+  requirements?: string
+  created_at: string
+}
+
+export async function getJobs(): Promise<JobListing[]> {
+  const res = await api.get<ApiResponse<JobListing[]>>('/jobs')
+  return res.data.data
+}
+
 // ── Newsletter ─────────────────────────────────────────────────────────────────
 
 export async function subscribeNewsletter(email: string, name?: string): Promise<void> {

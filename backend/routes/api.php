@@ -41,6 +41,8 @@ use App\Http\Controllers\Api\V1\SearchSuggestionController;
 use App\Http\Controllers\Api\V1\SavedSearchController;
 use App\Http\Controllers\Api\V1\NewsletterController;
 use App\Http\Controllers\Api\V1\PublicAgentController;
+use App\Http\Controllers\Api\V1\JobListingController;
+use App\Http\Controllers\Api\V1\Admin\JobListingController as AdminJobListingController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')->group(function () {
@@ -83,6 +85,7 @@ Route::prefix('v1')->group(function () {
         Route::get('developers/{developer}', [DeveloperController::class, 'show']);
         Route::get('operation-types', [OperationTypeController::class, 'index']);
         Route::get('agents', [PublicAgentController::class, 'index']);
+        Route::get('jobs', [JobListingController::class, 'index']);
 
         // Public property endpoints
         Route::get('properties', [PropertyController::class, 'index']);
@@ -234,6 +237,12 @@ Route::prefix('v1')->group(function () {
             Route::post('properties/{property}/images', [PropertyImageController::class, 'store']);
             Route::put('properties/{property}/images/{image}', [PropertyImageController::class, 'update']);
             Route::delete('properties/{property}/images/{image}', [PropertyImageController::class, 'destroy']);
+
+            // Job listings admin CRUD
+            Route::get('jobs', [AdminJobListingController::class, 'index']);
+            Route::post('jobs', [AdminJobListingController::class, 'store']);
+            Route::put('jobs/{jobListing}', [AdminJobListingController::class, 'update']);
+            Route::delete('jobs/{jobListing}', [AdminJobListingController::class, 'destroy']);
 
             // Blog admin CRUD
             Route::get('blog',                 [AdminBlogController::class, 'index']);
