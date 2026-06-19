@@ -2,29 +2,27 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
-import { Search, X, MapPin, Building2, Loader2 } from 'lucide-react'
+import { Search, X, MapPin, Building2, Loader2, TrendingUp } from 'lucide-react'
 import { AnimatePresence, motion } from 'framer-motion'
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000/api/v1'
 
-type AreaSuggestion = { name: string; slug: string; count: number }
+type AreaSuggestion     = { name: string; slug: string; count: number }
 type PropertySuggestion = { title: string; slug: string; type: string; price: string }
-type Results = { areas: AreaSuggestion[]; properties: PropertySuggestion[] }
+type Results            = { areas: AreaSuggestion[]; properties: PropertySuggestion[]; trending?: boolean }
+type OpType             = { id: number; name: string; property_count: number }
 
-type Operation = 'buy' | 'rent' | 'off-plan'
-
-const TABS: { label: string; value: Operation }[] = [
-  { label: 'Buy', value: 'buy' },
-  { label: 'Rent', value: 'rent' },
-  { label: 'Off-Plan', value: 'off-plan' },
-]
+// Derive URL-safe operation key from operation type name
+function opKey(name: string) {
+  return name.toLowerCase().replace(/\s+/g, '-')
+}
 
 export function GlobalSearchButton({ onClick }: { onClick: () => void }) {
   return (
     <button
       type="button"
       onClick={onClick}
-      className="hidden lg:flex items-center gap-2.5 py-2 px-4 rounded-full border border-white/20 hover:border-gold/50 bg-white/5 hover:bg-white/10 transition-all duration-200 text-muted hover:text-white/80 text-sm"
+      className="hidden sm:flex items-center gap-2.5 py-2 px-4 rounded-full border border-white/20 hover:border-gold/50 bg-white/5 hover:bg-white/10 transition-all duration-200 text-muted hover:text-white/80 text-sm"
       aria-label="Open search"
     >
       <Search size={14} className="text-gold shrink-0" />
@@ -34,26 +32,50 @@ export function GlobalSearchButton({ onClick }: { onClick: () => void }) {
 }
 
 export function GlobalSearch({ open, onClose }: { open: boolean; onClose: () => void }) {
-  const router = useRouter()
+  const router   = useRouter()
   const inputRef = useRef<HTMLInputElement>(null)
 
-  const [query, setQuery]           = useState('')
-  const [operation, setOperation]   = useState<Operation>('buy')
-  const [results, setResults]       = useState<Results>({ areas: [], properties: [] })
-  const [loading, setLoading]       = useState(false)
+  const [query, setQuery]               = useState('')
+  const [activeOp, setActiveOp]         = useState<OpType | null>(null)
+  const [opTypes, setOpTypes]           = useState<OpType[]>([])
+  const [results, setResults]           = useState<Results>({ areas: [], properties: [] })
+  const [loading, setLoading]           = useState(false)
   const [selectedArea, setSelectedArea] = useState<AreaSuggestion | null>(null)
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
-  // Focus input on open
+  // Load active operation types once
+  useEffect(() => {
+    fetch(`${API_BASE}/operation-types`)
+      .then(r => r.json())
+      .then(d => {
+        const types: OpType[] = d.data ?? []
+        setOpTypes(types)
+        if (types.length > 0 && !activeOp) setActiveOp(types[0])
+      })
+      .catch(() => {})
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  // On open: focus + load trending
   useEffect(() => {
     if (open) {
       setTimeout(() => inputRef.current?.focus(), 50)
+      loadTrending(activeOp?.id)
     } else {
       setQuery('')
       setResults({ areas: [], properties: [] })
       setSelectedArea(null)
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open])
+
+  // Reload trending when operation tab changes (only if no query typed)
+  useEffect(() => {
+    if (open && query.length < 2) {
+      loadTrending(activeOp?.id)
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeOp])
 
   // Close on ESC
   useEffect(() => {
@@ -62,18 +84,29 @@ export function GlobalSearch({ open, onClose }: { open: boolean; onClose: () => 
     return () => document.removeEventListener('keydown', handler)
   }, [onClose])
 
-  // Debounced fetch
-  const fetchSuggestions = useCallback((q: string) => {
+  function loadTrending(opId?: number) {
+    setLoading(true)
+    const params = new URLSearchParams({ trending: '1' })
+    if (opId) params.set('operation_type_id', String(opId))
+    fetch(`${API_BASE}/search/suggestions?${params}`)
+      .then(r => r.json())
+      .then(d => setResults(d.data ?? { areas: [], properties: [] }))
+      .catch(() => setResults({ areas: [], properties: [] }))
+      .finally(() => setLoading(false))
+  }
+
+  const fetchSuggestions = useCallback((q: string, opId?: number) => {
     if (debounceRef.current) clearTimeout(debounceRef.current)
     if (q.length < 2) {
-      setResults({ areas: [], properties: [] })
-      setLoading(false)
+      loadTrending(opId)
       return
     }
     setLoading(true)
     debounceRef.current = setTimeout(async () => {
       try {
-        const res = await fetch(`${API_BASE}/search/suggestions?q=${encodeURIComponent(q)}&limit=8`)
+        const params = new URLSearchParams({ q, limit: '8' })
+        if (opId) params.set('operation_type_id', String(opId))
+        const res  = await fetch(`${API_BASE}/search/suggestions?${params}`)
         const data = await res.json()
         setResults(data.data ?? { areas: [], properties: [] })
       } catch {
@@ -82,13 +115,21 @@ export function GlobalSearch({ open, onClose }: { open: boolean; onClose: () => 
         setLoading(false)
       }
     }, 250)
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   const handleQueryChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const val = e.target.value
     setQuery(val)
     setSelectedArea(null)
-    fetchSuggestions(val)
+    fetchSuggestions(val, activeOp?.id)
+  }
+
+  const handleOpChange = (op: OpType) => {
+    setActiveOp(op)
+    setSelectedArea(null)
+    // Re-run search with new op filter
+    if (query.length >= 2) fetchSuggestions(query, op.id)
   }
 
   const handleAreaClick = (area: AreaSuggestion) => {
@@ -105,14 +146,15 @@ export function GlobalSearch({ open, onClose }: { open: boolean; onClose: () => 
   const handleViewResults = () => {
     onClose()
     const params = new URLSearchParams()
-    if (operation !== 'buy') params.set('operation', operation)
+    if (activeOp) params.set('operation', opKey(activeOp.name))
     if (selectedArea) params.set('location', selectedArea.slug)
     else if (query.trim()) params.set('q', query.trim())
-    router.push(`/properties${params.size ? '?' + params.toString() : ''}`)
+    router.push(`/properties?${params.toString()}`)
   }
 
-  const hasResults = results.areas.length > 0 || results.properties.length > 0
-  const totalCount = (selectedArea?.count ?? 0)
+  const hasResults   = results.areas.length > 0 || results.properties.length > 0
+  const isTrending   = results.trending === true
+  const resultCount  = selectedArea ? selectedArea.count : (activeOp?.property_count ?? 0)
 
   return (
     <AnimatePresence>
@@ -137,20 +179,24 @@ export function GlobalSearch({ open, onClose }: { open: boolean; onClose: () => 
             className="fixed top-0 left-0 right-0 z-[61] bg-brand border-b border-gold-border shadow-2xl"
           >
             <div className="max-w-4xl mx-auto px-4 sm:px-6 pt-5 pb-4">
-              {/* Operation tabs */}
-              <div className="flex items-center gap-1 mb-4">
-                {TABS.map((tab) => (
+
+              {/* Operation type tabs */}
+              <div className="flex items-center gap-1.5 mb-4">
+                {opTypes.map((op) => (
                   <button
-                    key={tab.value}
+                    key={op.id}
                     type="button"
-                    onClick={() => setOperation(tab.value)}
-                    className={`px-4 py-1.5 rounded-full text-xs font-semibold tracking-wider uppercase transition-all duration-200 ${
-                      operation === tab.value
+                    onClick={() => handleOpChange(op)}
+                    className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold tracking-wider uppercase transition-all duration-200 ${
+                      activeOp?.id === op.id
                         ? 'bg-gold text-brand'
                         : 'text-muted hover:text-white border border-white/10 hover:border-gold/30'
                     }`}
                   >
-                    {tab.label}
+                    {op.name}
+                    <span className={`text-[10px] font-normal ${activeOp?.id === op.id ? 'text-brand/70' : 'text-muted/50'}`}>
+                      {op.property_count}
+                    </span>
                   </button>
                 ))}
                 <button
@@ -187,11 +233,11 @@ export function GlobalSearch({ open, onClose }: { open: boolean; onClose: () => 
                   className="shrink-0 flex items-center gap-2 px-5 py-3.5 bg-gold hover:bg-gold-light text-brand text-sm font-semibold tracking-wider uppercase rounded-sm transition-colors duration-200"
                 >
                   <Search size={14} />
-                  {totalCount > 0 ? `${totalCount} Results` : 'Search'}
+                  {resultCount > 0 ? `${resultCount} Results` : 'Search'}
                 </button>
               </div>
 
-              {/* Autocomplete results */}
+              {/* Suggestions */}
               <AnimatePresence>
                 {hasResults && (
                   <motion.div
@@ -203,8 +249,9 @@ export function GlobalSearch({ open, onClose }: { open: boolean; onClose: () => 
                   >
                     {results.areas.length > 0 && (
                       <div>
-                        <p className="px-4 pt-3 pb-1 text-[10px] font-semibold tracking-[0.15em] uppercase text-muted/50">
-                          Areas
+                        <p className="px-4 pt-3 pb-1 text-[10px] font-semibold tracking-[0.15em] uppercase text-muted/50 flex items-center gap-1.5">
+                          {isTrending && <TrendingUp size={10} className="text-gold" />}
+                          {isTrending ? 'Top Locations' : 'Areas'}
                         </p>
                         {results.areas.map((area) => (
                           <button
@@ -229,8 +276,9 @@ export function GlobalSearch({ open, onClose }: { open: boolean; onClose: () => 
 
                     {results.properties.length > 0 && (
                       <div>
-                        <p className="px-4 pt-3 pb-1 text-[10px] font-semibold tracking-[0.15em] uppercase text-muted/50">
-                          Properties
+                        <p className="px-4 pt-3 pb-1 text-[10px] font-semibold tracking-[0.15em] uppercase text-muted/50 flex items-center gap-1.5">
+                          {isTrending && <TrendingUp size={10} className="text-gold" />}
+                          {isTrending ? 'Most Viewed' : 'Properties'}
                         </p>
                         {results.properties.map((property) => (
                           <button
@@ -254,6 +302,7 @@ export function GlobalSearch({ open, onClose }: { open: boolean; onClose: () => 
                   </motion.div>
                 )}
               </AnimatePresence>
+
             </div>
           </motion.div>
         </>

@@ -1,8 +1,10 @@
 import type { Metadata } from 'next'
+import { Suspense } from 'react'
 import './globals.css'
 import { Navbar } from '@/components/layout/Navbar'
 import { Footer } from '@/components/layout/Footer'
 import { WhatsAppButton } from '@/components/ui/WhatsAppButton'
+import { NavigationProgress } from '@/components/ui/NavigationProgress'
 import { AuthProvider } from '@/context/AuthContext'
 import { CountryProvider } from '@/context/CountryContext'
 import { HtmlLocale } from '@/components/ui/HtmlLocale'
@@ -81,6 +83,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <CountryProvider>
           <HtmlLocale />
           <AuthProvider>
+            <Suspense><NavigationProgress /></Suspense>
             <Navbar />
             <main className="flex-1">{children}</main>
             <Footer />
