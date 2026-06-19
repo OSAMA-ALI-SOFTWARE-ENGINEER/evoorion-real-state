@@ -139,9 +139,11 @@ export function GlobalSearch({ open, onClose }: { open: boolean; onClose: () => 
   }
 
   const handleAreaClick = (area: AreaSuggestion) => {
-    setSelectedArea(area)
-    setQuery(area.name)
-    setResults({ areas: [], properties: [] })
+    onClose()
+    const params = new URLSearchParams()
+    if (activeOp) params.set('operation', opKey(activeOp.name))
+    params.set('location', area.slug)
+    router.push(`/properties?${params.toString()}`)
   }
 
   const handlePropertyClick = (slug: string) => {
