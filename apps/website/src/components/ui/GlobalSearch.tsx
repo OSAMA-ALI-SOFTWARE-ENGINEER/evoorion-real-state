@@ -77,6 +77,12 @@ export function GlobalSearch({ open, onClose }: { open: boolean; onClose: () => 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeOp])
 
+  // Lock body scroll when open
+  useEffect(() => {
+    document.body.style.overflow = open ? 'hidden' : ''
+    return () => { document.body.style.overflow = '' }
+  }, [open])
+
   // Close on ESC
   useEffect(() => {
     const handler = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose() }
@@ -245,7 +251,7 @@ export function GlobalSearch({ open, onClose }: { open: boolean; onClose: () => 
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0 }}
                     transition={{ duration: 0.15 }}
-                    className="mt-2 bg-brand-section border border-white/10 rounded-sm shadow-xl overflow-hidden"
+                    className="mt-2 bg-brand-section border border-white/10 rounded-sm shadow-xl overflow-hidden max-h-[55vh] overflow-y-auto"
                   >
                     {results.areas.length > 0 && (
                       <div>

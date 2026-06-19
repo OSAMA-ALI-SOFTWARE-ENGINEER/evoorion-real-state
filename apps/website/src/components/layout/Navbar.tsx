@@ -96,11 +96,11 @@ function OpLinkWithLocations({ op, pathname, onClose }: { op: OpType; pathname: 
       <AnimatePresence>
         {hovered && areas.length > 0 && (
           <motion.div
-            initial={{ opacity: 0, x: 8 }}
+            initial={{ opacity: 0, x: -8 }}
             animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: 8 }}
+            exit={{ opacity: 0, x: -8 }}
             transition={{ duration: 0.15 }}
-            className="absolute left-full top-0 ml-2 w-52 bg-brand-section border border-gold-border rounded-sm shadow-2xl overflow-hidden z-10"
+            className="absolute right-full top-0 mr-2 w-56 bg-brand-section border border-gold-border rounded-sm shadow-2xl overflow-hidden z-10"
           >
             <p className="px-3 pt-3 pb-1 text-[10px] text-gold/50 tracking-[0.2em] uppercase font-medium">Locations</p>
             {areas.map((area) => (
