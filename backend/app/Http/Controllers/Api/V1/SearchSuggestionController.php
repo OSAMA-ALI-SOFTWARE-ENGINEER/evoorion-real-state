@@ -28,7 +28,7 @@ class SearchSuggestionController
                     ->when($opId, fn($q) => $q->where('operation_type_id', $opId))
                 ])
                 ->orderByDesc('properties_count')
-                ->limit(5)
+                ->limit(3)
                 ->get()
                 ->map(fn($a) => [
                     'name'  => $a->name,
@@ -41,7 +41,7 @@ class SearchSuggestionController
                 ->when($opId, fn($q) => $q->where('operation_type_id', $opId))
                 ->orderByDesc('views_count')
                 ->select('title', 'slug', 'type', 'price', 'currency', 'views_count')
-                ->limit(5)
+                ->limit(3)
                 ->get()
                 ->map(fn($p) => [
                     'title' => $p->title,
