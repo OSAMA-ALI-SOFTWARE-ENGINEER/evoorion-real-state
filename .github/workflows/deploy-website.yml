@@ -1,11 +1,7 @@
 name: Deploy Website
 
 on:
-  push:
-    branches: [master]
-    paths:
-      - 'apps/website/**'
-      - '.github/workflows/deploy-website.yml'
+  workflow_dispatch:
 
 jobs:
   deploy:
