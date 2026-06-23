@@ -10,7 +10,7 @@ REPO_URL="https://github.com/OSAMA-ALI-SOFTWARE-ENGINEER/evoorion-real-state.git
 REPO_DIR="$HOME/evoorion"
 BASE="$HOME/domains/osama-ali.com/public_html"
 
-API_DIR="$BASE/evoorion-api.osama-ali.com"
+API_DIR="$BASE/evoorian-api-v2"
 WEB_DIR="$BASE/evoorion"
 ADMIN_DIR="$BASE/evoorion-admin"
 
@@ -48,7 +48,7 @@ rsync -a --exclude='.env.production' \
   "$REPO_DIR/apps/website/" "$WEB_DIR/"
 cd "$WEB_DIR"
 
-echo "NEXT_PUBLIC_API_URL=https://evoorion-api.osama-ali.com/api/v1" > .env.production
+echo "NEXT_PUBLIC_API_URL=https://evoorian-api-v2.osama-ali.com/api/v1" > .env.production
 
 npm ci
 npm run build
@@ -62,7 +62,7 @@ rsync -a --exclude='.env.production' \
   "$REPO_DIR/apps/admin/" "$ADMIN_DIR/"
 cd "$ADMIN_DIR"
 
-echo "NEXT_PUBLIC_API_URL=https://evoorion-api.osama-ali.com/api/v1" > .env.production
+echo "NEXT_PUBLIC_API_URL=https://evoorian-api-v2.osama-ali.com/api/v1" > .env.production
 
 npm ci
 npm run build

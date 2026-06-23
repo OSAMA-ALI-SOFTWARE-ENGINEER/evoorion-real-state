@@ -40,3 +40,6 @@ backend/public/storage
 
 # Tooling artifacts
 .playwright-mcp/
+
+.vercel
+.env*

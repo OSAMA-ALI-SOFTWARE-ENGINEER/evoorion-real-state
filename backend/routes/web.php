@@ -22,7 +22,7 @@ Route::post('/deploy', function () {
     ignore_user_abort(true);
     set_time_limit(300);
 
-    $dir = '/home/u121664729/domains/osama-ali.com/public_html/evoorion-api.osama-ali.com';
+    $dir = base_path();
     $log = date('Y-m-d H:i:s') . " — Deploy triggered\n";
 
     foreach ([

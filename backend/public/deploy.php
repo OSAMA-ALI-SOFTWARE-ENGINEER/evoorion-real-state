@@ -14,7 +14,7 @@ if (!$secret || !hash_equals($secret, $_SERVER['HTTP_X_DEPLOY_SECRET'] ?? '')) {
 ignore_user_abort(true);
 set_time_limit(300);
 
-$dir = '/home/u121664729/domains/osama-ali.com/public_html/evoorion-api.osama-ali.com';
+$dir = dirname(__DIR__);
 $log = date('Y-m-d H:i:s') . " — Deploy triggered\n";
 
 foreach ([
