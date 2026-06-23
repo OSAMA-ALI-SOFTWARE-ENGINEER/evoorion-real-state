@@ -82,7 +82,15 @@ const CountryContext = createContext<CountryContextValue>({
 
 // ── Provider ─────────────────────────────────────────────────────────────────
 
-export function CountryProvider({ children }: { children: ReactNode }) {
+// Map URL locale → preferred currency code (used when no saved preference exists)
+const LOCALE_CURRENCY: Record<string, string> = {
+  en:    'AED',
+  de:    'EUR',
+  ar:    'AED',
+  'en-gb': 'GBP',
+}
+
+export function CountryProvider({ children, locale }: { children: ReactNode; locale?: string }) {
   const [countries, setCountries] = useState<Country[]>([AED_FALLBACK])
   const [country,   setCountryState] = useState<Country>(AED_FALLBACK)
 
@@ -108,12 +116,15 @@ export function CountryProvider({ children }: { children: ReactNode }) {
           }
         } catch { /* ignore */ }
 
-        // Default to whichever currency is_default
-        const def = active.find(c => c.is_default) ?? active[0]
+        // Default from locale → currency mapping, then fall back to is_default
+        const preferredCode = locale ? LOCALE_CURRENCY[locale] : undefined
+        const def = (preferredCode ? active.find(c => c.code === preferredCode) : undefined)
+                 ?? active.find(c => c.is_default)
+                 ?? active[0]
         if (def) setCountryState(def)
       })
       .catch(() => {})
-  }, [])
+  }, [locale])
 
   const setCountry = useCallback((c: Country) => {
     setCountryState(c)
