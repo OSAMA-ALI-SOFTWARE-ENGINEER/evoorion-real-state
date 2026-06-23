@@ -26,10 +26,23 @@ jobs:
           script: |
             set -e
             DIR="/home/u121664729/domains/osama-ali.com/public_html/evoorian-api-v2"
+            REPO="git@github.com:OSAMA-ALI-SOFTWARE-ENGINEER/evoorion-real-state.git"
+            TMP="/tmp/evoorion-deploy-$$"
+
+            # Pull fresh copy to temp
+            GIT_SSH_COMMAND="ssh -i /home/u121664729/.ssh/deploy_key -o StrictHostKeyChecking=no" \
+              git clone --depth=1 "$REPO" "$TMP"
+
+            # Sync backend/ into app root (skip .env, storage, vendor)
+            rsync -a --delete \
+              --exclude='.env' \
+              --exclude='storage/' \
+              --exclude='vendor/' \
+              "$TMP/backend/" "$DIR/"
+
+            rm -rf "$TMP"
 
             cd "$DIR"
-            GIT_SSH_COMMAND="ssh -i /home/u121664729/.ssh/deploy_key" git pull origin master
-            rsync -a --delete --exclude='.env' --exclude='storage/' --exclude='vendor/' "$DIR/backend/" "$DIR/"
             composer install --no-dev --optimize-autoloader --no-interaction
             php artisan migrate --force
             php artisan config:cache
