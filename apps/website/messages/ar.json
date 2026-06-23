@@ -1,0 +1,91 @@
+{
+  "nav": {
+    "home": "الرئيسية",
+    "investments": "الاستثمارات",
+    "portfolio": "المحفظة",
+    "browseProperties": "تصفح العقارات",
+    "browsePropertiesDesc": "عرض جميع العروض",
+    "exploreLocations": "استكشف المواقع",
+    "exploreLocationsDesc": "مناطق الاستثمار في دبي",
+    "blog": "المدونة",
+    "about": "عنا",
+    "contact": "تواصل",
+    "signIn": "تسجيل الدخول",
+    "signInRegister": "تسجيل الدخول / إنشاء حساب",
+    "bookCall": "حجز مكالمة",
+    "bookPrivateCall": "حجز مكالمة خاصة",
+    "search": "بحث",
+    "searchPlaceholder": "ابحث عن منطقة أو مشروع أو عقار…",
+    "searchButton": "منطقة، مشروع…"
+  },
+  "hero": {
+    "eyebrow": "استثمار في العقارات الفاخرة",
+    "results": "{count} نتائج"
+  },
+  "search": {
+    "buy": "شراء",
+    "rent": "إيجار",
+    "offPlan": "على الخارطة",
+    "areas": "المناطق",
+    "properties": "عقارات",
+    "properties_count": "{count} عقار"
+  },
+  "cantFind": {
+    "buttonTitle": "لم تجد ما تبحث عنه؟",
+    "buttonSub": "سنجد لك خلال 24 ساعة",
+    "modalEyebrow": "بحث مخصص",
+    "modalTitle": "لم تجد ما تبحث عنه؟",
+    "modalSubtitle": "أخبرنا بمتطلباتك وسنجد لك عقارات مناسبة خلال 24 ساعة.",
+    "fullName": "الاسم الكامل",
+    "emailAddress": "البريد الإلكتروني",
+    "phoneNumber": "رقم الهاتف",
+    "preferredLocations": "المواقع المفضلة",
+    "budgetRange": "نطاق الميزانية",
+    "propertyType": "نوع العقار",
+    "bedrooms": "غرف النوم",
+    "additionalNotes": "ملاحظات إضافية",
+    "notesPlaceholder": "أي متطلبات خاصة — الطابق، الإطلالة، التأثيث، إلخ.",
+    "submit": "إرسال متطلباتي",
+    "submitting": "جاري الإرسال…",
+    "successTitle": "سنتواصل معك",
+    "successBody": "تلقى مستشارونا متطلباتك وسيتواصلون معك بأنسب العقارات خلال 24 ساعة.",
+    "close": "إغلاق"
+  },
+  "properties": {
+    "bedrooms": "غرف النوم",
+    "bathrooms": "دورات المياه",
+    "sqft": "قدم مربع",
+    "price": "السعر",
+    "aed": "د.إ.",
+    "viewDetails": "عرض التفاصيل",
+    "saveProperty": "حفظ العقار",
+    "compare": "مقارنة",
+    "readyToMove": "جاهز",
+    "offPlan": "على الخارطة",
+    "sold": "مباع",
+    "rented": "مؤجر"
+  },
+  "contact": {
+    "title": "تواصل معنا",
+    "subtitle": "تحدث مع مستشاري الاستثمار"
+  },
+  "footer": {
+    "newsletter": "ابق على اطلاع بأحدث فرص عقارية حصرية في دبي.",
+    "subscribe": "اشتراك",
+    "subscribePlaceholder": "بريدك الإلكتروني",
+    "rights": "جميع الحقوق محفوظة.",
+    "privacy": "سياسة الخصوصية",
+    "terms": "شروط الخدمة"
+  },
+  "common": {
+    "loading": "جاري التحميل…",
+    "error": "حدث خطأ. يرجى المحاولة مرة أخرى.",
+    "noResults": "لا توجد نتائج.",
+    "viewAll": "عرض الكل",
+    "learnMore": "معرفة المزيد",
+    "getInTouch": "تواصل",
+    "signOut": "تسجيل الخروج",
+    "savedProperties": "العقارات المحفوظة",
+    "myEnquiries": "استفساراتي"
+  }
+}

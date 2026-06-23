@@ -10,6 +10,7 @@ import { useAuth } from '@/context/AuthContext'
 import { AuthModal } from '@/components/ui/AuthModal'
 import { CountrySelector } from '@/components/ui/CountrySelector'
 import { GlobalSearch, GlobalSearchButton } from '@/components/ui/GlobalSearch'
+import { LanguageSwitcher } from '@/components/ui/LanguageSwitcher'
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000/api/v1'
 
@@ -210,6 +211,9 @@ export function Navbar() {
             <div className="flex items-center gap-2 sm:gap-3">
               {/* Search */}
               <GlobalSearchButton onClick={() => setSearchOpen(true)} />
+
+              {/* Language */}
+              <LanguageSwitcher />
 
               {/* Country */}
               <CountrySelector />

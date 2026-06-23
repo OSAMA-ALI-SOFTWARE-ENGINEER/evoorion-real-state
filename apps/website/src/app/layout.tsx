@@ -1,15 +1,6 @@
 import type { Metadata } from 'next'
-import { Suspense } from 'react'
 import './globals.css'
-import { Navbar } from '@/components/layout/Navbar'
-import { Footer } from '@/components/layout/Footer'
-import { WhatsAppButton } from '@/components/ui/WhatsAppButton'
-import { NavigationProgress } from '@/components/ui/NavigationProgress'
-import { AuthProvider } from '@/context/AuthContext'
-import { CountryProvider } from '@/context/CountryContext'
-import { HtmlLocale } from '@/components/ui/HtmlLocale'
 import { getPublicSettings } from '@/lib/api'
-import { AgentationWidget } from '@/components/ui/AgentationWidget'
 
 export const metadata: Metadata = {
   title: {
@@ -33,7 +24,6 @@ export const metadata: Metadata = {
 }
 
 // Strict hex-color whitelist — only #rgb, #rrggbb, #rrggbbaa forms allowed.
-// This prevents any CSS injection even if the DB is compromised.
 const HEX_RE = /^#[0-9a-fA-F]{3}(?:[0-9a-fA-F]{3}(?:[0-9a-fA-F]{2})?)?$/
 
 function safeHex(v: string | null | undefined): string | null {
@@ -42,9 +32,6 @@ function safeHex(v: string | null | undefined): string | null {
   return HEX_RE.test(trimmed) ? trimmed : null
 }
 
-// Build a CSS :root override block from DB settings.
-// Only outputs variables that are non-empty so globals.css defaults remain
-// as the base and admin can selectively override individual tokens.
 function buildThemeCss(s: Record<string, string | null | undefined>): string {
   const pairs: string[] = []
   const add = (cssVar: string, key: string) => {
@@ -64,9 +51,8 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   const themeCss = buildThemeCss(settings)
 
   return (
-    <html lang="en">
+    <html suppressHydrationWarning>
       <body className="min-h-screen flex flex-col bg-brand text-white antialiased">
-        {/* React 19 hoists these to <head>; precedence required for stylesheets */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link
@@ -74,24 +60,13 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           rel="stylesheet"
           precedence="default"
         />
-        {/* Dynamic theme override — CSS custom properties from admin settings */}
         {themeCss && (
           <style
             dangerouslySetInnerHTML={{ __html: themeCss }}
             precedence="high"
           />
         )}
-        <CountryProvider>
-          <HtmlLocale />
-          <AuthProvider>
-            <Suspense><NavigationProgress /></Suspense>
-            <Navbar />
-            <main className="flex-1">{children}</main>
-            <Footer />
-            <WhatsAppButton />
-            <AgentationWidget />
-          </AuthProvider>
-        </CountryProvider>
+        {children}
       </body>
     </html>
   )
