@@ -16,7 +16,20 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Deploy via SSH
+      - name: Package backend
+        run: tar czf api-deploy.tar.gz -C backend .
+
+      - name: Upload to server
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          password: ${{ secrets.SSH_PASSWORD }}
+          port: ${{ secrets.SSH_PORT }}
+          source: api-deploy.tar.gz
+          target: /tmp/
+
+      - name: Extract and deploy
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.SSH_HOST }}
@@ -26,21 +39,13 @@ jobs:
           script: |
             set -e
             DIR="/home/u121664729/domains/osama-ali.com/public_html/evoorian-api-v2"
-            REPO="git@github.com:OSAMA-ALI-SOFTWARE-ENGINEER/evoorion-real-state.git"
-            TMP="/tmp/evoorion-deploy-$$"
 
-            # Pull fresh copy to temp
-            GIT_SSH_COMMAND="ssh -i /home/u121664729/.ssh/deploy_key -o StrictHostKeyChecking=no" \
-              git clone --depth=1 "$REPO" "$TMP"
-
-            # Sync backend/ into app root (skip .env, storage, vendor)
-            rsync -a --delete \
+            # Extract backend files (skip .env, storage, vendor)
+            tar xzf /tmp/api-deploy.tar.gz -C "$DIR" \
               --exclude='.env' \
-              --exclude='storage/' \
-              --exclude='vendor/' \
-              "$TMP/backend/" "$DIR/"
-
-            rm -rf "$TMP"
+              --exclude='storage' \
+              --exclude='vendor'
+            rm /tmp/api-deploy.tar.gz
 
             cd "$DIR"
             composer install --no-dev --optimize-autoloader --no-interaction
