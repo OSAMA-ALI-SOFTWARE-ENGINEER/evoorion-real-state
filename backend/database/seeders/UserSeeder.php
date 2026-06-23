@@ -9,17 +9,15 @@ class UserSeeder extends Seeder
 {
     public function run(): void
     {
-        User::create([
+        User::firstOrCreate(['email' => 'admin@evoorion.com'], [
             'name' => 'Admin User',
-            'email' => 'admin@evoorion.com',
             'password' => bcrypt('password123'),
             'role' => 'super_admin',
             'is_active' => true,
         ]);
 
-        User::create([
+        User::firstOrCreate(['email' => 'manager@evoorion.com'], [
             'name' => 'Manager User',
-            'email' => 'manager@evoorion.com',
             'password' => bcrypt('password123'),
             'role' => 'manager',
             'is_active' => true,
