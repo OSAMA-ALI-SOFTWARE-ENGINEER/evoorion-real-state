@@ -427,7 +427,7 @@ HTML,
             $tagNames = $data['tags'];
             unset($data['tags']);
 
-            $post = BlogPost::create($data);
+            $post = BlogPost::firstOrCreate(['slug' => $data['slug']], $data);
 
             $tagIds = collect($tagNames)->map(fn (string $name) => $tags[$name]->id)->all();
             $post->tags()->sync($tagIds);
