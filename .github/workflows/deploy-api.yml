@@ -27,7 +27,7 @@ jobs:
           password: ${{ secrets.SSH_PASSWORD }}
           port: ${{ secrets.SSH_PORT }}
           source: api-deploy.tar.gz
-          target: /tmp/
+          target: ~/
 
       - name: Extract and deploy
         uses: appleboy/ssh-action@v1.0.3
@@ -41,11 +41,11 @@ jobs:
             DIR="/home/u121664729/domains/osama-ali.com/public_html/evoorian-api-v2"
 
             # Extract backend files (skip .env, storage, vendor)
-            tar xzf /tmp/api-deploy.tar.gz -C "$DIR" \
+            tar xzf ~/api-deploy.tar.gz -C "$DIR" \
               --exclude='.env' \
               --exclude='storage' \
               --exclude='vendor'
-            rm /tmp/api-deploy.tar.gz
+            rm ~/api-deploy.tar.gz
 
             cd "$DIR"
             composer install --no-dev --optimize-autoloader --no-interaction
