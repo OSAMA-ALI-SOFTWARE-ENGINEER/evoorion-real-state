@@ -30,10 +30,12 @@ jobs:
           npm ci
           npm run build
 
-      - name: Package artifacts (source + build, no node_modules)
+      - name: Package standalone artifacts
         run: |
           cd apps/website
-          tar czf ../../website-deploy.tar.gz --exclude='node_modules' .
+          cp -r .next/static .next/standalone/.next/static
+          cp -r public .next/standalone/public
+          tar czf ../../website-deploy.tar.gz -C .next/standalone .
 
       - name: Upload package to server
         uses: appleboy/scp-action@v0.1.7
@@ -43,7 +45,7 @@ jobs:
           password: ${{ secrets.SSH_PASSWORD }}
           port: ${{ secrets.SSH_PORT }}
           source: website-deploy.tar.gz
-          target: /tmp/
+          target: ~/
 
       - name: Extract and restart
         uses: appleboy/ssh-action@v1.0.3
@@ -56,14 +58,9 @@ jobs:
             set -e
             APP_DIR=~/domains/osama-ali.com/public_html/evoorion
 
-            cd "$APP_DIR"
-            tar xzf /tmp/website-deploy.tar.gz
-            rm /tmp/website-deploy.tar.gz
+            tar xzf ~/website-deploy.tar.gz -C "$APP_DIR"
+            rm ~/website-deploy.tar.gz
 
-            echo "NEXT_PUBLIC_API_URL=https://evoorian-api-v2.osama-ali.com/api/v1" > .env.production
-
-            npm ci --omit=dev
-
-            mkdir -p tmp
-            touch tmp/restart.txt
+            mkdir -p "$APP_DIR/tmp"
+            touch "$APP_DIR/tmp/restart.txt"
             echo "Website deployed"
