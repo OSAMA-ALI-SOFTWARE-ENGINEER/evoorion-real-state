@@ -27,7 +27,7 @@ jobs:
         env:
           NEXT_PUBLIC_API_URL: https://evoorian-api-v2.osama-ali.com/api/v1
         run: |
-          npm ci
+          npm install
           npm run build
 
       - name: Package standalone artifacts
