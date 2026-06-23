@@ -17,7 +17,7 @@ class DeveloperSeeder extends Seeder
         ];
 
         foreach ($developers as $dev) {
-            Developer::create($dev);
+            Developer::firstOrCreate(['name' => $dev['name']], $dev);
         }
     }
 }
