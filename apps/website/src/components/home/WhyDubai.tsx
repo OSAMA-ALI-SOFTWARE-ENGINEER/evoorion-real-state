@@ -5,63 +5,84 @@ import { ScrollReveal } from '@/components/ui/ScrollReveal'
 const ICONS = [Percent, TrendingUp, Globe, Award]
 
 const DEFAULT_STATS = [
-  { value: '0%',    label: 'Property Tax',      description: 'No capital gains or property tax makes Dubai the most tax-efficient real estate market globally.' },
-  { value: '8–12%', label: 'Rental Yield',      description: 'Among the highest net rental yields of any global prime city, consistently outperforming London and New York.' },
-  { value: '100%',  label: 'Foreign Ownership', description: 'Designated freehold zones allow full foreign ownership with no restrictions on repatriation of funds.' },
-  { value: '#1',    label: 'Global Destination', description: "Dubai ranks as the world's most visited city and a top destination for HNWI relocation." },
+  { value: '0%',    label: 'Property Tax',      description: 'No property or capital gains tax.' },
+  { value: '8–12%', label: 'Rental Yield',      description: 'Among the highest rental yields globally.' },
+  { value: '100%',  label: 'Foreign Ownership', description: 'Full ownership in designated freehold areas.' },
+  { value: '#1',    label: 'Global Destination', description: 'Dubai ranked #1 city to live and invest.' },
 ]
 
 export function WhyDubai({ cms, bgImage }: { cms?: Record<string, unknown>; bgImage?: string | null }) {
-  const eyebrow = (cms?.why_dubai_eyebrow as string) ?? 'Why Dubai'
-  const rawHeadline = (cms?.why_dubai_headline as string) ?? "The World's Premier\nInvestment Destination"
+  const eyebrow = (cms?.why_dubai_eyebrow as string) ?? 'Why Invest in Dubai'
+  const rawHeadline = (cms?.why_dubai_headline as string) ?? "A City Built\nfor Growth."
   const [headLine1, headLine2] = rawHeadline.split('\n')
   const cmsStats = cms?.why_dubai_stats as Array<{ value: string; label: string; description: string }> | undefined
   const STATS = (cmsStats ?? DEFAULT_STATS).map((s, i) => ({ ...s, icon: ICONS[i] ?? Percent }))
+
   return (
-    <section className="relative py-28 overflow-hidden">
-      {/* Background */}
-      <div className="absolute inset-0 bg-gradient-to-br from-brand via-brand to-brand-section" />
-      {bgImage && (
-        <Image src={bgImage} alt="" fill className="object-cover opacity-15" unoptimized />
-      )}
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(201,168,76,0.08),transparent_60%)]" />
-      <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-gold/30 to-transparent" />
-      <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-gold/30 to-transparent" />
+    <section className="relative overflow-hidden">
+      <div className="grid grid-cols-1 lg:grid-cols-2 min-h-[600px]">
 
-      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <ScrollReveal>
-          <div className="text-center mb-16">
-            <div className="inline-flex items-center gap-3 mb-5">
-              <div className="h-px w-10 bg-gold" />
-              <span className="text-gold text-xs tracking-[0.3em] uppercase">{eyebrow}</span>
-              <div className="h-px w-10 bg-gold" />
+        {/* Left — featured image */}
+        <div className="relative h-72 lg:h-auto order-2 lg:order-1">
+          {bgImage ? (
+            <Image
+              src={bgImage}
+              alt="Dubai Investment"
+              fill
+              className="object-cover"
+              unoptimized
+            />
+          ) : (
+            <div className="absolute inset-0 bg-gradient-to-br from-brand-section to-brand" />
+          )}
+          {/* Gold overlay on the right edge to blend into content */}
+          <div className="absolute inset-y-0 right-0 w-24 bg-gradient-to-l from-brand to-transparent hidden lg:block" />
+          {/* Bottom overlay for mobile */}
+          <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-brand to-transparent lg:hidden" />
+        </div>
+
+        {/* Right — heading + stats */}
+        <div className="order-1 lg:order-2 bg-brand relative py-20 px-8 sm:px-12 lg:px-16 flex flex-col justify-center">
+          {/* Decorative top line */}
+          <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-gold/30 via-transparent to-transparent" />
+
+          <ScrollReveal>
+            <div className="mb-12">
+              <div className="inline-flex items-center gap-3 mb-5">
+                <div className="h-px w-10 bg-gold" />
+                <span className="text-gold text-xs tracking-[0.3em] uppercase">{eyebrow}</span>
+              </div>
+              <h2 className="font-serif text-4xl sm:text-5xl font-bold text-white leading-tight">
+                {headLine1}
+                <br />
+                <span className="text-gold-gradient italic">{headLine2}</span>
+              </h2>
             </div>
-            <h2 className="font-serif text-4xl sm:text-5xl font-bold text-white">
-              {headLine1}
-              <br />
-              <span className="text-gold-gradient italic">{headLine2}</span>
-            </h2>
-          </div>
-        </ScrollReveal>
+          </ScrollReveal>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {STATS.map((stat, i) => {
-            const Icon = stat.icon
-            return (
-              <ScrollReveal key={stat.label} delay={i * 0.12}>
-                <div className="group text-center p-8 border border-gold-border rounded-sm bg-white/[0.02] hover:bg-white/[0.04] hover:border-gold/40 transition-all duration-300">
-                  <div className="w-14 h-14 mx-auto mb-5 rounded-full border border-gold-border flex items-center justify-center bg-gold/5 group-hover:bg-gold/10 transition-colors">
-                    <Icon size={24} className="text-gold" />
+          {/* 2×2 stat grid */}
+          <div className="grid grid-cols-2 gap-4">
+            {STATS.map((stat, i) => {
+              const Icon = stat.icon
+              return (
+                <ScrollReveal key={stat.label} delay={i * 0.1}>
+                  <div className="group p-6 border border-gold-border rounded-sm bg-white/[0.02] hover:bg-white/[0.04] hover:border-gold/40 transition-all duration-300">
+                    <div className="flex items-start gap-3 mb-3">
+                      <div className="w-9 h-9 shrink-0 rounded-full border border-gold-border flex items-center justify-center bg-gold/5 group-hover:bg-gold/10 transition-colors">
+                        <Icon size={16} className="text-gold" />
+                      </div>
+                      <div className="font-serif text-3xl font-bold text-gold leading-none pt-1">{stat.value}</div>
+                    </div>
+                    <div className="text-white font-semibold text-xs tracking-wider uppercase mb-1.5">{stat.label}</div>
+                    <p className="text-muted text-xs leading-relaxed">{stat.description}</p>
                   </div>
-                  <div className="font-serif text-4xl font-bold text-gold mb-1">{stat.value}</div>
-                  <div className="text-white font-semibold text-sm tracking-wider uppercase mb-3">
-                    {stat.label}
-                  </div>
-                  <p className="text-muted text-xs leading-relaxed">{stat.description}</p>
-                </div>
-              </ScrollReveal>
-            )
-          })}
+                </ScrollReveal>
+              )
+            })}
+          </div>
+
+          {/* Decorative bottom line */}
+          <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-gold/30 via-transparent to-transparent" />
         </div>
       </div>
     </section>

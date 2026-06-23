@@ -21,9 +21,9 @@ export function WhatWeDo({ cms, bgJson }: { cms?: Record<string, unknown>; bgJso
     <section className="py-24 bg-brand relative overflow-hidden">
       <SectionBackground bgJson={bgJson} opacity={20} />
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-start">
-          {/* Left heading */}
-          <ScrollReveal>
+        {/* Top: heading block */}
+        <ScrollReveal>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-end mb-14">
             <div>
               <div className="flex items-center gap-3 mb-5">
                 <div className="h-px w-10 bg-gold" />
@@ -34,32 +34,29 @@ export function WhatWeDo({ cms, bgJson }: { cms?: Record<string, unknown>; bgJso
                 <br />
                 <span className="text-gold-gradient italic">{headLine2}</span>
               </h2>
-              <p className="text-muted mt-6 leading-relaxed max-w-md">{body}</p>
-              <div className="mt-8 h-px w-full bg-gradient-to-r from-gold/40 to-transparent" />
             </div>
-          </ScrollReveal>
-
-          {/* Right cards */}
-          <div className="space-y-5">
-            {services.map((service, i) => {
-              const Icon = service.icon
-              return (
-                <ScrollReveal key={service.title} delay={i * 0.15}>
-                  <div className="group flex gap-5 p-6 rounded-sm border border-white/5 hover:border-gold-border bg-brand-section/50 hover:bg-brand-section transition-all duration-300">
-                    <div className="shrink-0 w-12 h-12 rounded-sm border border-gold-border flex items-center justify-center bg-gold/5 group-hover:bg-gold/10 transition-colors">
-                      <Icon size={22} className="text-gold" />
-                    </div>
-                    <div>
-                      <h3 className="text-white font-semibold mb-2 group-hover:text-gold transition-colors duration-300">
-                        {service.title}
-                      </h3>
-                      <p className="text-muted text-sm leading-relaxed">{service.description}</p>
-                    </div>
-                  </div>
-                </ScrollReveal>
-              )
-            })}
+            <p className="text-muted leading-relaxed lg:pb-2">{body}</p>
           </div>
+        </ScrollReveal>
+
+        {/* Bottom: 3-column service cards */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {services.map((service, i) => {
+            const Icon = service.icon
+            return (
+              <ScrollReveal key={service.title} delay={i * 0.15}>
+                <div className="group flex flex-col p-8 rounded-sm border border-white/5 hover:border-gold-border bg-brand-section/50 hover:bg-brand-section transition-all duration-300 h-full">
+                  <div className="shrink-0 w-12 h-12 rounded-sm border border-gold-border flex items-center justify-center bg-gold/5 group-hover:bg-gold/10 transition-colors mb-5">
+                    <Icon size={22} className="text-gold" />
+                  </div>
+                  <h3 className="text-white font-semibold mb-3 tracking-wide text-sm uppercase group-hover:text-gold transition-colors duration-300">
+                    {service.title}
+                  </h3>
+                  <p className="text-muted text-sm leading-relaxed">{service.description}</p>
+                </div>
+              </ScrollReveal>
+            )
+          })}
         </div>
       </div>
     </section>

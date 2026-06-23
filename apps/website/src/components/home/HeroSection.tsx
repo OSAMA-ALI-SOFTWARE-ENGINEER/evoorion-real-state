@@ -42,7 +42,7 @@ export function HeroSection({ cms, bgImage }: { cms?: Record<string, unknown>; b
             src={bgImage}
             alt=""
             fill
-            className="object-cover opacity-30"
+            className="object-cover opacity-50"
             priority
             unoptimized
           />
