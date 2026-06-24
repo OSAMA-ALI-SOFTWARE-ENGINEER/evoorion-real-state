@@ -49,6 +49,18 @@ const TABS: TabDef[] = [
     ],
   },
   {
+    id: 'offices',
+    label: 'Regional Offices',
+    icon: (
+      <svg width={16} height={16} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.75} strokeLinecap="round" strokeLinejoin="round">
+        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+        <polyline points="9 22 9 12 15 12 15 22"/>
+      </svg>
+    ),
+    hint: 'Contact details for offices outside UAE. Leave blank if an office is not active.',
+    custom: true,
+  },
+  {
     id: 'social',
     label: 'Social Media',
     icon: (
@@ -767,6 +779,76 @@ function SectionsBgTab({ values, set }: { values: Settings; set: (k: string, v: 
   )
 }
 
+// ── Regional Offices tab ─────────────────────────────────────────────────────
+
+const OFFICE_GROUPS = [
+  {
+    id: 'de',
+    flag: '🇩🇪',
+    label: 'Germany Office',
+    fields: [
+      { key: 'contact_phone_de',   label: 'Phone',        type: 'phone' as const },
+      { key: 'contact_email_de',   label: 'Email',        type: 'email' as const },
+      { key: 'contact_address_de', label: 'Address',      placeholder: 'Am Sandtorkai 48, 20457 Hamburg, Germany' },
+      { key: 'contact_hours_de',   label: 'Office Hours', placeholder: 'Monday – Friday: 9:00 AM – 6:00 PM CET' },
+    ],
+  },
+  {
+    id: 'gb',
+    flag: '🇬🇧',
+    label: 'United Kingdom Office',
+    fields: [
+      { key: 'contact_phone_gb',   label: 'Phone',        type: 'phone' as const },
+      { key: 'contact_email_gb',   label: 'Email',        type: 'email' as const },
+      { key: 'contact_address_gb', label: 'Address',      placeholder: '30 St Mary Axe (The Gherkin), London EC3A 8BF, UK' },
+      { key: 'contact_hours_gb',   label: 'Office Hours', placeholder: 'Monday – Friday: 9:00 AM – 6:00 PM GMT' },
+    ],
+  },
+]
+
+const officeInp = 'w-full px-3.5 py-2.5 rounded-lg border border-slate-200 dark:border-slate-600 text-sm focus:outline-none focus:border-[#C9A84C] focus:ring-1 focus:ring-[#C9A84C] bg-white dark:bg-slate-700 text-slate-800 dark:text-slate-100 placeholder-slate-400'
+
+function OfficesTab({ values, set }: { values: Settings; set: (k: string, v: string) => void }) {
+  return (
+    <div className="p-6 space-y-8">
+      {OFFICE_GROUPS.map(group => (
+        <div key={group.id}>
+          <p className="text-sm font-semibold text-slate-700 dark:text-slate-200 mb-4 flex items-center gap-2">
+            <span>{group.flag}</span>
+            {group.label}
+          </p>
+          <div className="space-y-4 pl-6 border-l-2 border-slate-100 dark:border-slate-700">
+            {group.fields.map(field => (
+              <div key={field.key}>
+                <label htmlFor={field.key} className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
+                  {field.label}
+                </label>
+                {field.type === 'phone' ? (
+                  <PhoneSettingInput
+                    id={field.key}
+                    value={values[field.key] ?? ''}
+                    onChange={v => set(field.key, v)}
+                  />
+                ) : (
+                  <input
+                    id={field.key}
+                    type={field.type ?? 'text'}
+                    value={values[field.key] ?? ''}
+                    onChange={e => set(field.key, e.target.value)}
+                    placeholder={'placeholder' in field ? field.placeholder : undefined}
+                    className={officeInp}
+                    autoComplete="off"
+                  />
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      ))}
+    </div>
+  )
+}
+
 // ── Page ──────────────────────────────────────────────────────────────────────
 
 const inp = 'w-full px-3.5 py-2.5 rounded-lg border border-slate-200 dark:border-slate-600 text-sm focus:outline-none focus:border-[#C9A84C] focus:ring-1 focus:ring-[#C9A84C] bg-white dark:bg-slate-700 text-slate-800 dark:text-slate-100 placeholder-slate-400'
@@ -881,6 +963,7 @@ export default function SettingsPage() {
             {currentTab.id === 'images'   && <SectionImagesTab values={values} set={set} />}
             {currentTab.id === 'sections' && <SectionsBgTab values={values} set={set} />}
             {currentTab.id === 'partners' && <PartnersTab values={values} set={set} />}
+            {currentTab.id === 'offices'  && <OfficesTab  values={values} set={set} />}
 
             {/* Standard field tabs */}
             {!currentTab.custom && (

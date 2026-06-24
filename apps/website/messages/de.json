@@ -20,7 +20,15 @@
   },
   "hero": {
     "eyebrow": "Luxus-Immobilieninvestitionen",
-    "results": "{count} Ergebnisse"
+    "results": "{count} Ergebnisse",
+    "line1": "Investieren in Dubai.",
+    "line2": "Sichern Sie Ihr Erbe.",
+    "subtext": "Exklusive Angebote außerhalb des Marktes. Hohe Renditen. Vollständige Investitionsberatung.",
+    "ctaPrimary": "Chancen erkunden",
+    "ctaSecondary": "Privates Gespräch buchen",
+    "statPropertiesSold": "Verkaufte Immobilien",
+    "statTransactions": "Transaktionen",
+    "statClientSatisfaction": "Kundenzufriedenheit"
   },
   "search": {
     "buy": "Kaufen",
@@ -51,6 +59,52 @@
     "successBody": "Unsere Berater haben Ihre Anforderungen erhalten und werden sich innerhalb von 24 Stunden mit passenden Angeboten bei Ihnen melden.",
     "close": "Schließen"
   },
+  "whatWeDo": {
+    "eyebrow": "Unsere Leistungen",
+    "headline1": "Strategische Investitionen.",
+    "headline2": "Maßgeschneidert für Sie.",
+    "body": "EVOORION ist ein in Dubai ansässiges Luxusimmobilien-Investmentunternehmen, das vermögende Privatpersonen dabei unterstützt, ihre Immobilienportfolios mit Vertrauen und Präzision aufzubauen und zu erweitern.",
+    "service1Title": "Vorverkauf-Investitionen",
+    "service1Desc": "Zugang zu Vorstarterchancen bei Dubais renommiertesten Entwicklern. Sichern Sie Einheiten zu Vormarktpreisen mit flexiblen Zahlungsplänen und außergewöhnlichem Kapitalwertsteigerungspotenzial.",
+    "service2Title": "Bezugsfertige Immobilien",
+    "service2Desc": "Sofortige Mieteinnahmen aus handverlesenen bezugsfertigen Villen, Apartments und Penthäusern in Dubais begehrtesten Wohnanlagen — mit jährlichen Mietrenditen von 8–12%.",
+    "service3Title": "Private Beratung",
+    "service3Desc": "Ganzheitliches Investmentmanagement: Marktintelligenz, rechtliche Strukturierung, Immobilienverwaltung und Portfoliooptimierung — alles durch unser Expertenteam."
+  },
+  "whyDubai": {
+    "eyebrow": "Warum in Dubai investieren",
+    "headline1": "Eine Stadt für",
+    "headline2": "Wachstum gebaut.",
+    "stat1Value": "0%",
+    "stat1Label": "Grundsteuer",
+    "stat1Desc": "Keine Grundsteuer oder Kapitalertragssteuer.",
+    "stat2Value": "8–12%",
+    "stat2Label": "Mietrendite",
+    "stat2Desc": "Zu den höchsten Mietrenditen weltweit.",
+    "stat3Value": "100%",
+    "stat3Label": "Ausländisches Eigentum",
+    "stat3Desc": "Volleigentum in ausgewiesenen Freizonen.",
+    "stat4Value": "#1",
+    "stat4Label": "Weltweites Ziel",
+    "stat4Desc": "Dubai als Nr. 1 Stadt zum Leben und Investieren."
+  },
+  "process": {
+    "eyebrow": "Der Prozess",
+    "headline1": "Eine nahtlose",
+    "headline2": "Investitionsreise",
+    "step": "Schritt",
+    "step1Title": "Entdecken",
+    "step1Desc": "Wir führen eine gründliche Beratungssitzung durch, um Ihre Investitionsziele, Ihr Risikoprofil und Ihre Präferenzen zu verstehen.",
+    "step2Title": "Auswählen",
+    "step2Desc": "Unsere Berater erstellen eine maßgeschneiderte Auswahl an Off-Market- und gelisteten Immobilien, die Ihren Kriterien entsprechen.",
+    "step3Title": "Erwerben",
+    "step3Desc": "Wir übernehmen Verhandlungen, rechtliche Sorgfaltspflicht, Kaufvertragsentwurf und DLD-Registrierung — von Anfang bis Ende.",
+    "step4Title": "Verwalten",
+    "step4Desc": "Nach dem Erwerb stellt unser Team sicher, dass Ihr Vermögen vermietet, verwaltet und für maximale Rendite optimiert wird."
+  },
+  "trustStrip": {
+    "label": "Vertrauen führender Entwickler"
+  },
   "properties": {
     "bedrooms": "Schlafzimmer",
     "bathrooms": "Badezimmer",
@@ -70,12 +124,22 @@
     "subtitle": "Sprechen Sie mit unseren Investitionsberatern"
   },
   "footer": {
+    "tagline": "Ihr Zugang zu exklusiven Dubai-Immobilien. Wir verbinden anspruchsvolle Investoren mit den feinsten Luxusimmobilien und liefern außergewöhnliche Renditen und eine nahtlose Erwerbserfahrung.",
+    "quickLinks": "Schnelllinks",
+    "investments": "Investitionen",
+    "contactUs": "Kontakt",
+    "officeHours": "Bürozeiten",
+    "offPlanProperties": "Vorverkauf-Immobilien",
+    "readyProperties": "Bezugsfertige Immobilien",
+    "privateAdvisory": "Private Beratung",
+    "browseAll": "Alle ansehen",
     "newsletter": "Bleiben Sie über exklusive Dubai-Immobilien informiert.",
     "subscribe": "Abonnieren",
     "subscribePlaceholder": "Ihre E-Mail-Adresse",
     "rights": "Alle Rechte vorbehalten.",
     "privacy": "Datenschutzrichtlinie",
-    "terms": "Nutzungsbedingungen"
+    "terms": "Nutzungsbedingungen",
+    "serving": "Wir betreuen: Palm Jumeirah · Downtown · Marina · Business Bay · JVC · Creek Harbour"
   },
   "common": {
     "loading": "Wird geladen…",

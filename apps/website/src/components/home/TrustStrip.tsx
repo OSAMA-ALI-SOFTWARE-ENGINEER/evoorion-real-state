@@ -2,6 +2,7 @@
 
 import Image from 'next/image'
 import { motion } from 'framer-motion'
+import { useTranslations } from 'next-intl'
 import { ScrollReveal } from '@/components/ui/ScrollReveal'
 import { SectionBackground } from '@/components/ui/SectionBackground'
 
@@ -29,7 +30,8 @@ interface Props {
 }
 
 export function TrustStrip({ cms, partnersJson, speedSeconds, stripLabel, bgJson }: Props) {
-  const label = stripLabel ?? (cms?.trust_strip_label as string) ?? 'Trusted by Leading Developers'
+  const t = useTranslations('trustStrip')
+  const label = stripLabel ?? (cms?.trust_strip_label as string) ?? t('label')
   const duration = Math.max(5, Math.min(120, parseInt(speedSeconds ?? '25', 10) || 25))
 
   let partners: Partner[] = DEFAULT_PARTNERS

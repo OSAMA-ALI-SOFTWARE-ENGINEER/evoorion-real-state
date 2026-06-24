@@ -6,6 +6,7 @@ import Image from 'next/image'
 import { usePathname } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Menu, X, Phone, LogOut, User, Heart, ChevronRight, MapPin } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 import { useAuth } from '@/context/AuthContext'
 import { AuthModal } from '@/components/ui/AuthModal'
 import { CountrySelector } from '@/components/ui/CountrySelector'
@@ -27,11 +28,6 @@ function opHref(op: OpType) {
   return `/properties?operation=${key}`
 }
 
-const COMPANY_LINKS = [
-  { label: 'Investments',  href: '/investments' },
-  { label: 'Blog',         href: '/blog' },
-  { label: 'About',        href: '/about' },
-]
 
 function DrawerLink({ href, label, pathname, onClick }: { href: string; label: string; pathname: string; onClick: () => void }) {
   const base   = href.split('?')[0]
@@ -182,6 +178,14 @@ export function Navbar() {
   }, [drawerOpen])
 
   const initials = user ? user.name.split(' ').map((w: string) => w[0]).slice(0, 2).join('').toUpperCase() : ''
+  const t = useTranslations('nav')
+  const tc = useTranslations('common')
+
+  const COMPANY_LINKS = [
+    { label: t('investments'), href: '/investments' },
+    { label: t('blog'),        href: '/blog' },
+    { label: t('about'),       href: '/about' },
+  ]
 
   return (
     <>
@@ -224,7 +228,7 @@ export function Navbar() {
                 className="hidden sm:flex items-center gap-2 px-4 py-2.5 bg-gold text-brand text-xs font-semibold tracking-wider uppercase rounded-sm hover:bg-gold-light transition-colors duration-300"
               >
                 <Phone size={13} />
-                Book Call
+                {t('bookCall')}
               </Link>
 
               {/* Hamburger */}
@@ -303,8 +307,8 @@ export function Navbar() {
                   {opTypes.map((op) => (
                     <OpLinkWithLocations key={op.id} op={op} pathname={pathname} onClose={() => setDrawerOpen(false)} />
                   ))}
-                  <DrawerLink href="/properties" label="All Listings" pathname={pathname} onClick={() => setDrawerOpen(false)} />
-                  <DrawerLink href="/locations"  label="Explore Locations" pathname={pathname} onClick={() => setDrawerOpen(false)} />
+                  <DrawerLink href="/properties" label={tc('viewAll')} pathname={pathname} onClick={() => setDrawerOpen(false)} />
+                  <DrawerLink href="/locations"  label={t('exploreLocations')} pathname={pathname} onClick={() => setDrawerOpen(false)} />
                 </div>
               )}
 

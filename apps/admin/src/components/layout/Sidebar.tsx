@@ -70,8 +70,9 @@ const NAV: Array<{ group?: string; items: NavItem[] }> = [
     items: [
       { label: 'Blog',     href: '/blog',     icon: <IconFileText />,  roles: ['manager', 'super_admin'] },
       { label: 'Media',    href: '/media',    icon: <IconImage />,     roles: ['manager', 'super_admin'] },
-      { label: 'CMS',      href: '/cms',      icon: <IconSliders />,   roles: ['super_admin'] },
-      { label: 'Settings', href: '/settings', icon: <IconSettings />, roles: ['super_admin'] },
+      { label: 'CMS',          href: '/cms',          icon: <IconSliders />,   roles: ['super_admin'] },
+      { label: 'Translations', href: '/translations',  icon: <IconGlobe />,     roles: ['super_admin'] },
+      { label: 'Settings',     href: '/settings',      icon: <IconSettings />,  roles: ['super_admin'] },
     ],
   },
   {

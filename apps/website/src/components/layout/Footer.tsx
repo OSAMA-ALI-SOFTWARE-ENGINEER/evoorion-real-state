@@ -1,20 +1,8 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import { MapPin, Mail, Phone } from 'lucide-react'
+import { getTranslations } from 'next-intl/server'
 import { SocialIcon } from '@/components/ui/SocialIcon'
-
-const QUICK_LINKS = [
-  { label: 'Home', href: '/' },
-  { label: 'About Us', href: '/about' },
-  { label: 'Contact', href: '/contact' },
-]
-
-const INVESTMENT_LINKS = [
-  { label: 'Off-Plan Properties', href: '/investments' },
-  { label: 'Ready Properties', href: '/investments' },
-  { label: 'Private Advisory', href: '/investments' },
-  { label: 'Browse All', href: '/properties' },
-]
 
 const SOCIALS: { label: string; name: 'instagram' | 'linkedin' | 'twitter' | 'facebook'; href: string }[] = [
   { label: 'Instagram', name: 'instagram', href: '#' },
@@ -23,7 +11,23 @@ const SOCIALS: { label: string; name: 'instagram' | 'linkedin' | 'twitter' | 'fa
   { label: 'Facebook', name: 'facebook', href: '#' },
 ]
 
-export function Footer() {
+export async function Footer() {
+  const t  = await getTranslations('footer')
+  const tn = await getTranslations('nav')
+
+  const QUICK_LINKS = [
+    { label: tn('home'),    href: '/' },
+    { label: tn('about'),   href: '/about' },
+    { label: tn('contact'), href: '/contact' },
+  ]
+
+  const INVESTMENT_LINKS = [
+    { label: t('offPlanProperties'), href: '/investments' },
+    { label: t('readyProperties'),   href: '/investments' },
+    { label: t('privateAdvisory'),   href: '/investments' },
+    { label: t('browseAll'),         href: '/properties' },
+  ]
+
   return (
     <footer className="bg-brand-section border-t border-gold-border">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
@@ -40,9 +44,7 @@ export function Footer() {
               />
             </Link>
             <p className="text-muted text-sm leading-relaxed max-w-xs mb-6">
-              Your gateway to exclusive Dubai real estate. We connect discerning investors with
-              the finest luxury properties, delivering exceptional returns and a seamless
-              acquisition experience.
+              {t('tagline')}
             </p>
             <div className="flex gap-3">
               {SOCIALS.map(({ label, name, href }) => (
@@ -61,7 +63,7 @@ export function Footer() {
           {/* Quick Links */}
           <div>
             <h4 className="text-white text-xs font-semibold tracking-[0.2em] uppercase mb-5">
-              Quick Links
+              {t('quickLinks')}
             </h4>
             <ul className="space-y-3">
               {QUICK_LINKS.map((l) => (
@@ -80,7 +82,7 @@ export function Footer() {
           {/* Investments */}
           <div>
             <h4 className="text-white text-xs font-semibold tracking-[0.2em] uppercase mb-5">
-              Investments
+              {t('investments')}
             </h4>
             <ul className="space-y-3">
               {INVESTMENT_LINKS.map((l) => (
@@ -99,7 +101,7 @@ export function Footer() {
           {/* Contact */}
           <div>
             <h4 className="text-white text-xs font-semibold tracking-[0.2em] uppercase mb-5">
-              Contact Us
+              {t('contactUs')}
             </h4>
             <ul className="space-y-4">
               <li className="flex items-start gap-3">
@@ -123,7 +125,7 @@ export function Footer() {
               </li>
             </ul>
             <div className="mt-5">
-              <h5 className="text-white/60 text-xs tracking-wider uppercase mb-1">Office Hours</h5>
+              <h5 className="text-white/60 text-xs tracking-wider uppercase mb-1">{t('officeHours')}</h5>
               <p className="text-muted text-sm">Mon – Sat: 9:00 AM – 7:00 PM</p>
             </div>
           </div>
@@ -133,10 +135,10 @@ export function Footer() {
         <div className="mt-12 pt-8 border-t border-white/5">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
             <p className="text-muted text-xs tracking-widest uppercase">
-              Serving: Palm Jumeirah · Downtown · Marina · Business Bay · JVC · Creek Harbour
+              {t('serving')}
             </p>
             <p className="text-muted/60 text-xs">
-              © {new Date().getFullYear()} EVOORION Real Estate. All rights reserved.
+              © {new Date().getFullYear()} EVOORION Real Estate. {t('rights')}
             </p>
           </div>
         </div>

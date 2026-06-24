@@ -78,6 +78,10 @@ class SettingController
         'trust_strip_label',
         'trust_strip_speed',
         'partners_list',
+        // Translations (JSON blobs per locale)
+        'translations_en',
+        'translations_ar',
+        'translations_de',
         // Section backgrounds (JSON: {type,color1,color2,dir,image_url})
         'section_bg_what_we_do',
         'section_bg_our_process',
@@ -141,7 +145,8 @@ class SettingController
             str_starts_with($key, 'image_')        => 'images',
             str_starts_with($key, 'trust_strip_')  => 'partners',
             $key === 'partners_list'               => 'partners',
-            str_starts_with($key, 'section_bg_')  => 'sections',
+            str_starts_with($key, 'section_bg_')    => 'sections',
+            str_starts_with($key, 'translations_')  => 'translations',
             default                               => 'integrations',
         };
     }

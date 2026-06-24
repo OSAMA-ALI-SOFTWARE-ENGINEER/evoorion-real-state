@@ -1,18 +1,23 @@
+import { getTranslations } from 'next-intl/server'
 import { ScrollReveal } from '@/components/ui/ScrollReveal'
 import { SectionBackground } from '@/components/ui/SectionBackground'
 
-const DEFAULT_STEPS = [
-  { number: '01', title: 'Discover', description: 'We conduct a thorough discovery session to understand your investment goals, risk profile, and preferences.' },
-  { number: '02', title: 'Select',   description: 'Our advisors curate a bespoke shortlist of off-market and listed properties matched to your criteria.' },
-  { number: '03', title: 'Acquire',  description: 'We handle negotiations, legal due diligence, SPA drafting, and DLD registration — end to end.' },
-  { number: '04', title: 'Manage',   description: 'Post-acquisition, our team ensures your asset is tenanted, managed, and optimised for maximum yield.' },
-]
+export async function OurProcess({ cms, bgJson }: { cms?: Record<string, unknown>; bgJson?: string | null }) {
+  const t = await getTranslations('process')
 
-export function OurProcess({ cms, bgJson }: { cms?: Record<string, unknown>; bgJson?: string | null }) {
-  const eyebrow = (cms?.our_process_eyebrow as string) ?? 'The Process'
-  const rawHeadline = (cms?.our_process_headline as string) ?? "A Seamless\nInvestment Journey"
+  const eyebrow     = (cms?.our_process_eyebrow as string) ?? t('eyebrow')
+  const rawHeadline = (cms?.our_process_headline as string) ?? `${t('headline1')}\n${t('headline2')}`
   const [headLine1, headLine2] = rawHeadline.split('\n')
+  const stepLabel   = t('step')
+
+  const DEFAULT_STEPS = [
+    { number: '01', title: t('step1Title'), description: t('step1Desc') },
+    { number: '02', title: t('step2Title'), description: t('step2Desc') },
+    { number: '03', title: t('step3Title'), description: t('step3Desc') },
+    { number: '04', title: t('step4Title'), description: t('step4Desc') },
+  ]
   const STEPS = (cms?.our_process_steps as typeof DEFAULT_STEPS) ?? DEFAULT_STEPS
+
   return (
     <section className="py-24 bg-brand relative overflow-hidden">
       <SectionBackground bgJson={bgJson} opacity={20} />
@@ -42,7 +47,7 @@ export function OurProcess({ cms, bgJson }: { cms?: Record<string, unknown>; bgJ
               <div className="relative flex flex-col items-center text-center px-6">
                 {/* Step circle */}
                 <div className="relative z-10 w-20 h-20 rounded-full border-2 border-gold-border bg-brand flex flex-col items-center justify-center mb-6 group-hover:border-gold transition-colors">
-                  <span className="text-gold text-[10px] tracking-widest uppercase">Step</span>
+                  <span className="text-gold text-[10px] tracking-widest uppercase">{stepLabel}</span>
                   <span className="text-gold font-serif text-2xl font-bold leading-none">{step.number}</span>
                 </div>
                 <h3 className="text-white font-semibold text-lg mb-3 tracking-wide">
@@ -60,7 +65,7 @@ export function OurProcess({ cms, bgJson }: { cms?: Record<string, unknown>; bgJ
             <ScrollReveal key={step.number} delay={i * 0.1}>
               <div className="flex gap-5 p-6 border border-white/5 rounded-sm bg-brand-section/30">
                 <div className="shrink-0 w-14 h-14 rounded-full border border-gold-border flex flex-col items-center justify-center">
-                  <span className="text-gold text-[9px] tracking-widest uppercase">Step</span>
+                  <span className="text-gold text-[9px] tracking-widest uppercase">{stepLabel}</span>
                   <span className="text-gold font-serif text-xl font-bold leading-none">{step.number}</span>
                 </div>
                 <div>

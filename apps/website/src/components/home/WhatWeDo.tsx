@@ -1,21 +1,24 @@
 import { TrendingUp, Home, Users } from 'lucide-react'
+import { getTranslations } from 'next-intl/server'
 import { ScrollReveal } from '@/components/ui/ScrollReveal'
 import { SectionBackground } from '@/components/ui/SectionBackground'
 
 const ICONS = [TrendingUp, Home, Users]
 
-const DEFAULT_SERVICES = [
-  { title: 'Off-Plan Investments', description: "Access pre-launch opportunities from Dubai's most prestigious developers. Secure units at pre-market pricing with flexible payment plans and exceptional capital appreciation potential." },
-  { title: 'Ready Properties',     description: "Immediate rental income from handpicked ready-to-occupy villas, apartments, and penthouses in Dubai's most sought-after communities — delivering 8–12% annual rental yields." },
-  { title: 'Private Advisory',     description: 'End-to-end investment management: market intelligence, legal structuring, property management, and portfolio optimisation — all handled by our expert team.' },
-]
+export async function WhatWeDo({ cms, bgJson }: { cms?: Record<string, unknown>; bgJson?: string | null }) {
+  const t = await getTranslations('whatWeDo')
 
-export function WhatWeDo({ cms, bgJson }: { cms?: Record<string, unknown>; bgJson?: string | null }) {
-  const eyebrow  = (cms?.what_we_do_eyebrow as string) ?? 'What We Do'
-  const body     = (cms?.what_we_do_body as string)    ?? 'EVOORION is a Dubai-based luxury real estate investment firm dedicated to helping high-net-worth individuals build and grow their real estate portfolios with confidence and precision.'
-  const rawHeadline = (cms?.what_we_do_headline as string) ?? "Strategic Investments.\nTailored for You."
+  const eyebrow     = (cms?.what_we_do_eyebrow as string) ?? t('eyebrow')
+  const body        = (cms?.what_we_do_body as string)    ?? t('body')
+  const rawHeadline = (cms?.what_we_do_headline as string) ?? `${t('headline1')}\n${t('headline2')}`
   const [headLine1, headLine2] = rawHeadline.split('\n')
+
   const cmsServices = cms?.what_we_do_services as Array<{ title: string; description: string }> | undefined
+  const DEFAULT_SERVICES = [
+    { title: t('service1Title'), description: t('service1Desc') },
+    { title: t('service2Title'), description: t('service2Desc') },
+    { title: t('service3Title'), description: t('service3Desc') },
+  ]
   const services = (cmsServices ?? DEFAULT_SERVICES).map((s, i) => ({ ...s, icon: ICONS[i] ?? TrendingUp }))
   return (
     <section className="py-24 bg-brand relative overflow-hidden">

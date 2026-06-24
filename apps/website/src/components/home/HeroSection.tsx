@@ -5,26 +5,30 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { ArrowRight, ChevronDown } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 
 type OperationTab = 'buy' | 'rent' | 'off-plan'
 
-const OP_TABS: { key: OperationTab; label: string }[] = [
-  { key: 'buy',      label: 'Buy'      },
-  { key: 'rent',     label: 'Rent'     },
-  { key: 'off-plan', label: 'Off-Plan' },
-]
-
 export function HeroSection({ cms, bgImage }: { cms?: Record<string, unknown>; bgImage?: string | null }) {
-  const eyebrow   = (cms?.hero_eyebrow as string)        ?? 'Luxury Real Estate Investment'
-  const line1     = (cms?.hero_headline_line1 as string) ?? 'Invest in Dubai.'
-  const line2     = (cms?.hero_headline_line2 as string) ?? 'Secure Your Legacy.'
-  const subtext   = (cms?.hero_subtext as string)        ?? 'Exclusive off-market opportunities. High returns. Full-service investment advisory.'
-  const ctaPrimary   = (cms?.hero_cta_primary as string)   ?? 'Explore Opportunities'
-  const ctaSecondary = (cms?.hero_cta_secondary as string) ?? 'Book Private Call'
+  const t  = useTranslations('hero')
+  const ts = useTranslations('search')
+
+  const eyebrow      = (cms?.hero_eyebrow as string)        ?? t('eyebrow')
+  const line1        = (cms?.hero_headline_line1 as string) ?? t('line1')
+  const line2        = (cms?.hero_headline_line2 as string) ?? t('line2')
+  const subtext      = (cms?.hero_subtext as string)        ?? t('subtext')
+  const ctaPrimary   = (cms?.hero_cta_primary as string)    ?? t('ctaPrimary')
+  const ctaSecondary = (cms?.hero_cta_secondary as string)  ?? t('ctaSecondary')
   const stats = (cms?.hero_stats as Array<{ value: string; label: string }>) ?? [
-    { value: '500+',    label: 'Properties Sold' },
-    { value: 'AED 2B+', label: 'Transactions' },
-    { value: '98%',     label: 'Client Satisfaction' },
+    { value: '500+',    label: t('statPropertiesSold') },
+    { value: 'AED 2B+', label: t('statTransactions') },
+    { value: '98%',     label: t('statClientSatisfaction') },
+  ]
+
+  const OP_TABS: { key: OperationTab; label: string }[] = [
+    { key: 'buy',      label: ts('buy')     },
+    { key: 'rent',     label: ts('rent')    },
+    { key: 'off-plan', label: ts('offPlan') },
   ]
 
   const [operationTab, setOperationTab] = useState<OperationTab>('buy')

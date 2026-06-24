@@ -1,21 +1,24 @@
 import Image from 'next/image'
 import { Percent, TrendingUp, Globe, Award } from 'lucide-react'
+import { getTranslations } from 'next-intl/server'
 import { ScrollReveal } from '@/components/ui/ScrollReveal'
 
 const ICONS = [Percent, TrendingUp, Globe, Award]
 
-const DEFAULT_STATS = [
-  { value: '0%',    label: 'Property Tax',      description: 'No property or capital gains tax.' },
-  { value: '8–12%', label: 'Rental Yield',      description: 'Among the highest rental yields globally.' },
-  { value: '100%',  label: 'Foreign Ownership', description: 'Full ownership in designated freehold areas.' },
-  { value: '#1',    label: 'Global Destination', description: 'Dubai ranked #1 city to live and invest.' },
-]
+export async function WhyDubai({ cms, bgImage }: { cms?: Record<string, unknown>; bgImage?: string | null }) {
+  const t = await getTranslations('whyDubai')
 
-export function WhyDubai({ cms, bgImage }: { cms?: Record<string, unknown>; bgImage?: string | null }) {
-  const eyebrow = (cms?.why_dubai_eyebrow as string) ?? 'Why Invest in Dubai'
-  const rawHeadline = (cms?.why_dubai_headline as string) ?? "A City Built\nfor Growth."
+  const eyebrow     = (cms?.why_dubai_eyebrow as string) ?? t('eyebrow')
+  const rawHeadline = (cms?.why_dubai_headline as string) ?? `${t('headline1')}\n${t('headline2')}`
   const [headLine1, headLine2] = rawHeadline.split('\n')
+
   const cmsStats = cms?.why_dubai_stats as Array<{ value: string; label: string; description: string }> | undefined
+  const DEFAULT_STATS = [
+    { value: t('stat1Value'), label: t('stat1Label'), description: t('stat1Desc') },
+    { value: t('stat2Value'), label: t('stat2Label'), description: t('stat2Desc') },
+    { value: t('stat3Value'), label: t('stat3Label'), description: t('stat3Desc') },
+    { value: t('stat4Value'), label: t('stat4Label'), description: t('stat4Desc') },
+  ]
   const STATS = (cmsStats ?? DEFAULT_STATS).map((s, i) => ({ ...s, icon: ICONS[i] ?? Percent }))
 
   return (

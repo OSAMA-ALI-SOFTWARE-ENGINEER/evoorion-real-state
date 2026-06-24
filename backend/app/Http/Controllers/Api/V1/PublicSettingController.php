@@ -58,6 +58,10 @@ class PublicSettingController
         'section_bg_about_difference',
         'section_bg_about_cta',
         'section_bg_investments_strategies',
+        // Translations per locale
+        'translations_en',
+        'translations_ar',
+        'translations_de',
     ];
 
     public function index(): JsonResponse
