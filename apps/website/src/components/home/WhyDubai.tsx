@@ -8,18 +8,18 @@ const ICONS = [Percent, TrendingUp, Globe, Award]
 export async function WhyDubai({ cms, bgImage }: { cms?: Record<string, unknown>; bgImage?: string | null }) {
   const t = await getTranslations('whyDubai')
 
-  const eyebrow     = (cms?.why_dubai_eyebrow as string) ?? t('eyebrow')
-  const rawHeadline = (cms?.why_dubai_headline as string) ?? `${t('headline1')}\n${t('headline2')}`
-  const [headLine1, headLine2] = rawHeadline.split('\n')
+  const eyebrow  = t('eyebrow')
+  const headLine1 = t('headline1')
+  const headLine2 = t('headline2')
 
-  const cmsStats = cms?.why_dubai_stats as Array<{ value: string; label: string; description: string }> | undefined
-  const DEFAULT_STATS = [
-    { value: t('stat1Value'), label: t('stat1Label'), description: t('stat1Desc') },
-    { value: t('stat2Value'), label: t('stat2Label'), description: t('stat2Desc') },
-    { value: t('stat3Value'), label: t('stat3Label'), description: t('stat3Desc') },
-    { value: t('stat4Value'), label: t('stat4Label'), description: t('stat4Desc') },
+  const STATS = [
+    { value: t('stat1Value'), label: t('stat1Label'), description: t('stat1Desc'), icon: ICONS[0] },
+    { value: t('stat2Value'), label: t('stat2Label'), description: t('stat2Desc'), icon: ICONS[1] },
+    { value: t('stat3Value'), label: t('stat3Label'), description: t('stat3Desc'), icon: ICONS[2] },
+    { value: t('stat4Value'), label: t('stat4Label'), description: t('stat4Desc'), icon: ICONS[3] },
   ]
-  const STATS = (cmsStats ?? DEFAULT_STATS).map((s, i) => ({ ...s, icon: ICONS[i] ?? Percent }))
+
+  const bgImg = (cms?.image_why_dubai as string) ?? bgImage
 
   return (
     <section className="relative overflow-hidden">
@@ -27,9 +27,9 @@ export async function WhyDubai({ cms, bgImage }: { cms?: Record<string, unknown>
 
         {/* Left — featured image */}
         <div className="relative h-72 lg:h-auto order-2 lg:order-1">
-          {bgImage ? (
+          {bgImg ? (
             <Image
-              src={bgImage}
+              src={bgImg}
               alt="Dubai Investment"
               fill
               className="object-cover"

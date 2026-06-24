@@ -2,21 +2,20 @@ import { getTranslations } from 'next-intl/server'
 import { ScrollReveal } from '@/components/ui/ScrollReveal'
 import { SectionBackground } from '@/components/ui/SectionBackground'
 
-export async function OurProcess({ cms, bgJson }: { cms?: Record<string, unknown>; bgJson?: string | null }) {
+export async function OurProcess({ bgJson }: { cms?: Record<string, unknown>; bgJson?: string | null }) {
   const t = await getTranslations('process')
 
-  const eyebrow     = (cms?.our_process_eyebrow as string) ?? t('eyebrow')
-  const rawHeadline = (cms?.our_process_headline as string) ?? `${t('headline1')}\n${t('headline2')}`
-  const [headLine1, headLine2] = rawHeadline.split('\n')
-  const stepLabel   = t('step')
+  const eyebrow  = t('eyebrow')
+  const headLine1 = t('headline1')
+  const headLine2 = t('headline2')
+  const stepLabel = t('step')
 
-  const DEFAULT_STEPS = [
+  const STEPS = [
     { number: '01', title: t('step1Title'), description: t('step1Desc') },
     { number: '02', title: t('step2Title'), description: t('step2Desc') },
     { number: '03', title: t('step3Title'), description: t('step3Desc') },
     { number: '04', title: t('step4Title'), description: t('step4Desc') },
   ]
-  const STEPS = (cms?.our_process_steps as typeof DEFAULT_STEPS) ?? DEFAULT_STEPS
 
   return (
     <section className="py-24 bg-brand relative overflow-hidden">

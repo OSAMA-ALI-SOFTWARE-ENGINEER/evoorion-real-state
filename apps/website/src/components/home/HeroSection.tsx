@@ -13,13 +13,13 @@ export function HeroSection({ cms, bgImage }: { cms?: Record<string, unknown>; b
   const t  = useTranslations('hero')
   const ts = useTranslations('search')
 
-  const eyebrow      = (cms?.hero_eyebrow as string)        ?? t('eyebrow')
-  const line1        = (cms?.hero_headline_line1 as string) ?? t('line1')
-  const line2        = (cms?.hero_headline_line2 as string) ?? t('line2')
-  const subtext      = (cms?.hero_subtext as string)        ?? t('subtext')
-  const ctaPrimary   = (cms?.hero_cta_primary as string)    ?? t('ctaPrimary')
-  const ctaSecondary = (cms?.hero_cta_secondary as string)  ?? t('ctaSecondary')
-  const stats = (cms?.hero_stats as Array<{ value: string; label: string }>) ?? [
+  const eyebrow      = t('eyebrow')
+  const line1        = t('line1')
+  const line2        = t('line2')
+  const subtext      = t('subtext')
+  const ctaPrimary   = t('ctaPrimary')
+  const ctaSecondary = t('ctaSecondary')
+  const stats = [
     { value: '500+',    label: t('statPropertiesSold') },
     { value: 'AED 2B+', label: t('statTransactions') },
     { value: '98%',     label: t('statClientSatisfaction') },
