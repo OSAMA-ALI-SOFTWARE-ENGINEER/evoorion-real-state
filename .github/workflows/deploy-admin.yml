@@ -61,6 +61,13 @@ jobs:
             tar xzf ~/admin-deploy.tar.gz -C "$APP_DIR"
             rm ~/admin-deploy.tar.gz
 
+            # Write Passenger config if not already present
+            if [ ! -f "$APP_DIR/.htaccess" ]; then
+              NODE_BIN=$(which node || echo /usr/local/bin/node)
+              printf "PassengerEnabled On\nPassengerNodejs %s\nPassengerStartupFile server.js\nPassengerAppRoot %s\n" "$NODE_BIN" "$APP_DIR" > "$APP_DIR/.htaccess"
+              echo "Passenger .htaccess written"
+            fi
+
             mkdir -p "$APP_DIR/tmp"
             touch "$APP_DIR/tmp/restart.txt"
             echo "Admin deployed to admin.evoorionrealestate.com"
