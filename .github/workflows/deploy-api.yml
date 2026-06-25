@@ -38,7 +38,7 @@ jobs:
           port: ${{ secrets.SSH_PORT }}
           script: |
             set -e
-            DIR="/home/u121664729/domains/osama-ali.com/public_html/evoorian-api-v2"
+            DIR=~/domains/api.evoorionrealestate.com/public_html
 
             # Extract backend files (skip .env, storage, vendor)
             tar xzf ~/api-deploy.tar.gz -C "$DIR" \
@@ -52,4 +52,4 @@ jobs:
             php artisan migrate --force
             php artisan config:cache
             php artisan route:cache
-            echo "API deployed"
+            echo "API deployed to api.evoorionrealestate.com"

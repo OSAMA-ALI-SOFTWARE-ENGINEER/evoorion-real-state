@@ -25,7 +25,7 @@ jobs:
       - name: Build admin
         working-directory: apps/admin
         env:
-          NEXT_PUBLIC_API_URL: https://evoorian-api-v2.osama-ali.com/api/v1
+          NEXT_PUBLIC_API_URL: https://api.evoorionrealestate.com/api/v1
         run: |
           npm ci
           npm run build
@@ -56,11 +56,11 @@ jobs:
           port: ${{ secrets.SSH_PORT }}
           script: |
             set -e
-            APP_DIR=~/domains/osama-ali.com/public_html/evoorion-admin
+            APP_DIR=~/domains/admin.evoorionrealestate.com/public_html
 
             tar xzf ~/admin-deploy.tar.gz -C "$APP_DIR"
             rm ~/admin-deploy.tar.gz
 
             mkdir -p "$APP_DIR/tmp"
             touch "$APP_DIR/tmp/restart.txt"
-            echo "Admin deployed"
+            echo "Admin deployed to admin.evoorionrealestate.com"
