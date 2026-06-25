@@ -48,13 +48,18 @@ jobs:
               --exclude='vendor'
             rm ~/api-deploy.tar.gz
 
-            # First-time setup: copy .env from old API and update domain
+            # First-time setup: copy .env from old API
             if [ ! -f "$DIR/.env" ]; then
               cp "$OLD_DIR/.env" "$DIR/.env"
-              sed -i "s|APP_URL=.*|APP_URL=https://api.evoorionrealestate.com|" "$DIR/.env"
-              sed -i "s|CORS_ALLOWED_ORIGINS=.*|CORS_ALLOWED_ORIGINS=https://evoorionrealestate.com,https://www.evoorionrealestate.com,https://admin.evoorionrealestate.com|" "$DIR/.env"
               echo ".env bootstrapped from old API"
             fi
+
+            # Always ensure domain-specific values are correct
+            sed -i "s|APP_URL=.*|APP_URL=https://api.evoorionrealestate.com|" "$DIR/.env"
+            sed -i "s|CORS_ALLOWED_ORIGINS=.*|CORS_ALLOWED_ORIGINS=https://evoorionrealestate.com,https://www.evoorionrealestate.com,https://admin.evoorionrealestate.com|" "$DIR/.env"
+            sed -i "s|FRONTEND_URL=.*|FRONTEND_URL=https://evoorionrealestate.com|" "$DIR/.env"
+            sed -i "s|SANCTUM_STATEFUL_DOMAINS=.*|SANCTUM_STATEFUL_DOMAINS=evoorionrealestate.com,admin.evoorionrealestate.com|" "$DIR/.env"
+            sed -i "s|SESSION_DOMAIN=.*|SESSION_DOMAIN=.evoorionrealestate.com|" "$DIR/.env"
 
             # Ensure storage directories exist with correct structure
             mkdir -p "$DIR/storage/app/public"
