@@ -36,6 +36,8 @@ jobs:
           cd apps/website
           cp -r .next/static .next/standalone/.next/static
           cp -r public .next/standalone/public
+          # Include complete @swc/helpers so ESM submodule is present at runtime
+          cp -r node_modules/@swc/helpers .next/standalone/node_modules/@swc/helpers
           tar czf ../../website-deploy.tar.gz -C .next/standalone .
 
       - name: Upload package to server
