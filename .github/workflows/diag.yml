@@ -1,0 +1,27 @@
+name: Diagnose Passenger
+on: workflow_dispatch
+jobs:
+  diag:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check passenger config
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          password: ${{ secrets.SSH_PASSWORD }}
+          port: ${{ secrets.SSH_PORT }}
+          script: |
+            echo "=== which node ==="
+            which node || echo "not found"
+            node --version || echo "no node"
+            echo "=== old app htaccess ==="
+            cat ~/domains/osama-ali.com/public_html/evoorion/.htaccess 2>/dev/null || echo "no htaccess"
+            echo "=== old app tmp ==="
+            ls ~/domains/osama-ali.com/public_html/evoorion/tmp/ 2>/dev/null || echo "no tmp"
+            echo "=== new site htaccess ==="
+            cat ~/domains/evoorionrealestate.com/public_html/.htaccess 2>/dev/null || echo "no htaccess"
+            echo "=== new site files ==="
+            ls ~/domains/evoorionrealestate.com/public_html/ | head -20
+            echo "=== passenger check ==="
+            passenger --version 2>/dev/null || echo "passenger not in PATH"
