@@ -56,18 +56,21 @@ jobs:
           port: ${{ secrets.SSH_PORT }}
           script: |
             set -e
-            APP_DIR=~/domains/evoorionrealestate.com/public_html/admin
+            HOME_DIR=/home/u121664729
+            APP_DIR=$HOME_DIR/domains/evoorionrealestate.com/nodejs/admin
+            WEB_ROOT=$HOME_DIR/domains/evoorionrealestate.com/public_html/admin
+
+            # Create nodejs app directory on first deploy
+            mkdir -p "$APP_DIR"
 
             tar xzf ~/admin-deploy.tar.gz -C "$APP_DIR"
             rm ~/admin-deploy.tar.gz
 
-            # Write Passenger config if not already present
-            if [ ! -f "$APP_DIR/.htaccess" ]; then
-              NODE_BIN=$(which node || echo /usr/local/bin/node)
-              printf "PassengerEnabled On\nPassengerNodejs %s\nPassengerStartupFile server.js\nPassengerAppRoot %s\n" "$NODE_BIN" "$APP_DIR" > "$APP_DIR/.htaccess"
-              echo "Passenger .htaccess written"
-            fi
+            # Write Passenger .htaccess into subdomain web root
+            printf "PassengerAppRoot %s\nPassengerAppType node\nPassengerNodejs /opt/alt/alt-nodejs20/root/bin/node\nPassengerStartupFile server.js\nPassengerBaseURI /\nPassengerRestartDir %s/tmp\nSetEnv LSNODE_CONSOLE_LOG console.log\nSetEnv TOKIO_WORKER_THREADS 2\n" \
+              "$APP_DIR" "$APP_DIR" > "$WEB_ROOT/.htaccess"
 
+            # Restart Passenger
             mkdir -p "$APP_DIR/tmp"
             touch "$APP_DIR/tmp/restart.txt"
             echo "Admin deployed to admin.evoorionrealestate.com"
