@@ -38,7 +38,7 @@ jobs:
           port: ${{ secrets.SSH_PORT }}
           script: |
             set -e
-            DIR=~/domains/api.evoorionrealestate.com/public_html
+            DIR=~/domains/evoorionrealestate.com/public_html/api
 
             # Extract backend files (skip .env, storage, vendor)
             tar xzf ~/api-deploy.tar.gz -C "$DIR" \
