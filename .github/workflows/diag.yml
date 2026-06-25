@@ -1,0 +1,25 @@
+name: Diagnose Website 503
+on: workflow_dispatch
+jobs:
+  diag:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check stderr log
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          password: ${{ secrets.SSH_PASSWORD }}
+          port: ${{ secrets.SSH_PORT }}
+          script: |
+            echo "=== website stderr log (last 40 lines) ==="
+            cat ~/domains/evoorionrealestate.com/nodejs/website/stderr.log 2>/dev/null | tail -40 || echo "no log"
+            echo "=== swc helpers check ==="
+            ls ~/domains/evoorionrealestate.com/nodejs/website/node_modules/@swc/helpers/ 2>/dev/null || echo "no swc helpers"
+            echo "=== .next dir check ==="
+            ls ~/domains/evoorionrealestate.com/nodejs/website/.next/ 2>/dev/null || echo "no .next dir"
+            echo "=== start server test ==="
+            cd ~/domains/evoorionrealestate.com/nodejs/website && /opt/alt/alt-nodejs20/root/bin/node server.js 2>&1 &
+            PID=$!
+            sleep 4
+            kill $PID 2>/dev/null || true
