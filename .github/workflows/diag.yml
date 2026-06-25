@@ -4,7 +4,7 @@ jobs:
   diag:
     runs-on: ubuntu-latest
     steps:
-      - name: Check passenger config
+      - name: Check website 503
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.SSH_HOST }}
@@ -12,16 +12,17 @@ jobs:
           password: ${{ secrets.SSH_PASSWORD }}
           port: ${{ secrets.SSH_PORT }}
           script: |
-            echo "=== full old website htaccess ==="
-            cat ~/domains/osama-ali.com/public_html/evoorion/.htaccess 2>/dev/null || echo "no htaccess"
-            echo "=== full old admin htaccess ==="
-            cat ~/domains/osama-ali.com/public_html/evoorion-admin/.htaccess 2>/dev/null || echo "no htaccess"
-            echo "=== nodejs dir structure ==="
-            ls ~/domains/osama-ali.com/nodejs/ 2>/dev/null || echo "no nodejs dir"
-            echo "=== nodejs/evoorion files ==="
-            ls ~/domains/osama-ali.com/nodejs/evoorion/ 2>/dev/null | head -20
-            echo "=== node binary search ==="
-            find /usr/local /usr/bin /opt -name "node" -type f 2>/dev/null | head -5
-            ls ~/nodevenv/ 2>/dev/null || echo "no nodevenv"
-            echo "=== evoorionrealestate dir ==="
-            ls ~/domains/evoorionrealestate.com/ 2>/dev/null
+            echo "=== nodejs/website files ==="
+            ls ~/domains/evoorionrealestate.com/nodejs/website/ 2>/dev/null || echo "no nodejs/website dir"
+            echo "=== nodejs/admin files ==="
+            ls ~/domains/evoorionrealestate.com/nodejs/admin/ 2>/dev/null | head -10
+            echo "=== public_html files ==="
+            ls ~/domains/evoorionrealestate.com/public_html/ 2>/dev/null
+            echo "=== public_html .htaccess ==="
+            cat ~/domains/evoorionrealestate.com/public_html/.htaccess 2>/dev/null || echo "no htaccess"
+            echo "=== website stderr log ==="
+            cat ~/domains/evoorionrealestate.com/nodejs/website/stderr.log 2>/dev/null | tail -30 || echo "no stderr log"
+            echo "=== try starting server manually ==="
+            cd ~/domains/evoorionrealestate.com/nodejs/website && /opt/alt/alt-nodejs20/root/bin/node server.js 2>&1 &
+            sleep 3
+            kill %1 2>/dev/null || true
