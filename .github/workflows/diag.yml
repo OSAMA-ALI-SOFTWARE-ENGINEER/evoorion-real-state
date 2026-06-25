@@ -12,16 +12,16 @@ jobs:
           password: ${{ secrets.SSH_PASSWORD }}
           port: ${{ secrets.SSH_PORT }}
           script: |
-            echo "=== which node ==="
-            which node || echo "not found"
-            node --version || echo "no node"
-            echo "=== old app htaccess ==="
+            echo "=== full old website htaccess ==="
             cat ~/domains/osama-ali.com/public_html/evoorion/.htaccess 2>/dev/null || echo "no htaccess"
-            echo "=== old app tmp ==="
-            ls ~/domains/osama-ali.com/public_html/evoorion/tmp/ 2>/dev/null || echo "no tmp"
-            echo "=== new site htaccess ==="
-            cat ~/domains/evoorionrealestate.com/public_html/.htaccess 2>/dev/null || echo "no htaccess"
-            echo "=== new site files ==="
-            ls ~/domains/evoorionrealestate.com/public_html/ | head -20
-            echo "=== passenger check ==="
-            passenger --version 2>/dev/null || echo "passenger not in PATH"
+            echo "=== full old admin htaccess ==="
+            cat ~/domains/osama-ali.com/public_html/evoorion-admin/.htaccess 2>/dev/null || echo "no htaccess"
+            echo "=== nodejs dir structure ==="
+            ls ~/domains/osama-ali.com/nodejs/ 2>/dev/null || echo "no nodejs dir"
+            echo "=== nodejs/evoorion files ==="
+            ls ~/domains/osama-ali.com/nodejs/evoorion/ 2>/dev/null | head -20
+            echo "=== node binary search ==="
+            find /usr/local /usr/bin /opt -name "node" -type f 2>/dev/null | head -5
+            ls ~/nodevenv/ 2>/dev/null || echo "no nodevenv"
+            echo "=== evoorionrealestate dir ==="
+            ls ~/domains/evoorionrealestate.com/ 2>/dev/null
