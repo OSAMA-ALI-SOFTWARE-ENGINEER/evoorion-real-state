@@ -266,6 +266,9 @@ function PropertiesPageInner() {
 
   const hasAdvancedFilters = !!(areaId || opTypeId || priceKey || sortKey)
 
+  // Derive operation name from URL (master uses URL-based tracking, not an opName state var)
+  const opName = searchParams.get('operation') ?? 'all'
+
   // Build a plain object of current filters suitable for saving
   const currentFiltersObj: Record<string, unknown> = {
     ...(opName !== 'all' ? { operation: opName } : {}),
