@@ -157,7 +157,7 @@ export default async function CareersPage() {
                 <p className="text-muted">Mention the role you&apos;re interested in and attach your CV in the message.</p>
               </div>
             </ScrollReveal>
-            <LeadForm defaultMessage="I'd like to apply for a position at EVOORION. Please find my details below." />
+            <LeadForm />
           </div>
         </div>
       </section>
