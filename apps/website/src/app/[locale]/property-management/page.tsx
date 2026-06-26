@@ -168,7 +168,7 @@ export default function PropertyManagementPage() {
               <p className="text-muted">Tell us about your property and we&apos;ll prepare a tailored management proposal.</p>
             </div>
           </ScrollReveal>
-          <LeadForm defaultMessage="I'd like to enquire about property management services." />
+          <LeadForm />
         </div>
       </section>
     </main>

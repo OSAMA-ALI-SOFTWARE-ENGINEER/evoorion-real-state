@@ -175,7 +175,7 @@ export default function SellPage() {
               </p>
             </div>
           </ScrollReveal>
-          <LeadForm defaultMessage="I'd like to list my property for sale and request a free valuation." />
+          <LeadForm />
         </div>
       </section>
     </main>
