@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import './globals.css'
 import { getPublicSettings } from '@/lib/api'
+import { ServiceWorkerRegister } from '@/components/ui/ServiceWorkerRegister'
 
 export const metadata: Metadata = {
   title: {
@@ -21,6 +22,15 @@ export const metadata: Metadata = {
     locale: 'en_AE',
     siteName: 'EVOORION',
   },
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'black-translucent',
+    title: 'EVOORION',
+  },
+  icons: {
+    apple: '/logos/logomark.png',
+  },
+  formatDetection: { telephone: false },
 }
 
 // Strict hex-color whitelist — only #rgb, #rrggbb, #rrggbbaa forms allowed.
@@ -67,6 +77,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           />
         )}
         {children}
+        <ServiceWorkerRegister />
       </body>
     </html>
   )

@@ -2,11 +2,21 @@ import type { Metadata } from 'next'
 import { AuthProvider } from '@/context/AuthContext'
 import { ThemeProvider } from '@/context/ThemeContext'
 import { AgentationWidget } from '@/components/AgentationWidget'
+import { ServiceWorkerRegister } from '@/components/ServiceWorkerRegister'
 import './globals.css'
 
 export const metadata: Metadata = {
   title: 'EVOORION Admin',
   description: 'EVOORION real estate admin panel',
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'black-translucent',
+    title: 'EV Admin',
+  },
+  icons: {
+    apple: '/logos/logomark.png',
+  },
+  formatDetection: { telephone: false },
 }
 
 // Inline script prevents theme flash before React hydrates
@@ -37,6 +47,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           </ThemeProvider>
           <AgentationWidget />
         </AuthProvider>
+        <ServiceWorkerRegister />
       </body>
     </html>
   )
