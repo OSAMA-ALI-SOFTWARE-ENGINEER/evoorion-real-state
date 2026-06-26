@@ -3,7 +3,6 @@ import Image from 'next/image'
 import { Phone, Mail, MessageCircle, Building2, LayoutGrid } from 'lucide-react'
 import { ScrollReveal } from '@/components/ui/ScrollReveal'
 import { LeadForm } from '@/components/ui/LeadForm'
-import { SectionBackground } from '@/components/ui/SectionBackground'
 import { getAgents, type PublicAgent } from '@/lib/api'
 
 export const metadata: Metadata = {
@@ -137,7 +136,7 @@ export default async function AgentsPage() {
       </section>
 
       {/* CTA */}
-      <SectionBackground variant="section">
+      <section className="bg-brand-section">
         <div className="py-20 px-4">
           <div className="max-w-2xl mx-auto">
             <ScrollReveal>
@@ -152,7 +151,7 @@ export default async function AgentsPage() {
             <LeadForm />
           </div>
         </div>
-      </SectionBackground>
+      </section>
     </main>
   )
 }

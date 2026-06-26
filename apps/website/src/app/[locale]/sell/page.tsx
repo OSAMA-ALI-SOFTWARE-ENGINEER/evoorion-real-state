@@ -2,7 +2,6 @@ import type { Metadata } from 'next'
 import { CheckCircle2, TrendingUp, Eye, FileText, Users, Clock } from 'lucide-react'
 import { ScrollReveal } from '@/components/ui/ScrollReveal'
 import { LeadForm } from '@/components/ui/LeadForm'
-import { SectionBackground } from '@/components/ui/SectionBackground'
 
 export const metadata: Metadata = {
   title: 'Sell Your Property in Dubai | List With Us | EVOORION',
@@ -88,7 +87,7 @@ export default function SellPage() {
       </section>
 
       {/* Stats bar */}
-      <SectionBackground variant="section">
+      <section className="bg-brand-section">
         <div className="py-10 px-4">
           <div className="max-w-5xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8">
             {STATS.map((s) => (
@@ -101,7 +100,7 @@ export default function SellPage() {
             ))}
           </div>
         </div>
-      </SectionBackground>
+      </section>
 
       {/* How it works */}
       <section className="py-20 px-4">
@@ -138,7 +137,7 @@ export default function SellPage() {
       </section>
 
       {/* What's included */}
-      <SectionBackground variant="section">
+      <section className="bg-brand-section">
         <div className="py-20 px-4">
           <div className="max-w-4xl mx-auto">
             <ScrollReveal>
@@ -160,7 +159,7 @@ export default function SellPage() {
             </div>
           </div>
         </div>
-      </SectionBackground>
+      </section>
 
       {/* Lead form */}
       <section id="sell-form" className="py-20 px-4 scroll-mt-24">

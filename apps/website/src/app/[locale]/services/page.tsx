@@ -2,7 +2,6 @@ import type { Metadata } from 'next'
 import { Building2, Key, TrendingUp, FileText, ShieldCheck, Globe, Users, BarChart3 } from 'lucide-react'
 import { ScrollReveal } from '@/components/ui/ScrollReveal'
 import { LeadForm } from '@/components/ui/LeadForm'
-import { SectionBackground } from '@/components/ui/SectionBackground'
 
 export const metadata: Metadata = {
   title: 'Our Services | Dubai Real Estate Advisory | EVOORION',
@@ -111,7 +110,7 @@ export default function ServicesPage() {
       </section>
 
       {/* CTA */}
-      <SectionBackground variant="section">
+      <section className="bg-brand-section">
         <div className="py-20 px-4">
           <div className="max-w-2xl mx-auto">
             <ScrollReveal>
@@ -128,7 +127,7 @@ export default function ServicesPage() {
             <LeadForm />
           </div>
         </div>
-      </SectionBackground>
+      </section>
     </main>
   )
 }

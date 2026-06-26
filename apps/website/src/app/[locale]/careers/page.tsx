@@ -3,7 +3,6 @@ import type { Metadata } from 'next'
 import { MapPin, Briefcase, Clock, ChevronRight } from 'lucide-react'
 import { ScrollReveal } from '@/components/ui/ScrollReveal'
 import { LeadForm } from '@/components/ui/LeadForm'
-import { SectionBackground } from '@/components/ui/SectionBackground'
 import { getJobs, type JobListing } from '@/lib/api'
 
 export const metadata: Metadata = {
@@ -94,7 +93,7 @@ export default async function CareersPage() {
       </section>
 
       {/* Values */}
-      <SectionBackground variant="section">
+      <section className="bg-brand-section">
         <div className="py-16 px-4">
           <div className="max-w-5xl mx-auto">
             <ScrollReveal>
@@ -115,7 +114,7 @@ export default async function CareersPage() {
             </div>
           </div>
         </div>
-      </SectionBackground>
+      </section>
 
       {/* Open roles */}
       <section className="py-20 px-4">
@@ -146,7 +145,7 @@ export default async function CareersPage() {
       </section>
 
       {/* Apply form */}
-      <SectionBackground variant="section">
+      <section className="bg-brand-section">
         <div id="apply-form" className="py-20 px-4 scroll-mt-24">
           <div className="max-w-2xl mx-auto">
             <ScrollReveal>
@@ -161,7 +160,7 @@ export default async function CareersPage() {
             <LeadForm defaultMessage="I'd like to apply for a position at EVOORION. Please find my details below." />
           </div>
         </div>
-      </SectionBackground>
+      </section>
     </main>
   )
 }

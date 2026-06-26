@@ -2,7 +2,6 @@ import type { Metadata } from 'next'
 import { Wrench, BarChart3, Shield, Users, Clock, BadgePercent, CheckCircle2 } from 'lucide-react'
 import { ScrollReveal } from '@/components/ui/ScrollReveal'
 import { LeadForm } from '@/components/ui/LeadForm'
-import { SectionBackground } from '@/components/ui/SectionBackground'
 
 export const metadata: Metadata = {
   title: 'Property Management Dubai | Hassle-Free Rental Management | EVOORION',
@@ -88,7 +87,7 @@ export default function PropertyManagementPage() {
       </section>
 
       {/* Stats */}
-      <SectionBackground variant="section">
+      <section className="bg-brand-section">
         <div className="py-10 px-4">
           <div className="max-w-4xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-6">
             {STATS.map((s) => (
@@ -101,7 +100,7 @@ export default function PropertyManagementPage() {
             ))}
           </div>
         </div>
-      </SectionBackground>
+      </section>
 
       {/* Features */}
       <section className="py-20 px-4">
@@ -133,7 +132,7 @@ export default function PropertyManagementPage() {
       </section>
 
       {/* All-inclusive list */}
-      <SectionBackground variant="section">
+      <section className="bg-brand-section">
         <div className="py-20 px-4">
           <div className="max-w-4xl mx-auto">
             <ScrollReveal>
@@ -155,7 +154,7 @@ export default function PropertyManagementPage() {
             </div>
           </div>
         </div>
-      </SectionBackground>
+      </section>
 
       {/* Lead form */}
       <section id="management-form" className="py-20 px-4 scroll-mt-24">
