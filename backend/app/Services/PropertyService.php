@@ -39,7 +39,8 @@ class PropertyService
         $params = $request->only([
             'search', 'area_id', 'operation_type_id', 'type', 'featured',
             'min_price', 'max_price', 'developer_id', 'bedrooms_min', 'bedrooms_max',
-            'bathrooms_min', 'bathrooms_max', 'sort_by', 'sort_direction', 'per_page', 'page',
+            'bathrooms_min', 'bathrooms_max', 'min_area_sqft', 'max_area_sqft',
+            'sort_by', 'sort_direction', 'per_page', 'page',
         ]);
 
         // Normalize featured: treat false/0/'0'/'' identically to absent
@@ -88,6 +89,12 @@ class PropertyService
             }
             if ($request->filled('bathrooms_max')) {
                 $query = $query->where('bathrooms', '<=', $request->integer('bathrooms_max'));
+            }
+            if ($request->filled('min_area_sqft')) {
+                $query = $query->where('area_sqft', '>=', (float) $request->input('min_area_sqft'));
+            }
+            if ($request->filled('max_area_sqft')) {
+                $query = $query->where('area_sqft', '<=', (float) $request->input('max_area_sqft'));
             }
 
             $sortBy        = $request->input('sort_by', 'created_at');

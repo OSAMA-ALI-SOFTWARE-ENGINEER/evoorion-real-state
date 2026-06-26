@@ -44,6 +44,8 @@ export interface PropertyFilters {
   operation_type_id?: number
   min_price?: number
   max_price?: number
+  min_area_sqft?: number
+  max_area_sqft?: number
   sort_by?: string
   sort_direction?: 'asc' | 'desc'
   per_page?: number
@@ -173,6 +175,30 @@ export async function removeFavorite(propertySlug: string): Promise<ApiResponse<
   return res.data
 }
 
+// ── Saved Searches ────────────────────────────────────────────────────────────
+
+export interface SavedSearch {
+  id: number
+  name: string
+  filters: Record<string, unknown>
+  created_at: string
+}
+
+export async function getSavedSearches(): Promise<ApiResponse<SavedSearch[]>> {
+  const res = await api.get<ApiResponse<SavedSearch[]>>('/saved-searches')
+  return res.data
+}
+
+export async function createSavedSearch(name: string, filters: Record<string, unknown>): Promise<ApiResponse<SavedSearch>> {
+  const res = await api.post<ApiResponse<SavedSearch>>('/saved-searches', { name, filters })
+  return res.data
+}
+
+export async function deleteSavedSearch(id: number): Promise<ApiResponse<null>> {
+  const res = await api.delete<ApiResponse<null>>(`/saved-searches/${id}`)
+  return res.data
+}
+
 // ── Public settings ───────────────────────────────────────────────────────────
 
 export interface PublicSettings {
@@ -245,6 +271,48 @@ export interface ApiCurrency {
 export async function getCurrencies(): Promise<ApiResponse<ApiCurrency[]>> {
   const res = await api.get<ApiResponse<ApiCurrency[]>>('/currencies')
   return res.data
+}
+
+// ── Agents ────────────────────────────────────────────────────────────────────
+
+export interface PublicAgent {
+  id: number
+  name: string
+  email: string
+  phone?: string
+  whatsapp?: string
+  avatar_url?: string | null
+  agency?: { id: number; name: string } | null
+  listings: number
+}
+
+export async function getAgents(): Promise<PublicAgent[]> {
+  const res = await api.get<ApiResponse<PublicAgent[]>>('/agents')
+  return res.data.data
+}
+
+// ── Jobs ──────────────────────────────────────────────────────────────────────
+
+export interface JobListing {
+  id: number
+  title: string
+  department: string
+  location: string
+  type: 'full_time' | 'part_time' | 'contract' | 'internship'
+  description: string
+  requirements?: string
+  created_at: string
+}
+
+export async function getJobs(): Promise<JobListing[]> {
+  const res = await api.get<ApiResponse<JobListing[]>>('/jobs')
+  return res.data.data
+}
+
+// ── Newsletter ─────────────────────────────────────────────────────────────────
+
+export async function subscribeNewsletter(email: string, name?: string): Promise<void> {
+  await api.post('/newsletter/subscribe', { email, name })
 }
 
 export default api

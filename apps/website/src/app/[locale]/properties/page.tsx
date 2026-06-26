@@ -2,8 +2,9 @@
 
 import { Suspense, useCallback, useEffect, useRef, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
+import dynamic from 'next/dynamic'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Search, SlidersHorizontal, X } from 'lucide-react'
+import { Search, SlidersHorizontal, X, LayoutGrid, Map, Bell } from 'lucide-react'
 import {
   getProperties,
   getAreas,
@@ -11,8 +12,16 @@ import {
   getFavorites,
   addFavorite,
   removeFavorite,
+  getSavedSearches,
+  type SavedSearch,
 } from '@/lib/api'
+import { SavedSearchModal } from '@/components/ui/SavedSearchModal'
 import { PropertyCard } from '@/components/ui/PropertyCard'
+
+const PropertyMapView = dynamic(
+  () => import('@/components/ui/PropertyMapView').then((m) => m.PropertyMapView),
+  { ssr: false, loading: () => <div className="w-full h-[60vh] min-h-[420px] rounded-sm border border-gold-border bg-brand-section/40 animate-pulse" /> },
+)
 import { SkeletonCard } from '@/components/ui/SkeletonCard'
 import { ScrollReveal } from '@/components/ui/ScrollReveal'
 import { AuthModal } from '@/components/ui/AuthModal'
@@ -93,6 +102,13 @@ function PropertiesPageInner() {
   const [areas, setAreas] = useState<Area[]>([])
   const [opTypes, setOpTypes] = useState<OperationType[]>([])
 
+  // View mode: grid or map
+  const [viewMode, setViewMode] = useState<'grid' | 'map'>('grid')
+
+  // Saved searches
+  const [savedSearches, setSavedSearches] = useState<SavedSearch[]>([])
+  const [showSaveModal, setShowSaveModal] = useState(false)
+
   // Filter panel toggle
   const [showAdvanced, setShowAdvanced] = useState(false)
 
@@ -152,11 +168,14 @@ function PropertiesPageInner() {
     setInitialized(true)
   }, [searchParams, opTypes, areas])
 
-  // Load favorites when user is logged in
+  // Load favorites and saved searches when user is logged in
   useEffect(() => {
-    if (!user) { setFavoriteIds(new Set()); return }
+    if (!user) { setFavoriteIds(new Set()); setSavedSearches([]); return }
     getFavorites()
       .then((res) => setFavoriteIds(new Set(res.data.map((p) => p.id))))
+      .catch(() => {})
+    getSavedSearches()
+      .then((res) => setSavedSearches(res.data ?? []))
       .catch(() => {})
   }, [user])
 
@@ -247,6 +266,26 @@ function PropertiesPageInner() {
 
   const hasAdvancedFilters = !!(areaId || opTypeId || priceKey || sortKey)
 
+  // Build a plain object of current filters suitable for saving
+  const currentFiltersObj: Record<string, unknown> = {
+    ...(opName !== 'all' ? { operation: opName } : {}),
+    ...(activeType ? { type: activeType } : {}),
+    ...(areaId ? { area_id: areaId } : {}),
+    ...(priceKey ? { price_range: priceKey } : {}),
+    ...(debouncedSearch ? { search: debouncedSearch } : {}),
+    ...(sortKey ? { sort: sortKey } : {}),
+  }
+
+  function buildFilterSummary(): string {
+    const parts: string[] = []
+    if (opName !== 'all') parts.push(opName.charAt(0).toUpperCase() + opName.slice(1))
+    if (activeType) parts.push(activeType.charAt(0).toUpperCase() + activeType.slice(1))
+    if (areaId) { const a = areas.find(x => x.id === areaId); if (a) parts.push(a.name) }
+    if (priceKey) parts.push(priceKey.replace(/_/g, ' '))
+    if (debouncedSearch) parts.push(`"${debouncedSearch}"`)
+    return parts.length ? parts.join(' · ') : 'All properties'
+  }
+
   return (
     <>
       {/* Hero */}
@@ -291,6 +330,40 @@ function PropertiesPageInner() {
             </div>
 
             <div className="flex items-center gap-2 w-full sm:w-auto">
+              {/* Save search */}
+              <button
+                type="button"
+                title="Save this search"
+                onClick={() => { if (!user) setShowAuth(true); else setShowSaveModal(true) }}
+                className="flex items-center justify-center w-9 h-9 border border-white/10 rounded-sm text-muted hover:text-gold hover:border-gold/40 transition-colors shrink-0"
+              >
+                <Bell size={14} />
+              </button>
+
+              {/* View mode toggle */}
+              <div className="flex rounded-sm border border-white/10 overflow-hidden shrink-0">
+                <button
+                  type="button"
+                  onClick={() => setViewMode('grid')}
+                  title="Grid view"
+                  className={`flex items-center justify-center w-9 h-9 transition-colors ${
+                    viewMode === 'grid' ? 'bg-gold text-brand' : 'text-muted hover:text-white'
+                  }`}
+                >
+                  <LayoutGrid size={14} />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setViewMode('map')}
+                  title="Map view"
+                  className={`flex items-center justify-center w-9 h-9 border-l border-white/10 transition-colors ${
+                    viewMode === 'map' ? 'bg-gold text-brand' : 'text-muted hover:text-white'
+                  }`}
+                >
+                  <Map size={14} />
+                </button>
+              </div>
+
               {/* Search */}
               <div className="relative flex-1 sm:w-56">
                 <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted pointer-events-none" />
@@ -396,35 +469,43 @@ function PropertiesPageInner() {
         </div>
       </section>
 
-      {/* Grid */}
+      {/* Grid / Map */}
       <section className={`py-16 bg-brand min-h-[60vh] ${compareList.length > 0 ? 'pb-36' : ''}`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          {loading ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {Array.from({ length: 9 }).map((_, i) => <SkeletonCard key={i} />)}
-            </div>
-          ) : properties.length === 0 ? (
-            <div className="text-center py-24">
-              <SlidersHorizontal size={40} className="text-gold/30 mx-auto mb-4" />
-              <p className="text-muted text-lg mb-2">No properties found</p>
-              <p className="text-muted/60 text-sm">Try adjusting your filters</p>
-            </div>
-          ) : (
-            <AnimatePresence mode="popLayout">
-              <motion.div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" layout>
-                {properties.map((p, i) => (
-                  <ScrollReveal key={p.id} delay={i * 0.05} className="h-full">
-                    <PropertyCard
-                      property={p}
-                      isFavorited={favoriteIds.has(p.id)}
-                      onToggleFavorite={toggleFavorite}
-                      isComparing={!!compareList.find((c) => c.id === p.id)}
-                      onToggleCompare={toggleCompare}
-                    />
-                  </ScrollReveal>
-                ))}
-              </motion.div>
-            </AnimatePresence>
+          {/* Map view */}
+          {viewMode === 'map' && (
+            <PropertyMapView properties={properties} areas={areas} />
+          )}
+
+          {/* Grid view */}
+          {viewMode === 'grid' && (
+            loading ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {Array.from({ length: 9 }).map((_, i) => <SkeletonCard key={i} />)}
+              </div>
+            ) : properties.length === 0 ? (
+              <div className="text-center py-24">
+                <SlidersHorizontal size={40} className="text-gold/30 mx-auto mb-4" />
+                <p className="text-muted text-lg mb-2">No properties found</p>
+                <p className="text-muted/60 text-sm">Try adjusting your filters</p>
+              </div>
+            ) : (
+              <AnimatePresence mode="popLayout">
+                <motion.div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" layout>
+                  {properties.map((p, i) => (
+                    <ScrollReveal key={p.id} delay={i * 0.05} className="h-full">
+                      <PropertyCard
+                        property={p}
+                        isFavorited={favoriteIds.has(p.id)}
+                        onToggleFavorite={toggleFavorite}
+                        isComparing={!!compareList.find((c) => c.id === p.id)}
+                        onToggleCompare={toggleCompare}
+                      />
+                    </ScrollReveal>
+                  ))}
+                </motion.div>
+              </AnimatePresence>
+            )
           )}
 
           {totalPages > 1 && !loading && (
@@ -506,6 +587,16 @@ function PropertiesPageInner() {
       </AnimatePresence>
 
       {showAuth && <AuthModal onClose={() => setShowAuth(false)} />}
+      {showSaveModal && (
+        <SavedSearchModal
+          onClose={() => setShowSaveModal(false)}
+          currentFilters={currentFiltersObj}
+          filterSummary={buildFilterSummary()}
+          savedSearches={savedSearches}
+          onSaved={(s) => setSavedSearches((prev) => [s, ...prev])}
+          onDeleted={(id) => setSavedSearches((prev) => prev.filter((s) => s.id !== id))}
+        />
+      )}
       <CantFindCTA />
     </>
   )

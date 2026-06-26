@@ -20,15 +20,7 @@
   },
   "hero": {
     "eyebrow": "Luxury Real Estate Investment",
-    "results": "{count} Results",
-    "line1": "Invest in Dubai.",
-    "line2": "Secure Your Legacy.",
-    "subtext": "Exclusive off-market opportunities. High returns. Full-service investment advisory.",
-    "ctaPrimary": "Explore Opportunities",
-    "ctaSecondary": "Book Private Call",
-    "statPropertiesSold": "Properties Sold",
-    "statTransactions": "Transactions",
-    "statClientSatisfaction": "Client Satisfaction"
+    "results": "{count} Results"
   },
   "search": {
     "buy": "Buy",
@@ -59,52 +51,6 @@
     "successBody": "Our advisors have received your requirements and will match you with the most suitable properties within 24 hours.",
     "close": "Close"
   },
-  "whatWeDo": {
-    "eyebrow": "What We Do",
-    "headline1": "Strategic Investments.",
-    "headline2": "Tailored for You.",
-    "body": "EVOORION is a Dubai-based luxury real estate investment firm dedicated to helping high-net-worth individuals build and grow their real estate portfolios with confidence and precision.",
-    "service1Title": "Off-Plan Investments",
-    "service1Desc": "Access pre-launch opportunities from Dubai's most prestigious developers. Secure units at pre-market pricing with flexible payment plans and exceptional capital appreciation potential.",
-    "service2Title": "Ready Properties",
-    "service2Desc": "Immediate rental income from handpicked ready-to-occupy villas, apartments, and penthouses in Dubai's most sought-after communities — delivering 8–12% annual rental yields.",
-    "service3Title": "Private Advisory",
-    "service3Desc": "End-to-end investment management: market intelligence, legal structuring, property management, and portfolio optimisation — all handled by our expert team."
-  },
-  "whyDubai": {
-    "eyebrow": "Why Invest in Dubai",
-    "headline1": "A City Built",
-    "headline2": "for Growth.",
-    "stat1Value": "0%",
-    "stat1Label": "Property Tax",
-    "stat1Desc": "No property or capital gains tax.",
-    "stat2Value": "8–12%",
-    "stat2Label": "Rental Yield",
-    "stat2Desc": "Among the highest rental yields globally.",
-    "stat3Value": "100%",
-    "stat3Label": "Foreign Ownership",
-    "stat3Desc": "Full ownership in designated freehold areas.",
-    "stat4Value": "#1",
-    "stat4Label": "Global Destination",
-    "stat4Desc": "Dubai ranked #1 city to live and invest."
-  },
-  "process": {
-    "eyebrow": "The Process",
-    "headline1": "A Seamless",
-    "headline2": "Investment Journey",
-    "step": "Step",
-    "step1Title": "Discover",
-    "step1Desc": "We conduct a thorough discovery session to understand your investment goals, risk profile, and preferences.",
-    "step2Title": "Select",
-    "step2Desc": "Our advisors curate a bespoke shortlist of off-market and listed properties matched to your criteria.",
-    "step3Title": "Acquire",
-    "step3Desc": "We handle negotiations, legal due diligence, SPA drafting, and DLD registration — end to end.",
-    "step4Title": "Manage",
-    "step4Desc": "Post-acquisition, our team ensures your asset is tenanted, managed, and optimised for maximum yield."
-  },
-  "trustStrip": {
-    "label": "Trusted by Leading Developers"
-  },
   "properties": {
     "bedrooms": "Bedrooms",
     "bathrooms": "Bathrooms",
@@ -124,22 +70,12 @@
     "subtitle": "Speak with our investment advisors"
   },
   "footer": {
-    "tagline": "Your gateway to exclusive Dubai real estate. We connect discerning investors with the finest luxury properties, delivering exceptional returns and a seamless acquisition experience.",
-    "quickLinks": "Quick Links",
-    "investments": "Investments",
-    "contactUs": "Contact Us",
-    "officeHours": "Office Hours",
-    "offPlanProperties": "Off-Plan Properties",
-    "readyProperties": "Ready Properties",
-    "privateAdvisory": "Private Advisory",
-    "browseAll": "Browse All",
     "newsletter": "Stay informed on exclusive Dubai real estate opportunities.",
     "subscribe": "Subscribe",
     "subscribePlaceholder": "Your email address",
     "rights": "All rights reserved.",
     "privacy": "Privacy Policy",
-    "terms": "Terms of Service",
-    "serving": "Serving: Palm Jumeirah · Downtown · Marina · Business Bay · JVC · Creek Harbour"
+    "terms": "Terms of Service"
   },
   "common": {
     "loading": "Loading…",

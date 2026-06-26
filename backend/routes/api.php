@@ -38,6 +38,11 @@ use App\Http\Controllers\Api\V1\CmsController;
 use App\Http\Controllers\Api\V1\PublicSettingController;
 use App\Http\Controllers\Api\V1\UserPreferenceController;
 use App\Http\Controllers\Api\V1\SearchSuggestionController;
+use App\Http\Controllers\Api\V1\SavedSearchController;
+use App\Http\Controllers\Api\V1\NewsletterController;
+use App\Http\Controllers\Api\V1\PublicAgentController;
+use App\Http\Controllers\Api\V1\JobListingController;
+use App\Http\Controllers\Api\V1\Admin\JobListingController as AdminJobListingController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')->group(function () {
@@ -79,6 +84,8 @@ Route::prefix('v1')->group(function () {
         Route::get('developers', [DeveloperController::class, 'index']);
         Route::get('developers/{developer}', [DeveloperController::class, 'show']);
         Route::get('operation-types', [OperationTypeController::class, 'index']);
+        Route::get('agents', [PublicAgentController::class, 'index']);
+        Route::get('jobs', [JobListingController::class, 'index']);
 
         // Public property endpoints
         Route::get('properties', [PropertyController::class, 'index']);
@@ -93,6 +100,9 @@ Route::prefix('v1')->group(function () {
         Route::get('blog/{slug}', [BlogController::class, 'show']);
     });
 
+    // Newsletter subscription
+    Route::middleware('throttle:5,1')->post('newsletter/subscribe', [NewsletterController::class, 'subscribe']);
+
     // Public lead submission (stricter rate limit)
     Route::middleware('throttle:10,1')->post('leads', [LeadController::class, 'store']);
 
@@ -104,6 +114,10 @@ Route::prefix('v1')->group(function () {
 
         Route::get('user/preferences',  [UserPreferenceController::class, 'show']);
         Route::put('user/preferences',  [UserPreferenceController::class, 'update']);
+
+        Route::get('saved-searches',              [SavedSearchController::class, 'index']);
+        Route::post('saved-searches',             [SavedSearchController::class, 'store']);
+        Route::delete('saved-searches/{savedSearch}', [SavedSearchController::class, 'destroy']);
     });
 
     // Admin endpoints
@@ -223,6 +237,12 @@ Route::prefix('v1')->group(function () {
             Route::post('properties/{property}/images', [PropertyImageController::class, 'store']);
             Route::put('properties/{property}/images/{image}', [PropertyImageController::class, 'update']);
             Route::delete('properties/{property}/images/{image}', [PropertyImageController::class, 'destroy']);
+
+            // Job listings admin CRUD
+            Route::get('jobs', [AdminJobListingController::class, 'index']);
+            Route::post('jobs', [AdminJobListingController::class, 'store']);
+            Route::put('jobs/{jobListing}', [AdminJobListingController::class, 'update']);
+            Route::delete('jobs/{jobListing}', [AdminJobListingController::class, 'destroy']);
 
             // Blog admin CRUD
             Route::get('blog',                 [AdminBlogController::class, 'index']);
