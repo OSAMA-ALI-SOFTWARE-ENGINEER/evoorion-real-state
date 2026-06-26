@@ -1,3 +1,4 @@
+import { notFound } from 'next/navigation'
 import type { Metadata } from 'next'
 import { MapPin, Briefcase, Clock, ChevronRight } from 'lucide-react'
 import { ScrollReveal } from '@/components/ui/ScrollReveal'
@@ -67,6 +68,7 @@ function JobCard({ job }: { job: JobListing }) {
 }
 
 export default async function CareersPage() {
+  notFound()
   let jobs: JobListing[] = []
   try {
     jobs = await getJobs()
