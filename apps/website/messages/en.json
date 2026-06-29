@@ -20,7 +20,61 @@
   },
   "hero": {
     "eyebrow": "Luxury Real Estate Investment",
-    "results": "{count} Results"
+    "results": "{count} Results",
+    "line1": "Invest in Dubai.",
+    "line2": "Secure Your Legacy.",
+    "subtext": "We connect discerning investors with the finest luxury properties, delivering exceptional returns and a seamless acquisition experience.",
+    "ctaPrimary": "Browse Properties",
+    "ctaSecondary": "Book a Consultation",
+    "statPropertiesSold": "Properties Sold",
+    "statTransactions": "Transaction Volume",
+    "statClientSatisfaction": "Client Satisfaction"
+  },
+  "whatWeDo": {
+    "eyebrow": "What We Do",
+    "headline1": "Dubai Real Estate,",
+    "headline2": "Simplified",
+    "body": "From luxury residential to high-yield commercial assets, we guide investors at every stage of their Dubai property journey.",
+    "service1Title": "Off-Plan Investment",
+    "service1Desc": "Secure tomorrow's premium properties at today's prices. Access exclusive pre-launch opportunities with high capital appreciation potential.",
+    "service2Title": "Ready Properties",
+    "service2Desc": "Move-in ready units and income-generating assets delivering immediate returns and stable long-term value.",
+    "service3Title": "Portfolio Advisory",
+    "service3Desc": "Strategic guidance on building and managing a diversified Dubai property portfolio tailored to your goals."
+  },
+  "whyDubai": {
+    "eyebrow": "Why Dubai",
+    "headline1": "The World's Most Dynamic",
+    "headline2": "Real Estate Market",
+    "stat1Value": "0%",
+    "stat1Label": "Income Tax",
+    "stat1Desc": "No personal income tax or capital gains tax — keep more of your investment return.",
+    "stat2Value": "8–12%",
+    "stat2Label": "Rental Yields",
+    "stat2Desc": "Among the highest rental yields globally in prime Dubai locations.",
+    "stat3Value": "200+",
+    "stat3Label": "Nationalities",
+    "stat3Desc": "A truly global hub attracting investors and residents from across the world.",
+    "stat4Value": "Top 1",
+    "stat4Label": "Safety Rating",
+    "stat4Desc": "Consistently ranked among the safest cities globally for residents and investments."
+  },
+  "process": {
+    "eyebrow": "How It Works",
+    "headline1": "From Enquiry to",
+    "headline2": "Completed Investment",
+    "step": "Step",
+    "step1Title": "Initial Consultation",
+    "step1Desc": "We learn your investment goals, budget, and preferences — then tailor a shortlist of opportunities to match.",
+    "step2Title": "Property Selection",
+    "step2Desc": "Browse curated options, attend viewings, and receive detailed ROI analysis for each property.",
+    "step3Title": "Offer & Legal",
+    "step3Desc": "We negotiate on your behalf and manage all documentation, including MOU and DLD registration.",
+    "step4Title": "Handover & Support",
+    "step4Desc": "We oversee the handover process and offer ongoing property management and resale support."
+  },
+  "trustStrip": {
+    "label": "Trusted by Leading Developers"
   },
   "search": {
     "buy": "Buy",

@@ -20,7 +20,61 @@
   },
   "hero": {
     "eyebrow": "Luxus-Immobilieninvestitionen",
-    "results": "{count} Ergebnisse"
+    "results": "{count} Ergebnisse",
+    "line1": "Investieren in Dubai.",
+    "line2": "Sichern Sie Ihr Erbe.",
+    "subtext": "Wir verbinden anspruchsvolle Investoren mit den feinsten Luxusimmobilien und erzielen außergewöhnliche Renditen bei einem reibungslosen Erwerbsprozess.",
+    "ctaPrimary": "Immobilien ansehen",
+    "ctaSecondary": "Beratungstermin",
+    "statPropertiesSold": "Verkaufte Immobilien",
+    "statTransactions": "Transaktionsvolumen",
+    "statClientSatisfaction": "Kundenzufriedenheit"
+  },
+  "whatWeDo": {
+    "eyebrow": "Was wir tun",
+    "headline1": "Dubai-Immobilien,",
+    "headline2": "Vereinfacht",
+    "body": "Von luxuriösen Wohnimmobilien bis hin zu hochrentablen Gewerbeimmobilien begleiten wir Investoren auf jedem Schritt ihrer Dubai-Immobilienreise.",
+    "service1Title": "Vorverkauf-Investitionen",
+    "service1Desc": "Sichern Sie sich die Premiumimmobilien von morgen zu heutigen Preisen mit exklusivem Zugang zu Pre-Launch-Angeboten.",
+    "service2Title": "Fertige Immobilien",
+    "service2Desc": "Bezugsfertige Einheiten und ertragsstarke Anlagen, die sofortige Renditen und langfristig stabilen Wert liefern.",
+    "service3Title": "Portfolio-Beratung",
+    "service3Desc": "Strategische Beratung beim Aufbau und der Verwaltung eines auf Ihre Ziele zugeschnittenen Dubai-Immobilienportfolios."
+  },
+  "whyDubai": {
+    "eyebrow": "Warum Dubai",
+    "headline1": "Der dynamischste Immobilienmarkt",
+    "headline2": "der Welt",
+    "stat1Value": "0%",
+    "stat1Label": "Einkommensteuer",
+    "stat1Desc": "Keine Einkommensteuer oder Kapitalertragsteuer — behalten Sie mehr von Ihrer Investitionsrendite.",
+    "stat2Value": "8–12%",
+    "stat2Label": "Mietrenditen",
+    "stat2Desc": "Zu den höchsten Mietrenditen weltweit in erstklassigen Dubai-Lagen.",
+    "stat3Value": "200+",
+    "stat3Label": "Nationalitäten",
+    "stat3Desc": "Ein globaler Knotenpunkt, der Investoren und Einwohner aus aller Welt anzieht.",
+    "stat4Value": "Platz 1",
+    "stat4Label": "Sicherheitsbewertung",
+    "stat4Desc": "Regelmäßig zu den sichersten Städten der Welt für Einwohner und Investitionen gezählt."
+  },
+  "process": {
+    "eyebrow": "So funktioniert es",
+    "headline1": "Von der Anfrage zur",
+    "headline2": "Abgeschlossenen Investition",
+    "step": "Schritt",
+    "step1Title": "Erstberatung",
+    "step1Desc": "Wir lernen Ihre Investitionsziele, Ihr Budget und Ihre Präferenzen kennen — und stellen eine maßgeschneiderte Auswahl zusammen.",
+    "step2Title": "Immobilienauswahl",
+    "step2Desc": "Entdecken Sie kuratierte Optionen, besuchen Sie Besichtigungen und erhalten Sie detaillierte ROI-Analysen.",
+    "step3Title": "Angebot & Rechtliches",
+    "step3Desc": "Wir verhandeln in Ihrem Namen und verwalten alle Dokumente einschließlich MOU und DLD-Registrierung.",
+    "step4Title": "Übergabe & Support",
+    "step4Desc": "Wir begleiten den Übergabeprozess und bieten fortlaufenden Support bei Verwaltung und Wiederverkauf."
+  },
+  "trustStrip": {
+    "label": "Vertraut von führenden Entwicklern"
   },
   "search": {
     "buy": "Kaufen",

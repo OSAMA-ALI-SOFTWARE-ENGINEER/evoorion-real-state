@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react'
 import { useLocale } from 'next-intl'
-import { usePathname, useRouter } from 'next/navigation'
+import { usePathname, useRouter } from '@/i18n/navigation'
 import { ChevronDown } from 'lucide-react'
 import { AnimatePresence, motion } from 'framer-motion'
 
@@ -12,10 +12,12 @@ const LOCALES = [
   { code: 'ar', label: 'AR', flag: '🇸🇦', name: 'العربية' },
 ] as const
 
+type LocaleCode = typeof LOCALES[number]['code']
+
 export function LanguageSwitcher() {
   const locale   = useLocale()
-  const pathname = usePathname()
-  const router   = useRouter()
+  const pathname = usePathname() // locale-stripped path from next-intl
+  const router   = useRouter()   // locale-aware router from next-intl
   const [open, setOpen] = useState(false)
   const ref = useRef<HTMLDivElement>(null)
 
@@ -29,17 +31,10 @@ export function LanguageSwitcher() {
     return () => document.removeEventListener('mousedown', handler)
   }, [])
 
-  const switchTo = (code: string) => {
+  const switchTo = (code: LocaleCode) => {
     setOpen(false)
-    // Strip current locale prefix and add new one
-    let path = pathname
-    for (const l of LOCALES) {
-      if (path.startsWith(`/${l.code}/`)) { path = path.slice(l.code.length + 1); break }
-      if (path === `/${l.code}`) { path = '/'; break }
-    }
-    // For 'en' (default, no prefix with localePrefix: 'as-needed')
-    const newPath = code === 'en' ? path || '/' : `/${code}${path.startsWith('/') ? path : '/' + path}`
-    router.push(newPath)
+    if (code === locale) return
+    router.replace(pathname, { locale: code })
   }
 
   return (
