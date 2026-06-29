@@ -170,7 +170,12 @@ export default function LocationDetailPage({ params }: { params: Promise<{ slug:
               {area.latitude != null && area.longitude != null && (
                 <ScrollReveal>
                   <h2 className="font-serif text-2xl font-bold text-white mb-4">Location</h2>
-                  <AreaMap lat={area.latitude} lng={area.longitude} name={area.name} />
+                  <AreaMap
+                    lat={area.latitude}
+                    lng={area.longitude}
+                    name={area.name}
+                    propertyCount={propsLoading ? undefined : properties.length}
+                  />
                 </ScrollReveal>
               )}
 

@@ -7,6 +7,7 @@ import { MapPin, TrendingUp, ArrowRight } from 'lucide-react'
 import { getAreas } from '@/lib/api'
 import { ScrollReveal } from '@/components/ui/ScrollReveal'
 import { SectionBackground } from '@/components/ui/SectionBackground'
+import { LocationsMap } from '@/components/ui/LocationsMap'
 import type { Area } from '@/types'
 
 const PLACEHOLDER = 'https://images.unsplash.com/photo-1512453979798-5ea266f8880c?auto=format&fit=crop&w=800&q=80'
@@ -130,6 +131,19 @@ export default function LocationsPage() {
           </div>
         </div>
       </section>
+
+      {/* Interactive map */}
+      {!loading && areas.length > 0 && (
+        <section className="bg-brand py-10">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex items-center gap-3 mb-5">
+              <div className="h-px w-8 bg-gold" />
+              <span className="text-gold text-xs tracking-[0.3em] uppercase">Map View</span>
+            </div>
+            <LocationsMap areas={areas} />
+          </div>
+        </section>
+      )}
 
       {/* Area cards grid */}
       <section className="py-16 bg-brand min-h-[60vh]">

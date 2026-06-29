@@ -9,9 +9,8 @@ import { Menu, X, Phone, LogOut, User, Heart, ChevronRight, MapPin } from 'lucid
 import { useTranslations } from 'next-intl'
 import { useAuth } from '@/context/AuthContext'
 import { AuthModal } from '@/components/ui/AuthModal'
-import { CountrySelector } from '@/components/ui/CountrySelector'
 import { GlobalSearch, GlobalSearchButton } from '@/components/ui/GlobalSearch'
-import { LanguageSwitcher } from '@/components/ui/LanguageSwitcher'
+import { LocaleSelector } from '@/components/ui/LocaleSelector'
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000/api/v1'
 
@@ -216,11 +215,8 @@ export function Navbar() {
               {/* Search */}
               <GlobalSearchButton onClick={() => setSearchOpen(true)} />
 
-              {/* Language */}
-              <LanguageSwitcher />
-
-              {/* Country */}
-              <CountrySelector />
+              {/* Language + Region combined */}
+              <LocaleSelector />
 
               {/* Book Call — hidden on small mobile */}
               <Link
