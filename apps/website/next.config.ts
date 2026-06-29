@@ -3,6 +3,8 @@ import createNextIntlPlugin from 'next-intl/plugin'
 
 const withNextIntl = createNextIntlPlugin('./src/i18n/request.ts')
 
+const isDev = process.env.NODE_ENV === 'development'
+
 const nextConfig: NextConfig = {
   output: 'standalone',
   images: {
@@ -27,12 +29,12 @@ const nextConfig: NextConfig = {
         hostname: 'api.evoorionrealestate.com',
         pathname: '/**',
       },
-      {
-        protocol: 'http',
-        hostname: 'localhost',
-        port: '8000',
-        pathname: '/**',
-      },
+      // Only allow the local dev API server in development builds.
+      // Keeping this in production would allow the image optimization
+      // endpoint to proxy requests to localhost on the server (SSRF).
+      ...(isDev
+        ? [{ protocol: 'http' as const, hostname: 'localhost', port: '8000', pathname: '/**' }]
+        : []),
     ],
   },
 }
