@@ -29,6 +29,13 @@ const nextConfig: NextConfig = {
         hostname: 'api.evoorionrealestate.com',
         pathname: '/**',
       },
+      // Legacy: images uploaded before the domain migration still reference this host.
+      // A DB migration replaces them, but this covers any that slip through.
+      {
+        protocol: 'https',
+        hostname: 'evoorion-api.osama-ali.com',
+        pathname: '/**',
+      },
       // Only allow the local dev API server in development builds.
       // Keeping this in production would allow the image optimization
       // endpoint to proxy requests to localhost on the server (SSRF).
