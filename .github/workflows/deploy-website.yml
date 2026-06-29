@@ -66,6 +66,8 @@ jobs:
             # Create nodejs app directory on first deploy
             mkdir -p "$APP_DIR"
 
+            # Clear stale Next.js cache before extracting new build
+            rm -rf "$APP_DIR/.next/cache/" || true
             tar xzf ~/website-deploy.tar.gz -C "$APP_DIR"
             rm ~/website-deploy.tar.gz
 

@@ -1,17 +1,14 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { ArrowRight, ChevronDown } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 
-type OperationTab = 'buy' | 'rent' | 'off-plan'
-
 export function HeroSection({ cms, bgImage }: { cms?: Record<string, unknown>; bgImage?: string | null }) {
   const t  = useTranslations('hero')
-  const ts = useTranslations('search')
 
   const eyebrow      = t('eyebrow')
   const line1        = t('line1')
@@ -24,14 +21,6 @@ export function HeroSection({ cms, bgImage }: { cms?: Record<string, unknown>; b
     { value: 'AED 2B+', label: t('statTransactions') },
     { value: '98%',     label: t('statClientSatisfaction') },
   ]
-
-  const OP_TABS: { key: OperationTab; label: string }[] = [
-    { key: 'buy',      label: ts('buy')     },
-    { key: 'rent',     label: ts('rent')    },
-    { key: 'off-plan', label: ts('offPlan') },
-  ]
-
-  const [operationTab, setOperationTab] = useState<OperationTab>('buy')
 
   const parallaxRef = useRef<HTMLDivElement>(null)
 
@@ -80,7 +69,7 @@ export function HeroSection({ cms, bgImage }: { cms?: Record<string, unknown>; b
       </div>
 
       {/* Content — pt-24 clears the 80px fixed navbar */}
-      <div className="relative z-10 max-w-5xl mx-auto px-6 text-center pt-24 pb-28">
+      <div className="relative z-10 max-w-5xl mx-auto px-5 sm:px-6 text-center pt-20 pb-16 sm:pt-24 sm:pb-24">
         {/* Eyebrow */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -100,7 +89,7 @@ export function HeroSection({ cms, bgImage }: { cms?: Record<string, unknown>; b
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.4 }}
-          className="font-serif text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold leading-[1.05] mb-4"
+          className="font-serif text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-bold leading-[1.05] mb-4"
         >
           <span className="text-white block">{line1}</span>
           <span className="text-gold-gradient block mt-1">{line2}</span>
@@ -116,38 +105,15 @@ export function HeroSection({ cms, bgImage }: { cms?: Record<string, unknown>; b
           {subtext}
         </motion.p>
 
-        {/* Operation tabs */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.78 }}
-          className="flex items-center justify-center gap-2 mb-8"
-        >
-          {OP_TABS.map((tab) => (
-            <button
-              key={tab.key}
-              type="button"
-              onClick={() => setOperationTab(tab.key)}
-              className={`px-7 py-2.5 text-xs tracking-widest uppercase rounded-sm border transition-all duration-200 ${
-                operationTab === tab.key
-                  ? 'bg-gold text-brand border-gold font-semibold'
-                  : 'border-white/25 text-white/70 hover:border-gold/50 hover:text-white'
-              }`}
-            >
-              {tab.label}
-            </button>
-          ))}
-        </motion.div>
-
         {/* CTAs */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, delay: 0.85 }}
+          transition={{ duration: 0.7, delay: 0.78 }}
           className="flex flex-col sm:flex-row items-center justify-center gap-4"
         >
           <Link
-            href={`/properties?operation=${operationTab}`}
+            href="/properties"
             className="group flex items-center gap-2.5 px-8 py-4 bg-gold text-brand font-semibold text-sm tracking-widest uppercase rounded-sm hover:bg-gold-light transition-colors duration-300"
           >
             {ctaPrimary}
@@ -166,7 +132,7 @@ export function HeroSection({ cms, bgImage }: { cms?: Record<string, unknown>; b
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.8, delay: 1.2 }}
-          className="mt-16 flex flex-wrap items-center justify-center gap-8 text-center"
+          className="mt-10 sm:mt-16 flex flex-wrap items-center justify-center gap-6 sm:gap-8 text-center"
         >
           {stats.map(({ value, label }) => (
             <div key={label}>

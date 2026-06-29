@@ -1,6 +1,7 @@
 import { NextIntlClientProvider } from 'next-intl'
 import { getMessages } from 'next-intl/server'
 import { notFound } from 'next/navigation'
+import NextTopLoader from 'nextjs-toploader'
 import { Navbar } from '@/components/layout/Navbar'
 import { Footer } from '@/components/layout/Footer'
 import { WhatsAppButton } from '@/components/ui/WhatsAppButton'
@@ -28,6 +29,7 @@ export default async function LocaleLayout({
     <NextIntlClientProvider messages={messages}>
       <CountryProvider locale={locale}>
         <HtmlLocale />
+        <NextTopLoader color="#C9A84C" height={2} showSpinner={false} />
         <AuthProvider>
           <Navbar />
           <main className="flex-1">{children}</main>

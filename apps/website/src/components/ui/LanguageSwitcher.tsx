@@ -1,9 +1,9 @@
 'use client'
 
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect, useTransition } from 'react'
 import { useLocale } from 'next-intl'
 import { usePathname, useRouter } from '@/i18n/navigation'
-import { ChevronDown } from 'lucide-react'
+import { ChevronDown, Loader2 } from 'lucide-react'
 import { AnimatePresence, motion } from 'framer-motion'
 
 const LOCALES = [
@@ -19,6 +19,7 @@ export function LanguageSwitcher() {
   const pathname = usePathname() // locale-stripped path from next-intl
   const router   = useRouter()   // locale-aware router from next-intl
   const [open, setOpen] = useState(false)
+  const [isPending, startTransition] = useTransition()
   const ref = useRef<HTMLDivElement>(null)
 
   const current = LOCALES.find((l) => l.code === locale) ?? LOCALES[0]
@@ -34,7 +35,9 @@ export function LanguageSwitcher() {
   const switchTo = (code: LocaleCode) => {
     setOpen(false)
     if (code === locale) return
-    router.replace(pathname, { locale: code })
+    startTransition(() => {
+      router.replace(pathname, { locale: code })
+    })
   }
 
   return (
@@ -42,10 +45,15 @@ export function LanguageSwitcher() {
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
-        className="flex items-center gap-1.5 py-1.5 px-2.5 rounded-full border border-white/10 hover:border-gold/30 text-muted hover:text-white transition-all duration-200 text-xs font-semibold tracking-wider"
+        disabled={isPending}
+        className="flex items-center gap-1.5 py-1.5 px-2.5 rounded-full border border-white/10 hover:border-gold/30 text-muted hover:text-white transition-all duration-200 text-xs font-semibold tracking-wider disabled:opacity-60"
         aria-label="Switch language"
       >
-        <span>{current.flag}</span>
+        {isPending ? (
+          <Loader2 size={12} className="animate-spin text-gold" />
+        ) : (
+          <span>{current.flag}</span>
+        )}
         <span>{current.label}</span>
         <ChevronDown size={10} className={`transition-transform duration-200 ${open ? 'rotate-180' : ''}`} />
       </button>

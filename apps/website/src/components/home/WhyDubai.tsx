@@ -45,7 +45,7 @@ export async function WhyDubai({ cms, bgImage }: { cms?: Record<string, unknown>
         </div>
 
         {/* Right — heading + stats */}
-        <div className="order-1 lg:order-2 bg-brand relative py-20 px-8 sm:px-12 lg:px-16 flex flex-col justify-center">
+        <div className="order-1 lg:order-2 bg-brand relative py-14 sm:py-20 px-5 sm:px-12 lg:px-16 flex flex-col justify-center">
           {/* Decorative top line */}
           <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-gold/30 via-transparent to-transparent" />
 
@@ -69,12 +69,12 @@ export async function WhyDubai({ cms, bgImage }: { cms?: Record<string, unknown>
               const Icon = stat.icon
               return (
                 <ScrollReveal key={stat.label} delay={i * 0.1}>
-                  <div className="group p-6 border border-gold-border rounded-sm bg-white/[0.02] hover:bg-white/[0.04] hover:border-gold/40 transition-all duration-300">
+                  <div className="group p-4 sm:p-6 border border-gold-border rounded-sm bg-white/[0.02] hover:bg-white/[0.04] hover:border-gold/40 transition-all duration-300">
                     <div className="flex items-start gap-3 mb-3">
-                      <div className="w-9 h-9 shrink-0 rounded-full border border-gold-border flex items-center justify-center bg-gold/5 group-hover:bg-gold/10 transition-colors">
-                        <Icon size={16} className="text-gold" />
+                      <div className="w-8 h-8 sm:w-9 sm:h-9 shrink-0 rounded-full border border-gold-border flex items-center justify-center bg-gold/5 group-hover:bg-gold/10 transition-colors">
+                        <Icon size={14} className="text-gold" />
                       </div>
-                      <div className="font-serif text-3xl font-bold text-gold leading-none pt-1">{stat.value}</div>
+                      <div className="font-serif text-2xl sm:text-3xl font-bold text-gold leading-none pt-1">{stat.value}</div>
                     </div>
                     <div className="text-white font-semibold text-xs tracking-wider uppercase mb-1.5">{stat.label}</div>
                     <p className="text-muted text-xs leading-relaxed">{stat.description}</p>

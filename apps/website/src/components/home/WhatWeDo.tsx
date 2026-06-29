@@ -20,7 +20,7 @@ export async function WhatWeDo({ bgJson }: { cms?: Record<string, unknown>; bgJs
   ]
 
   return (
-    <section className="py-24 bg-brand relative overflow-hidden">
+    <section className="py-16 sm:py-24 bg-brand relative overflow-hidden">
       <SectionBackground bgJson={bgJson} opacity={20} />
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Top: heading block */}
@@ -47,7 +47,7 @@ export async function WhatWeDo({ bgJson }: { cms?: Record<string, unknown>; bgJs
             const Icon = service.icon
             return (
               <ScrollReveal key={service.title} delay={i * 0.15}>
-                <div className="group flex flex-col p-8 rounded-sm border border-white/5 hover:border-gold-border bg-brand-section/50 hover:bg-brand-section transition-all duration-300 h-full">
+                <div className="group flex flex-col p-6 sm:p-8 rounded-sm border border-white/5 hover:border-gold-border bg-brand-section/50 hover:bg-brand-section transition-all duration-300 h-full">
                   <div className="shrink-0 w-12 h-12 rounded-sm border border-gold-border flex items-center justify-center bg-gold/5 group-hover:bg-gold/10 transition-colors mb-5">
                     <Icon size={22} className="text-gold" />
                   </div>
