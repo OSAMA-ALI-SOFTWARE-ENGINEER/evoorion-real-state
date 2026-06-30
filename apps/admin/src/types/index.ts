@@ -74,6 +74,7 @@ export interface Area {
   price_ranges?: PriceRange[] | null
   meta_title?: string | null
   meta_description?: string | null
+  region_id?: number | null
 }
 
 export interface PriceRange {
@@ -152,6 +153,7 @@ export interface Property {
   area_id?: number
   developer_id?: number
   operation_type_id?: number
+  region_id?: number
   primary_agent_id?: number | null
   meta_title?: string | null
   meta_description?: string | null
@@ -271,6 +273,7 @@ export interface BlogPost {
   meta_description?: string | null
   view_count: number
   reading_time?: number | null
+  region_id?: number | null
   author?: Pick<AuthUser, 'id' | 'name'>
   tags?: BlogTag[]
   deleted_at?: string | null

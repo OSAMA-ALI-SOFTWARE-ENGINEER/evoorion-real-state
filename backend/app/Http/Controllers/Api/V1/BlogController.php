@@ -17,12 +17,13 @@ class BlogController
         $perPage = min((int) $request->get('per_page', 9), 50);
         $tag     = $request->get('tag');
         $search  = $request->get('search');
+        $region  = $request->get('region');
 
         $query = BlogPost::published()
             ->with(['author:id,name', 'tags:id,name,slug'])
             ->select([
                 'id', 'author_id', 'title', 'slug', 'excerpt',
-                'featured_image_url', 'published_at', 'reading_time', 'view_count',
+                'featured_image_url', 'published_at', 'reading_time', 'view_count', 'region_id',
             ])
             ->orderByDesc('published_at');
 
@@ -34,6 +35,13 @@ class BlogController
             $query->where(function ($q) use ($search) {
                 $q->where('title', 'like', "%{$search}%")
                   ->orWhere('excerpt', 'like', "%{$search}%");
+            });
+        }
+
+        if ($region) {
+            $query->where(function ($q) use ($region) {
+                $q->whereHas('region', fn($r) => $r->where('code', $region))
+                  ->orWhereNull('region_id');
             });
         }
 

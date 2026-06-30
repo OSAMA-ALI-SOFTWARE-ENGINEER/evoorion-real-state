@@ -5,7 +5,8 @@ import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 import {
   getAreas, getDevelopers, getOperationTypes, createProperty, updateProperty,
-  uploadPropertyImage, updatePropertyImage, deletePropertyImage,
+  uploadPropertyImage, updatePropertyImage, deletePropertyImage, getRegions,
+  type Region,
 } from '@/lib/api'
 import type { Area, Developer, OperationType, Property, PropertyImage } from '@/types'
 import { RichTextEditor } from '@/components/ui/RichTextEditor'
@@ -29,6 +30,7 @@ interface FormState {
   area_id:           string
   developer_id:      string
   operation_type_id: string
+  region_id:         string
   meta_title:        string
   meta_description:  string
   amenities:         string[]
@@ -40,7 +42,7 @@ function blank(): FormState {
     price: '', currency: 'AED', location: '', area_sqft: '',
     bedrooms: '', bathrooms: '', is_featured: false, is_active: true,
     roi_min: '', roi_max: '', area_id: '', developer_id: '',
-    operation_type_id: '', meta_title: '', meta_description: '',
+    operation_type_id: '', region_id: '', meta_title: '', meta_description: '',
     amenities: [],
   }
 }
@@ -64,6 +66,7 @@ function fromProperty(p: Property): FormState {
     area_id:           p.area_id != null ? String(p.area_id) : '',
     developer_id:      p.developer_id != null ? String(p.developer_id) : '',
     operation_type_id: p.operation_type_id != null ? String(p.operation_type_id) : '',
+    region_id:         p.region_id != null ? String(p.region_id) : '',
     meta_title:        p.meta_title ?? '',
     meta_description:  p.meta_description ?? '',
     amenities:         p.amenities?.map(a => a.amenity) ?? [],
@@ -89,6 +92,7 @@ function toPayload(f: FormState): Record<string, unknown> {
     area_id:           Number(f.area_id),
     developer_id:      Number(f.developer_id),
     operation_type_id: Number(f.operation_type_id),
+    region_id:         f.region_id ? Number(f.region_id) : undefined,
     meta_title:        f.meta_title || undefined,
     meta_description:  f.meta_description || undefined,
     amenities:         f.amenities.length ? f.amenities : undefined,
@@ -379,6 +383,7 @@ export function PropertyForm({ property }: PropertyFormProps) {
   const [areas,   setAreas]   = useState<Area[]>([])
   const [devs,    setDevs]    = useState<Developer[]>([])
   const [opTypes, setOpTypes] = useState<OperationType[]>([])
+  const [regions, setRegions] = useState<Region[]>([])
   const [error,   setError]   = useState('')
   const [saving,  setSaving]  = useState(false)
 
@@ -387,10 +392,12 @@ export function PropertyForm({ property }: PropertyFormProps) {
       getAreas(),
       getDevelopers(),
       getOperationTypes(),
-    ]).then(([a, d, o]) => {
+      getRegions(),
+    ]).then(([a, d, o, r]) => {
       setAreas(a.data ?? [])
       setDevs(d.data ?? [])
       setOpTypes(o.data ?? [])
+      setRegions(r.data ?? [])
     }).catch(() => { /* non-critical */ })
   }, [])
 
@@ -619,6 +626,18 @@ export function PropertyForm({ property }: PropertyFormProps) {
                 onChange={v => set('operation_type_id', v)}
                 options={opOptions}
                 placeholder="Select type…"
+              />
+            </Field>
+
+            <Field label="Region">
+              <CustomSelect
+                value={form.region_id}
+                onChange={v => set('region_id', v)}
+                options={[
+                  { value: '', label: 'No region' },
+                  ...regions.map(r => ({ value: String(r.id), label: `${r.flag ?? ''} ${r.name}`.trim() })),
+                ]}
+                placeholder="Select region…"
               />
             </Field>
           </div>

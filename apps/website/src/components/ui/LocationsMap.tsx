@@ -44,7 +44,7 @@ export function LocationsMap({ areas, apiKey: apiKeyProp }: { areas: Area[]; api
 
   return (
     <APIProvider apiKey={apiKey}>
-      <div className="relative w-full h-[420px] sm:h-[500px] rounded-sm overflow-hidden border border-white/5">
+      <div className="relative isolate w-full h-[420px] sm:h-[500px] rounded-sm overflow-hidden border border-white/5">
         <Map
           defaultCenter={DUBAI_CENTER}
           defaultZoom={11}

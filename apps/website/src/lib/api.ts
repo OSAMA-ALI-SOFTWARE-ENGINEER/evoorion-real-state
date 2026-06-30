@@ -50,6 +50,7 @@ export interface PropertyFilters {
   sort_direction?: 'asc' | 'desc'
   per_page?: number
   page?: number
+  region?: string
 }
 
 export interface FavoritesResponse {
@@ -110,6 +111,19 @@ export interface BlogFilters {
   search?: string
   per_page?: number
   page?: number
+  region?: string
+}
+
+export interface RegionRecord {
+  id: number
+  code: string
+  name: string
+  flag: string
+}
+
+export async function getRegions(): Promise<ApiResponse<RegionRecord[]>> {
+  const res = await api.get<ApiResponse<RegionRecord[]>>('/regions')
+  return res.data
 }
 
 export async function getBlogPosts(

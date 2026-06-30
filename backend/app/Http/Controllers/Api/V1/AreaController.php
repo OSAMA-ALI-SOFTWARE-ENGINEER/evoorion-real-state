@@ -18,9 +18,11 @@ class AreaController
 
     public function index(Request $request): JsonResponse
     {
-        $opId = $request->query('operation_type_id');
+        $opId   = $request->query('operation_type_id');
+        $region = $request->query('region');
 
         $areas = Area::where('status', 'active')
+            ->when($region, fn($q) => $q->whereHas('region', fn($r) => $r->where('code', $region)))
             ->when($opId, fn($q) => $q->whereHas('properties', fn($p) => $p
                 ->where('is_active', true)
                 ->where('status', '!=', 'sold')
@@ -32,7 +34,8 @@ class AreaController
                 ->when($opId, fn($q) => $q->where('operation_type_id', $opId))
             ])
             ->orderByDesc('properties_count')
-            ->get(['id', 'name', 'slug']);
+            ->with('region:id,code,name,flag')
+            ->get(['id', 'name', 'slug', 'region_id', 'latitude', 'longitude']);
 
         return $this->success($areas);
     }

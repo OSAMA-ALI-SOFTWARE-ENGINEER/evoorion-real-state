@@ -19,6 +19,7 @@ use App\Http\Controllers\Api\V1\Admin\LanguageController;
 use App\Http\Controllers\Api\V1\Admin\DeveloperController as AdminDeveloperController;
 use App\Http\Controllers\Api\V1\Admin\MediaController;
 use App\Http\Controllers\Api\V1\Admin\OperationTypeController as AdminOperationTypeController;
+use App\Http\Controllers\Api\V1\Admin\RegionController as AdminRegionController;
 use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\BlogController;
 use App\Http\Controllers\Api\V1\BulkLeadController;
@@ -39,6 +40,7 @@ use App\Http\Controllers\Api\V1\PublicSettingController;
 use App\Http\Controllers\Api\V1\UserPreferenceController;
 use App\Http\Controllers\Api\V1\SearchSuggestionController;
 use App\Http\Controllers\Api\V1\SavedSearchController;
+use App\Http\Controllers\Api\V1\RegionController;
 use App\Http\Controllers\Api\V1\NewsletterController;
 use App\Http\Controllers\Api\V1\PublicAgentController;
 use App\Http\Controllers\Api\V1\JobListingController;
@@ -79,6 +81,7 @@ Route::prefix('v1')->group(function () {
     // Public master data endpoints (rate-limited)
     Route::middleware('throttle:120,1')->group(function () {
         Route::get('currencies', [\App\Http\Controllers\Api\V1\CurrencyController::class, 'index']);
+        Route::get('regions', [RegionController::class, 'index']);
         Route::get('areas', [AreaController::class, 'index']);
         Route::get('areas/{area}', [AreaController::class, 'show']);
         Route::get('developers', [DeveloperController::class, 'index']);
@@ -220,6 +223,7 @@ Route::prefix('v1')->group(function () {
 
             // Master data endpoints
             Route::resource('areas', AdminAreaController::class);
+            Route::apiResource('regions', AdminRegionController::class);
             Route::apiResource('currencies', CurrencyController::class)->except(['show']);
             Route::apiResource('languages', LanguageController::class)->except(['show']);
             Route::resource('developers', AdminDeveloperController::class);

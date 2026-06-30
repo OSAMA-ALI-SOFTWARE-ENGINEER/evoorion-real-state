@@ -38,6 +38,7 @@ class Property extends Model
         'meta_title',
         'meta_description',
         'views_count',
+        'region_id',
     ];
 
     protected $casts = [
@@ -53,6 +54,11 @@ class Property extends Model
     public function area(): BelongsTo
     {
         return $this->belongsTo(Area::class);
+    }
+
+    public function region(): BelongsTo
+    {
+        return $this->belongsTo(Region::class);
     }
 
     public function developer(): BelongsTo

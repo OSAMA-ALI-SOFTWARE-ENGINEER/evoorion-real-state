@@ -16,6 +16,7 @@ import {
   IconGlobe,
   IconLayers,
   IconLogOut,
+  IconMap,
   IconMapPin,
   IconImage,
   IconSettings,
@@ -44,6 +45,7 @@ const NAV: Array<{ group?: string; items: NavItem[] }> = [
     group: 'Master Data',
     items: [
       { label: 'Areas',            href: '/areas',            icon: <IconMapPin />,  roles: ['manager', 'super_admin'] },
+      { label: 'Regions',          href: '/regions',          icon: <IconMap />,     roles: ['manager', 'super_admin'] },
       { label: 'Developers',       href: '/developers',       icon: <IconLayers />,  roles: ['manager', 'super_admin'] },
       { label: 'Operation Types',  href: '/operation-types',  icon: <IconTag />,     roles: ['manager', 'super_admin'] },
       { label: 'Currencies',       href: '/currencies',       icon: <IconCoin />,    roles: ['manager', 'super_admin'] },

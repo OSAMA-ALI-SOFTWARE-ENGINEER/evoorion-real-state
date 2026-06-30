@@ -9,6 +9,7 @@ import { getBlogPosts, getBlogTags } from '@/lib/api'
 import { SectionBackground } from '@/components/ui/SectionBackground'
 import type { BlogPostSummary, BlogTag } from '@/types'
 import { ScrollReveal } from '@/components/ui/ScrollReveal'
+import { useRegion } from '@/hooks/useRegion'
 
 function formatDate(iso: string) {
   return new Date(iso).toLocaleDateString('en-AE', {
@@ -112,6 +113,7 @@ function BlogCardSkeleton() {
 }
 
 export default function BlogPage() {
+  const region = useRegion()
   const [heroBg, setHeroBg] = useState<string | null>(null)
   const [posts, setPosts]       = useState<BlogPostSummary[]>([])
   const [tags, setTags]         = useState<BlogTag[]>([])
@@ -145,6 +147,7 @@ export default function BlogPage() {
         search: debouncedSearch || undefined,
         page,
         per_page: 9,
+        region,
       })
       setPosts(res.data)
       setTotalPages(res.meta.pagination.last_page)
@@ -154,7 +157,7 @@ export default function BlogPage() {
     } finally {
       setLoading(false)
     }
-  }, [activeTag, debouncedSearch, page])
+  }, [activeTag, debouncedSearch, page, region])
 
   useEffect(() => { fetchPosts() }, [fetchPosts])
 

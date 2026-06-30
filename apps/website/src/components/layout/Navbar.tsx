@@ -189,7 +189,7 @@ export function Navbar() {
   return (
     <>
       <header
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
+        className={`fixed top-0 left-0 right-0 z-[2000] transition-all duration-500 ${
           scrolled || drawerOpen
             ? 'bg-brand/95 backdrop-blur-md border-b border-gold-border shadow-lg shadow-black/30'
             : 'bg-transparent'
@@ -276,7 +276,7 @@ export function Navbar() {
             animate={{ x: 0 }}
             exit={{ x: '100%' }}
             transition={{ type: 'tween', duration: 0.3, ease: [0.32, 0.72, 0, 1] }}
-            className="fixed top-0 right-0 bottom-0 z-50 w-80 max-w-[90vw] bg-brand border-l border-gold-border flex flex-col shadow-2xl"
+            className="fixed top-0 right-0 bottom-0 z-[2000] w-80 max-w-[90vw] bg-brand border-l border-gold-border flex flex-col shadow-2xl"
           >
             {/* Drawer header */}
             <div className="flex items-center justify-between px-6 py-5 border-b border-white/5">

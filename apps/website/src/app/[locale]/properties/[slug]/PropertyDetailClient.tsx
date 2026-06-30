@@ -11,16 +11,33 @@ import {
 } from 'lucide-react'
 import { LeadForm } from '@/components/ui/LeadForm'
 import { ScrollReveal } from '@/components/ui/ScrollReveal'
+import { useCountry } from '@/context/CountryContext'
 import type { Property, PropertyImage } from '@/types'
+
+function PropertyLocationMap({ location, apiKey }: { location: string; apiKey: string }) {
+  const q = encodeURIComponent(location)
+  const src = apiKey
+    ? `https://www.google.com/maps/embed/v1/place?key=${apiKey}&q=${q}`
+    : `https://maps.google.com/maps?q=${q}&output=embed`
+
+  return (
+    <div className="relative isolate rounded-sm overflow-hidden border border-white/5 h-64">
+      <iframe
+        src={src}
+        width="100%"
+        height="100%"
+        style={{ border: 0 }}
+        allowFullScreen
+        loading="lazy"
+        referrerPolicy="no-referrer-when-downgrade"
+        title="Property Location"
+      />
+    </div>
+  )
+}
 
 const PLACEHOLDER =
   'https://images.unsplash.com/photo-1582407947304-fd86f028f716?auto=format&fit=crop&w=1200&q=80'
-
-function formatPrice(price: string, currency: string) {
-  const num = parseFloat(price)
-  if (num >= 1_000_000) return `${currency} ${(num / 1_000_000).toFixed(2)}M`
-  return `${currency} ${num.toLocaleString()}`
-}
 
 function StatusBadge({ status }: { status: string }) {
   const map: Record<string, string> = {
@@ -292,7 +309,14 @@ function useSafeHtml(html: string | undefined) {
 }
 
 export function PropertyDetailClient({ property }: Props) {
+  const { formatPrice } = useCountry()
+  const [mapsKey, setMapsKey] = useState('')
   const allMedia   = property.images ?? []
+
+  useEffect(() => {
+    const api = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000/api/v1'
+    fetch(`${api}/settings`).then(r => r.json()).then(j => setMapsKey(j?.data?.google_maps_key ?? '')).catch(() => {})
+  }, [])
   const imageMedia = allMedia.filter((m) => !m.type || m.type === 'image')
   const videoMedia = allMedia.filter((m) => m.type === 'video')
   const fileMedia  = allMedia.filter((m) => m.type === 'file')
@@ -381,7 +405,7 @@ export function PropertyDetailClient({ property }: Props) {
 
                 {/* Price */}
                 <div className="flex items-baseline gap-3 mb-8 pb-8 border-b border-white/5">
-                  <span className="font-serif text-4xl font-bold text-gold">{formatPrice(property.price, property.currency ?? 'AED')}</span>
+                  <span className="font-serif text-4xl font-bold text-gold">{formatPrice(property.price)}</span>
                   <span className="text-muted text-sm">Starting Price</span>
                 </div>
 
@@ -402,6 +426,17 @@ export function PropertyDetailClient({ property }: Props) {
                   </div>
                 )}
               </ScrollReveal>
+
+              {/* Location map */}
+              {(property.area?.name || property.location) && (
+                <ScrollReveal>
+                  <h2 className="text-white font-semibold mb-3 tracking-wide">Location</h2>
+                  <PropertyLocationMap
+                    location={[property.area?.name, property.location].filter(Boolean).join(', ') + ', Dubai, UAE'}
+                    apiKey={mapsKey}
+                  />
+                </ScrollReveal>
+              )}
 
               {/* Amenities */}
               {property.amenities?.length > 0 && (

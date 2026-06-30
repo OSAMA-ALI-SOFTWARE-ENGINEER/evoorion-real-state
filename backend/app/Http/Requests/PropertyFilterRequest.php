@@ -32,6 +32,7 @@ class PropertyFilterRequest extends FormRequest
             'sort_direction'     => 'nullable|in:asc,desc',
             'page'               => 'nullable|integer|min:1',
             'per_page'           => 'nullable|integer|min:1|max:100',
+            'region'             => 'nullable|string|max:50',
         ];
     }
 }

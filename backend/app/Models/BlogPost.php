@@ -25,6 +25,7 @@ class BlogPost extends Model
         'meta_description',
         'view_count',
         'reading_time',
+        'region_id',
     ];
 
     protected function casts(): array

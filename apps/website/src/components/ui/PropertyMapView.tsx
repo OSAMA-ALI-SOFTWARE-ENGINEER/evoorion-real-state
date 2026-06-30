@@ -1,14 +1,29 @@
 'use client'
 
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import L from 'leaflet'
-import type { Map as LeafletMap } from 'leaflet'
+import type { Map as LeafletMap, TileLayer } from 'leaflet'
 import type { PropertySummary, Area } from '@/types'
 import { useCountry } from '@/context/CountryContext'
 
 interface PropertyMapViewProps {
   properties: PropertySummary[]
   areas: Area[]
+}
+
+type MapStyle = 'street' | 'satellite'
+
+const TILE_LAYERS: Record<MapStyle, { url: string; attribution: string; maxZoom: number }> = {
+  street: {
+    url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+    maxZoom: 19,
+  },
+  satellite: {
+    url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+    attribution: '&copy; <a href="https://www.esri.com">Esri</a> &mdash; Source: Esri, Maxar, Earthstar Geographics',
+    maxZoom: 18,
+  },
 }
 
 // Dubai city centre as default
@@ -50,14 +65,31 @@ function buildMarkerHtml(count: number, price: string): string {
 
 export function PropertyMapView({ properties, areas }: PropertyMapViewProps) {
   const mapRef = useRef<LeafletMap | null>(null)
+  const tileLayerRef = useRef<TileLayer | null>(null)
   const containerRef = useRef<HTMLDivElement>(null)
+  const [mapStyle, setMapStyle] = useState<MapStyle>('street')
   const { formatPrice } = useCountry()
+
+  // Swap tile layer when style changes without rebuilding markers
+  useEffect(() => {
+    const map = mapRef.current
+    if (!map) return
+    if (tileLayerRef.current) {
+      map.removeLayer(tileLayerRef.current)
+    }
+    const cfg = TILE_LAYERS[mapStyle]
+    tileLayerRef.current = L.tileLayer(cfg.url, {
+      attribution: cfg.attribution,
+      maxZoom: cfg.maxZoom,
+    }).addTo(map)
+  }, [mapStyle])
 
   useEffect(() => {
     if (!containerRef.current) return
     if (mapRef.current) {
       mapRef.current.remove()
       mapRef.current = null
+      tileLayerRef.current = null
     }
 
     // Fix default icon paths broken by webpack
@@ -77,9 +109,10 @@ export function PropertyMapView({ properties, areas }: PropertyMapViewProps) {
     })
     mapRef.current = map
 
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
-      maxZoom: 18,
+    const cfg = TILE_LAYERS[mapStyle]
+    tileLayerRef.current = L.tileLayer(cfg.url, {
+      attribution: cfg.attribution,
+      maxZoom: cfg.maxZoom,
     }).addTo(map)
 
     // Build a map of area id → full area (for lat/lng lookup)
@@ -243,10 +276,29 @@ export function PropertyMapView({ properties, areas }: PropertyMapViewProps) {
         .ev-popup .leaflet-popup-content { margin: 0; }
         .ev-popup .leaflet-popup-tip-container { display: none; }
       `}</style>
-      <div
-        ref={containerRef}
-        className="w-full h-[60vh] min-h-[420px] rounded-sm overflow-hidden border border-gold-border"
-      />
+      <div className="relative isolate">
+        <div
+          ref={containerRef}
+          className="w-full h-[60vh] min-h-[420px] rounded-sm overflow-hidden border border-gold-border"
+        />
+        {/* Satellite / Street toggle */}
+        <div className="absolute top-3 right-3 z-[500] flex rounded-sm overflow-hidden border border-gold/40 shadow-lg">
+          {(['street', 'satellite'] as const).map((style) => (
+            <button
+              key={style}
+              type="button"
+              onClick={() => setMapStyle(style)}
+              className={`px-3 py-1.5 text-[11px] font-semibold tracking-wider uppercase transition-colors ${
+                mapStyle === style
+                  ? 'bg-gold text-brand'
+                  : 'bg-brand/90 text-white/60 hover:text-white'
+              }`}
+            >
+              {style === 'street' ? 'Map' : 'Satellite'}
+            </button>
+          ))}
+        </div>
+      </div>
     </>
   )
 }

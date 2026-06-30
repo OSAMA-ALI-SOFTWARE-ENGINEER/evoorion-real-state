@@ -1,7 +1,7 @@
 'use client'
 
-import { useCallback, useRef, useState } from 'react'
-import { uploadMedia } from '@/lib/api'
+import { useCallback, useEffect, useRef, useState } from 'react'
+import { uploadMedia, getRegions, type Region } from '@/lib/api'
 import type { Area, AreaMediaItem, PriceRange } from '@/types'
 import { ImageCropper } from './ImageCropper'
 import { RichTextEditor } from './RichTextEditor'
@@ -202,9 +202,18 @@ export function AreaForm({ initial = {}, onSave, saveLabel = 'Save', mode = 'new
   const [galleryUploading, setGalleryUploading] = useState(false)
   const galleryInputRef = useRef<HTMLInputElement>(null)
   const draggedIdx = useRef<number | null>(null)
+  // Region
+  const [regions,  setRegions]  = useState<Region[]>([])
+  const [regionId, setRegionId] = useState<string>(
+    initial.region_id != null ? String(initial.region_id) : ''
+  )
   // Form
   const [error,   setError]   = useState('')
   const [saving,  setSaving]  = useState(false)
+
+  useEffect(() => {
+    getRegions().then(res => setRegions(res.data ?? [])).catch(() => {})
+  }, [])
 
   const slug = slugPreview(name)
   const hasCoords = latitude && longitude
@@ -320,6 +329,7 @@ export function AreaForm({ initial = {}, onSave, saveLabel = 'Save', mode = 'new
         price_ranges: priceRanges.length > 0 ? priceRanges : undefined,
         meta_title:       metaTitle.trim() || undefined,
         meta_description: metaDesc.trim()  || undefined,
+        region_id: regionId ? Number(regionId) : null,
       })
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Save failed')
@@ -502,6 +512,24 @@ export function AreaForm({ initial = {}, onSave, saveLabel = 'Save', mode = 'new
                 </button>
               )}
             </div>
+
+            {/* Region */}
+            {regions.length > 0 && (
+              <div className={card}>
+                <p className={sect + ' mt-0'}>Region</p>
+                <select
+                  aria-label="Region"
+                  value={regionId}
+                  onChange={e => setRegionId(e.target.value)}
+                  className={inp}
+                >
+                  <option value="">Global (all regions)</option>
+                  {regions.map(r => (
+                    <option key={r.id} value={r.id}>{r.flag} {r.name}</option>
+                  ))}
+                </select>
+              </div>
+            )}
 
             {/* Gallery */}
             <div className={card}>

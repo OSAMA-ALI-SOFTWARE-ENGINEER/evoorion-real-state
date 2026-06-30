@@ -14,7 +14,7 @@ class Area extends Model
         'name', 'slug', 'status', 'description', 'hero_image_url', 'gallery',
         'latitude', 'longitude',
         'long_term_roi', 'short_term_roi', 'appreciation', 'off_plan_discount',
-        'price_ranges', 'meta_title', 'meta_description',
+        'price_ranges', 'meta_title', 'meta_description', 'region_id',
     ];
 
     protected $casts = [

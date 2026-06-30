@@ -33,7 +33,7 @@ export function AreaMap({ lat, lng, name, propertyCount, zoom = 14, apiKey: apiK
 
   return (
     <APIProvider apiKey={apiKey}>
-      <div className="relative rounded-sm overflow-hidden border border-white/5 h-[340px]">
+      <div className="relative isolate rounded-sm overflow-hidden border border-white/5 h-[340px]">
         <Map
           defaultCenter={{ lat, lng }}
           defaultZoom={zoom}

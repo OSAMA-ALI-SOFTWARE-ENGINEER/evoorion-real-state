@@ -315,6 +315,33 @@ export async function deleteLanguage(id: number) {
   return request<ApiResponse<null>>(`/admin/languages/${id}`, { method: 'DELETE' })
 }
 
+// ── Regions ──────────────────────────────────────────────────────────────────
+
+export interface Region {
+  id: number
+  code: string
+  name: string
+  flag: string | null
+  is_active: boolean
+  sort_order: number
+}
+
+export async function getRegions() {
+  return request<ApiResponse<Region[]>>('/admin/regions')
+}
+
+export async function createRegion(data: Partial<Region>) {
+  return request<ApiResponse<Region>>('/admin/regions', { method: 'POST', body: JSON.stringify(data) })
+}
+
+export async function updateRegion(id: number, data: Partial<Region>) {
+  return request<ApiResponse<Region>>(`/admin/regions/${id}`, { method: 'PUT', body: JSON.stringify(data) })
+}
+
+export async function deleteRegion(id: number) {
+  return request<ApiResponse<null>>(`/admin/regions/${id}`, { method: 'DELETE' })
+}
+
 export async function getDevelopers() {
   return request<PaginatedResponse<Developer>>('/admin/developers')
 }

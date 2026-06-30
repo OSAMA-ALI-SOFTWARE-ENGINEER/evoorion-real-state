@@ -40,7 +40,7 @@ class PropertyService
             'search', 'area_id', 'operation_type_id', 'type', 'featured',
             'min_price', 'max_price', 'developer_id', 'bedrooms_min', 'bedrooms_max',
             'bathrooms_min', 'bathrooms_max', 'min_area_sqft', 'max_area_sqft',
-            'sort_by', 'sort_direction', 'per_page', 'page',
+            'sort_by', 'sort_direction', 'per_page', 'page', 'region',
         ]);
 
         // Normalize featured: treat false/0/'0'/'' identically to absent
@@ -95,6 +95,9 @@ class PropertyService
             }
             if ($request->filled('max_area_sqft')) {
                 $query = $query->where('area_sqft', '<=', (float) $request->input('max_area_sqft'));
+            }
+            if ($request->filled('region')) {
+                $query = $query->whereHas('region', fn($q) => $q->where('code', $request->input('region')));
             }
 
             $sortBy        = $request->input('sort_by', 'created_at');

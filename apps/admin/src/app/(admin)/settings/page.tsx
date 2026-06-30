@@ -804,6 +804,17 @@ const OFFICE_GROUPS = [
       { key: 'contact_hours_gb',   label: 'Office Hours', placeholder: 'Monday – Friday: 9:00 AM – 6:00 PM GMT' },
     ],
   },
+  {
+    id: 'it',
+    flag: '🇮🇹',
+    label: 'Italy Office',
+    fields: [
+      { key: 'contact_phone_it',   label: 'Phone',        type: 'phone' as const },
+      { key: 'contact_email_it',   label: 'Email',        type: 'email' as const },
+      { key: 'contact_address_it', label: 'Address',      placeholder: 'Via Monte Napoleone 8, 20121 Milan, Italy' },
+      { key: 'contact_hours_it',   label: 'Office Hours', placeholder: 'Monday – Friday: 9:00 AM – 6:00 PM CET' },
+    ],
+  },
 ]
 
 const officeInp = 'w-full px-3.5 py-2.5 rounded-lg border border-slate-200 dark:border-slate-600 text-sm focus:outline-none focus:border-[#C9A84C] focus:ring-1 focus:ring-[#C9A84C] bg-white dark:bg-slate-700 text-slate-800 dark:text-slate-100 placeholder-slate-400'

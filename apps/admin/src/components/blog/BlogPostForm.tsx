@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState, type FormEvent } from 'react'
 import { useRouter } from 'next/navigation'
-import { createBlogPost, updateBlogPost, getAdminBlogTags, createBlogTag } from '@/lib/api'
+import { createBlogPost, updateBlogPost, getAdminBlogTags, createBlogTag, getRegions, type Region } from '@/lib/api'
 import type { BlogPost, BlogTag, BlogStatus } from '@/types'
 import { useAuth } from '@/context/AuthContext'
 import { BlogEditor } from '@/components/ui/BlogEditor'
@@ -47,11 +47,16 @@ export function BlogPostForm({ post, initialTags }: Props) {
   const [addingTag,    setAddingTag]    = useState(false)
   const [showTagInput, setShowTagInput] = useState(false)
   const tagInputRef = useRef<HTMLInputElement>(null)
+  const [regions,      setRegions]      = useState<Region[]>([])
+  const [regionId,     setRegionId]     = useState<string>(
+    post?.region_id != null ? String(post.region_id) : ''
+  )
 
   useEffect(() => {
     if (!initialTags) {
       getAdminBlogTags().then(res => setTags(res.data ?? []))
     }
+    getRegions().then(res => setRegions(res.data ?? []))
   }, [initialTags])
 
   useEffect(() => {
@@ -118,6 +123,7 @@ export function BlogPostForm({ post, initialTags }: Props) {
         meta_title:         metaTitle.trim() || undefined,
         meta_description:   metaDesc.trim() || undefined,
         tag_ids:            selectedTags,
+        region_id:          regionId ? Number(regionId) : null,
       }
 
       if (post) {
@@ -132,7 +138,7 @@ export function BlogPostForm({ post, initialTags }: Props) {
       if (msg.toLowerCase().includes('title')) setTitleError(msg)
       else setError(msg)
     } finally { setSaving(false) }
-  }, [title, slug, excerpt, content, imageUrl, effectiveStatus, publishedAt, metaTitle, metaDesc, selectedTags, post, router])
+  }, [title, slug, excerpt, content, imageUrl, effectiveStatus, publishedAt, metaTitle, metaDesc, selectedTags, regionId, post, router])
 
   const inp = 'w-full px-3.5 py-2.5 rounded-lg border border-slate-200 dark:border-slate-600 text-sm focus:outline-none focus:border-[#C9A84C] focus:ring-1 focus:ring-[#C9A84C] bg-white dark:bg-slate-700 text-slate-800 dark:text-slate-100 placeholder-slate-400 transition-colors'
   const lbl = 'block text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400 mb-1.5'
@@ -297,6 +303,24 @@ export function BlogPostForm({ post, initialTags }: Props) {
                   </p>
                 )}
               </div>
+            </div>
+          )}
+
+          {/* Region */}
+          {regions.length > 0 && (
+            <div className="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 p-5">
+              <p className={lbl}>Region</p>
+              <select
+                aria-label="Region"
+                value={regionId}
+                onChange={e => setRegionId(e.target.value)}
+                className="w-full px-3.5 py-2.5 rounded-lg border border-slate-200 dark:border-slate-600 text-sm focus:outline-none focus:border-[#C9A84C] focus:ring-1 focus:ring-[#C9A84C] bg-white dark:bg-slate-700 text-slate-800 dark:text-slate-100"
+              >
+                <option value="">Global (all regions)</option>
+                {regions.map(r => (
+                  <option key={r.id} value={r.id}>{r.flag} {r.name}</option>
+                ))}
+              </select>
             </div>
           )}
 

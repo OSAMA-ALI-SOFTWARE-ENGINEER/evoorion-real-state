@@ -28,6 +28,7 @@ import { AuthModal } from '@/components/ui/AuthModal'
 import { useAuth } from '@/context/AuthContext'
 import { SectionBackground } from '@/components/ui/SectionBackground'
 import { CantFindCTA } from '@/components/ui/CantFindCTA'
+import { useRegion } from '@/hooks/useRegion'
 import type { Area, OperationType, PropertySummary, PropertyType } from '@/types'
 import { BUDGET_RANGES } from '@/types'
 
@@ -70,6 +71,7 @@ export default function PropertiesPage() {
 }
 
 function PropertiesPageInner() {
+  const region = useRegion()
   const { user } = useAuth()
   const router = useRouter()
   const searchParams = useSearchParams()
@@ -206,6 +208,7 @@ function PropertiesPageInner() {
           ...getSortParams(sKey),
           page: p,
           per_page: 9,
+          region,
         })
         setProperties(res.data)
         setTotalPages(res.meta.pagination.last_page)
@@ -215,7 +218,7 @@ function PropertiesPageInner() {
         setLoading(false)
       }
     },
-    [],
+    [region],
   )
 
   useEffect(() => {
