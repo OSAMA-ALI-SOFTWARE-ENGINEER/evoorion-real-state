@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { useState } from 'react'
 import { Mail, CheckCircle2, ArrowRight } from 'lucide-react'
@@ -65,3 +65,4 @@ export function NewsletterSignup() {
     </div>
   )
 }
+

@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
@@ -318,3 +318,4 @@ export function GlobalSearch({ open, onClose }: { open: boolean; onClose: () => 
     </AnimatePresence>
   )
 }
+

@@ -46,13 +46,23 @@ interface Props {
   value: string
   onChange: (val: string) => void
   placeholder?: string
+  defaultCountryCode?: string
 }
 
-export function PhoneInput({ value, onChange, placeholder }: Props) {
+export function PhoneInput({ value, onChange, placeholder, defaultCountryCode }: Props) {
   const [open, setOpen] = useState(false)
   const [search, setSearch] = useState('')
-  const [country, setCountry] = useState<Country>(COUNTRIES[0])
+  const [country, setCountry] = useState<Country>(
+    () => (defaultCountryCode ? COUNTRIES.find(c => c.code === defaultCountryCode) : undefined) ?? COUNTRIES[0]
+  )
   const [number, setNumber] = useState('')
+  // Update default country when prop changes (e.g. locale switches)
+  useEffect(() => {
+    if (!defaultCountryCode) return
+    const match = COUNTRIES.find(c => c.code === defaultCountryCode)
+    if (match) setCountry(match)
+  }, [defaultCountryCode])
+
   const wrapRef = useRef<HTMLDivElement>(null)
   const searchRef = useRef<HTMLInputElement>(null)
 

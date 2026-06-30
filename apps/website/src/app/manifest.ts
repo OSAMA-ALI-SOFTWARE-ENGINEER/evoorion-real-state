@@ -1,8 +1,8 @@
-import type { MetadataRoute } from 'next'
+﻿import type { MetadataRoute } from 'next'
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: 'EVOORION — Luxury Dubai Real Estate',
+    name: 'EVOORION â€” Luxury Dubai Real Estate',
     short_name: 'EVOORION',
     description: 'Exclusive luxury real estate investment in Dubai.',
     start_url: '/',
@@ -27,3 +27,4 @@ export default function manifest(): MetadataRoute.Manifest {
     categories: ['real estate', 'property', 'investment'],
   }
 }
+

@@ -1,4 +1,4 @@
-import axios from 'axios'
+﻿import axios from 'axios'
 import type {
   ApiResponse,
   Area,
@@ -78,7 +78,7 @@ export async function submitLead(payload: LeadPayload): Promise<ApiResponse<unkn
   return res.data
 }
 
-// ── Auth ──────────────────────────────────────────────────────────────────────
+// â”€â”€ Auth â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 export async function loginUser(
   payload: LoginPayload,
@@ -103,7 +103,7 @@ export async function getMe(): Promise<ApiResponse<AuthUser>> {
   return res.data
 }
 
-// ── Blog ──────────────────────────────────────────────────────────────────────
+// â”€â”€ Blog â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 export interface BlogFilters {
   tag?: string
@@ -134,7 +134,7 @@ export async function getBlogTags(): Promise<ApiResponse<BlogTag[]>> {
   return res.data
 }
 
-// ── Master data (public) ──────────────────────────────────────────────────────
+// â”€â”€ Master data (public) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 export async function getAreas(): Promise<ApiResponse<Area[]>> {
   const res = await api.get<ApiResponse<Area[]>>('/areas')
@@ -151,14 +151,14 @@ export async function getOperationTypes(): Promise<ApiResponse<OperationType[]>>
   return res.data
 }
 
-// ── Comparison ────────────────────────────────────────────────────────────────
+// â”€â”€ Comparison â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 export async function compareProperties(slugs: string[]): Promise<ApiResponse<ComparisonResult>> {
   const res = await api.post<ApiResponse<ComparisonResult>>('/properties/compare', { slugs })
   return res.data
 }
 
-// ── Favorites ─────────────────────────────────────────────────────────────────
+// â”€â”€ Favorites â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 export async function getFavorites(): Promise<FavoritesResponse> {
   const res = await api.get<FavoritesResponse>('/favorites')
@@ -175,7 +175,7 @@ export async function removeFavorite(propertySlug: string): Promise<ApiResponse<
   return res.data
 }
 
-// ── Saved Searches ────────────────────────────────────────────────────────────
+// â”€â”€ Saved Searches â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 export interface SavedSearch {
   id: number
@@ -199,7 +199,7 @@ export async function deleteSavedSearch(id: number): Promise<ApiResponse<null>> 
   return res.data
 }
 
-// ── Public settings ───────────────────────────────────────────────────────────
+// â”€â”€ Public settings â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 export interface PublicSettings {
   color_brand?:         string | null
@@ -241,7 +241,7 @@ export async function getPublicSettings(): Promise<PublicSettings> {
   }
 }
 
-// ── CMS (public) ─────────────────────────────────────────────────────────────
+// â”€â”€ CMS (public) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 export async function getCmsContent(slug: string): Promise<Record<string, unknown>> {
   const apiUrl = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000/api/v1'
@@ -255,7 +255,7 @@ export async function getCmsContent(slug: string): Promise<Record<string, unknow
   }
 }
 
-// ── Currencies ────────────────────────────────────────────────────────────────
+// â”€â”€ Currencies â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 export interface ApiCurrency {
   id:            number
@@ -273,7 +273,7 @@ export async function getCurrencies(): Promise<ApiResponse<ApiCurrency[]>> {
   return res.data
 }
 
-// ── Agents ────────────────────────────────────────────────────────────────────
+// â”€â”€ Agents â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 export interface PublicAgent {
   id: number
@@ -291,7 +291,7 @@ export async function getAgents(): Promise<PublicAgent[]> {
   return res.data.data
 }
 
-// ── Jobs ──────────────────────────────────────────────────────────────────────
+// â”€â”€ Jobs â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 export interface JobListing {
   id: number
@@ -309,10 +309,11 @@ export async function getJobs(): Promise<JobListing[]> {
   return res.data.data
 }
 
-// ── Newsletter ─────────────────────────────────────────────────────────────────
+// â”€â”€ Newsletter â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 export async function subscribeNewsletter(email: string, name?: string): Promise<void> {
   await api.post('/newsletter/subscribe', { email, name })
 }
 
 export default api
+

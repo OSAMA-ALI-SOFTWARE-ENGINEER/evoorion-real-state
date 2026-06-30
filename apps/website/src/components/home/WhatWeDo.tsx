@@ -1,4 +1,4 @@
-import { TrendingUp, Home, Users } from 'lucide-react'
+﻿import { TrendingUp, Home, Users } from 'lucide-react'
 import { getTranslations } from 'next-intl/server'
 import { ScrollReveal } from '@/components/ui/ScrollReveal'
 import { SectionBackground } from '@/components/ui/SectionBackground'
@@ -22,7 +22,7 @@ export async function WhatWeDo({ bgJson }: { cms?: Record<string, unknown>; bgJs
   return (
     <section className="py-16 sm:py-24 bg-brand relative overflow-hidden">
       <SectionBackground bgJson={bgJson} opacity={20} />
-      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="relative z-10 max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
         {/* Top: heading block */}
         <ScrollReveal>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-end mb-14">
@@ -64,3 +64,4 @@ export async function WhatWeDo({ bgJson }: { cms?: Record<string, unknown>; bgJs
     </section>
   )
 }
+

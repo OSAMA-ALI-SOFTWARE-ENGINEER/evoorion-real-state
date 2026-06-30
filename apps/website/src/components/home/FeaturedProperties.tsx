@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
@@ -12,7 +12,7 @@ import type { PropertySummary } from '@/types'
 const FALLBACK_PROPERTIES: PropertySummary[] = [
   {
     id: 1,
-    title: 'Signature Penthouse — Palm Jumeirah',
+    title: 'Signature Penthouse â€” Palm Jumeirah',
     slug: 'signature-penthouse-palm-jumeirah',
     type: 'penthouse',
     price: '8500000',
@@ -30,7 +30,7 @@ const FALLBACK_PROPERTIES: PropertySummary[] = [
   },
   {
     id: 2,
-    title: 'Ultra-Luxury Villa — Emirates Hills',
+    title: 'Ultra-Luxury Villa â€” Emirates Hills',
     slug: 'ultra-luxury-villa-emirates-hills',
     type: 'villa',
     price: '15000000',
@@ -48,7 +48,7 @@ const FALLBACK_PROPERTIES: PropertySummary[] = [
   },
   {
     id: 3,
-    title: 'Sky Residences — Downtown Dubai',
+    title: 'Sky Residences â€” Downtown Dubai',
     slug: 'sky-residences-downtown-dubai',
     type: 'apartment',
     price: '3200000',
@@ -83,7 +83,7 @@ export function FeaturedProperties() {
 
   return (
     <section className="py-24 bg-brand-section">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <ScrollReveal>
           <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-14">
@@ -122,3 +122,4 @@ export function FeaturedProperties() {
     </section>
   )
 }
+

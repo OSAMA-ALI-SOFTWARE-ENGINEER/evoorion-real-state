@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import Link from 'next/link'
 import Image from 'next/image'
@@ -42,7 +42,7 @@ export function PropertyCard({
       transition={{ duration: 0.3, ease: 'easeOut' }}
       className="group relative h-full flex flex-col rounded-sm overflow-hidden border border-white/5 hover:border-gold-border bg-brand-section transition-colors duration-300"
     >
-      {/* Heart button — sits above the Link so clicks don't navigate */}
+      {/* Heart button â€” sits above the Link so clicks don't navigate */}
       {onToggleFavorite && (
         <button
           type="button"
@@ -126,7 +126,7 @@ export function PropertyCard({
             {property.roi_min && property.roi_max && (
               <div className="flex items-center gap-1 text-emerald-400 text-xs">
                 <TrendingUp size={12} />
-                <span>{property.roi_min}–{property.roi_max}% ROI</span>
+                <span>{property.roi_min}â€“{property.roi_max}% ROI</span>
               </div>
             )}
           </div>
@@ -140,7 +140,7 @@ export function PropertyCard({
         </div>
       </Link>
 
-      {/* Compare toggle — outside Link */}
+      {/* Compare toggle â€” outside Link */}
       {onToggleCompare && (
         <button
           type="button"
@@ -164,3 +164,4 @@ export function PropertyCard({
     </motion.div>
   )
 }
+

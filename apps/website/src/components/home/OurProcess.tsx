@@ -1,4 +1,4 @@
-import { getTranslations } from 'next-intl/server'
+﻿import { getTranslations } from 'next-intl/server'
 import { ScrollReveal } from '@/components/ui/ScrollReveal'
 import { SectionBackground } from '@/components/ui/SectionBackground'
 
@@ -20,7 +20,7 @@ export async function OurProcess({ bgJson }: { cms?: Record<string, unknown>; bg
   return (
     <section className="py-16 sm:py-24 bg-brand relative overflow-hidden">
       <SectionBackground bgJson={bgJson} opacity={20} />
-      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="relative z-10 max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
         <ScrollReveal>
           <div className="text-center mb-10 sm:mb-16">
             <div className="inline-flex items-center gap-3 mb-5">
@@ -79,3 +79,4 @@ export async function OurProcess({ bgJson }: { cms?: Record<string, unknown>; bg
     </section>
   )
 }
+

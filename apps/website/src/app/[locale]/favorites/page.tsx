@@ -62,7 +62,7 @@ export default function FavoritesPage() {
       {/* Hero */}
       <section className="pt-32 pb-16 bg-brand-section relative overflow-hidden">
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(201,168,76,0.06),transparent_60%)]" />
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <div className="relative max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <div className="inline-flex items-center gap-3 mb-4">
             <div className="h-px w-10 bg-gold" />
             <span className="text-gold text-xs tracking-[0.3em] uppercase">Saved</span>
@@ -79,7 +79,7 @@ export default function FavoritesPage() {
 
       {/* Content */}
       <section className="py-16 bg-brand min-h-[60vh]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
           {isPageLoading ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {Array.from({ length: 6 }).map((_, i) => <SkeletonCard key={i} />)}

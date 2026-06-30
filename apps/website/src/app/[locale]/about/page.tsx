@@ -68,7 +68,7 @@ export default async function AboutPage() {
         <SectionBackground bgJson={settings.section_bg_hero_about} opacity={18} />
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,rgba(201,168,76,0.06),transparent_60%)]" />
         <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-gold/20 to-transparent" />
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="relative max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-3xl">
             <div className="inline-flex items-center gap-3 mb-5">
               <div className="h-px w-10 bg-gold" />
@@ -86,7 +86,7 @@ export default async function AboutPage() {
 
       {/* Brand story */}
       <section className="py-20 bg-brand">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
             <ScrollReveal>
               <div>
@@ -131,7 +131,7 @@ export default async function AboutPage() {
       {/* Why EVOORION */}
       <section className="py-20 bg-brand relative overflow-hidden">
         <SectionBackground bgJson={settings.section_bg_about_difference} opacity={20} />
-        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="relative z-10 max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
           <ScrollReveal>
             <div className="text-center mb-14">
               <div className="inline-flex items-center gap-3 mb-5">

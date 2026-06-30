@@ -1,4 +1,4 @@
-import type { CSSProperties } from 'react'
+﻿import type { CSSProperties } from 'react'
 
 export interface SectionBgData {
   type: 'default' | 'color' | 'gradient' | 'image'
@@ -48,3 +48,4 @@ export function parseSectionBg(json?: string | null): {
   } catch { /* ignore */ }
   return { style: {}, imageUrl: null }
 }
+

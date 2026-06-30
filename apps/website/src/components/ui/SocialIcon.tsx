@@ -1,4 +1,4 @@
-interface SocialIconProps {
+﻿interface SocialIconProps {
   name: 'instagram' | 'linkedin' | 'twitter' | 'facebook' | 'whatsapp'
   size?: number
   className?: string
@@ -54,3 +54,4 @@ export function SocialIcon({ name, size = 16, className = '' }: SocialIconProps)
     </svg>
   )
 }
+

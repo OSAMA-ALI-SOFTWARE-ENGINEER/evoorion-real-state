@@ -2,10 +2,11 @@
 
 interface ContactAddressMapProps {
   address: string
+  apiKey?: string
 }
 
-export function ContactAddressMap({ address }: ContactAddressMapProps) {
-  const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_KEY
+export function ContactAddressMap({ address, apiKey: apiKeyProp }: ContactAddressMapProps) {
+  const apiKey = apiKeyProp ?? process.env.NEXT_PUBLIC_GOOGLE_MAPS_KEY
   const q = encodeURIComponent(address)
 
   const src = apiKey
@@ -27,3 +28,4 @@ export function ContactAddressMap({ address }: ContactAddressMapProps) {
     </div>
   )
 }
+

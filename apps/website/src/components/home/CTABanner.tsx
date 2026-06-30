@@ -1,4 +1,4 @@
-import Image from 'next/image'
+﻿import Image from 'next/image'
 import Link from 'next/link'
 import { ArrowRight } from 'lucide-react'
 import { ScrollReveal } from '@/components/ui/ScrollReveal'
@@ -7,7 +7,7 @@ export function CTABanner({ cms, bgImage }: { cms?: Record<string, unknown>; bgI
   const eyebrow = (cms?.cta_eyebrow as string) ?? 'Get Started'
   const rawHeadline = (cms?.cta_headline as string) ?? "Ready to Build Your\nDubai Real Estate Portfolio?"
   const [headLine1, headLine2] = rawHeadline.split('\n')
-  const body       = (cms?.cta_body as string)   ?? 'Book a private consultation with our experts. No pressure, no obligations — just personalised investment intelligence.'
+  const body       = (cms?.cta_body as string)   ?? 'Book a private consultation with our experts. No pressure, no obligations â€” just personalised investment intelligence.'
   const buttonText = (cms?.cta_button as string) ?? 'Book Private Consultation'
   return (
     <section className="relative py-16 sm:py-24 overflow-hidden">
@@ -49,3 +49,4 @@ export function CTABanner({ cms, bgImage }: { cms?: Record<string, unknown>; bgI
     </section>
   )
 }
+

@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { useState } from 'react'
 import { X, Eye, EyeOff, Loader2 } from 'lucide-react'
@@ -182,7 +182,7 @@ export function AuthModal({ onClose, defaultTab = 'login' }: AuthModalProps) {
                     required
                     value={loginForm.password}
                     onChange={(e) => setLoginForm((f) => ({ ...f, password: e.target.value }))}
-                    placeholder="••••••••"
+                    placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢"
                     className="w-full bg-white/5 border border-white/15 rounded-lg px-4 py-2.5 pr-10 text-white placeholder-white/30 text-sm focus:outline-none focus:border-gold/50 transition-colors"
                   />
                   <button
@@ -277,3 +277,4 @@ export function AuthModal({ onClose, defaultTab = 'login' }: AuthModalProps) {
     </div>
   )
 }
+

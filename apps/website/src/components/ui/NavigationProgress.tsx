@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { useEffect, useRef, useState } from 'react'
 import { usePathname, useSearchParams } from 'next/navigation'
@@ -16,7 +16,7 @@ export function NavigationProgress() {
     if (url === prevUrl.current) return
     prevUrl.current = url
 
-    // Navigation completed — finish the bar
+    // Navigation completed â€” finish the bar
     setWidth(100)
     timerRef.current = setTimeout(() => setVisible(false), 300)
   }, [pathname, searchParams])
@@ -63,3 +63,4 @@ export function NavigationProgress() {
     </div>
   )
 }
+

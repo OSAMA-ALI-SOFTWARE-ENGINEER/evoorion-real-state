@@ -81,6 +81,7 @@ export default function LocationsPage() {
   const [areas, setAreas] = useState<Area[]>([])
   const [loading, setLoading] = useState(true)
   const [heroBg, setHeroBg] = useState<string | null>(null)
+  const [mapsKey, setMapsKey] = useState<string>('')
 
   useEffect(() => {
     getAreas()
@@ -88,7 +89,13 @@ export default function LocationsPage() {
       .catch(() => {})
       .finally(() => setLoading(false))
     const api = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000/api/v1'
-    fetch(`${api}/settings`).then(r => r.json()).then(j => setHeroBg(j?.data?.section_bg_hero_locations ?? null)).catch(() => {})
+    fetch(`${api}/settings`)
+      .then(r => r.json())
+      .then(j => {
+        setHeroBg(j?.data?.section_bg_hero_locations ?? null)
+        setMapsKey(j?.data?.google_maps_key ?? '')
+      })
+      .catch(() => {})
   }, [])
 
   return (
@@ -97,7 +104,7 @@ export default function LocationsPage() {
       <section className="pt-32 pb-16 bg-brand-section relative overflow-hidden">
         <SectionBackground bgJson={heroBg} opacity={18} />
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(201,168,76,0.06),transparent_60%)]" />
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <div className="relative max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <div className="inline-flex items-center gap-3 mb-4">
             <div className="h-px w-10 bg-gold" />
             <span className="text-gold text-xs tracking-[0.3em] uppercase">Dubai</span>
@@ -115,7 +122,7 @@ export default function LocationsPage() {
 
       {/* Stats bar */}
       <section className="bg-brand border-b border-white/5">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 text-center">
             {[
               { label: 'Areas Covered', value: areas.length > 0 ? `${areas.length}+` : '5+' },
@@ -135,19 +142,19 @@ export default function LocationsPage() {
       {/* Interactive map */}
       {!loading && areas.length > 0 && (
         <section className="bg-brand py-10">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex items-center gap-3 mb-5">
               <div className="h-px w-8 bg-gold" />
               <span className="text-gold text-xs tracking-[0.3em] uppercase">Map View</span>
             </div>
-            <LocationsMap areas={areas} />
+            <LocationsMap areas={areas} apiKey={mapsKey} />
           </div>
         </section>
       )}
 
       {/* Area cards grid */}
       <section className="py-16 bg-brand min-h-[60vh]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
           {loading ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {Array.from({ length: 6 }).map((_, i) => (
@@ -171,7 +178,7 @@ export default function LocationsPage() {
 
       {/* Bottom CTA */}
       <section className="py-16 bg-brand-section border-t border-white/5">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <ScrollReveal>
             <h2 className="font-serif text-3xl font-bold text-white mb-4">
               Not Sure Which Area Fits Your Goals?

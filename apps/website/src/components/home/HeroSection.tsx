@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { useEffect, useRef } from 'react'
 import Image from 'next/image'
@@ -38,7 +38,7 @@ export function HeroSection({ cms, bgImage }: { cms?: Record<string, unknown>; b
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
       {/* Background layers */}
       <div ref={parallaxRef} className="absolute inset-0 will-change-transform">
-        {/* Base gradient — uses CSS custom properties so admin theme colors apply */}
+        {/* Base gradient â€” uses CSS custom properties so admin theme colors apply */}
         <div className="absolute inset-0 bg-gradient-to-b from-brand via-brand to-brand-section" />
         {bgImage && (
           <Image
@@ -50,7 +50,7 @@ export function HeroSection({ cms, bgImage }: { cms?: Record<string, unknown>; b
             unoptimized
           />
         )}
-        {/* Geometric gold lines — decorative */}
+        {/* Geometric gold lines â€” decorative */}
         <svg
           className="absolute inset-0 w-full h-full opacity-10"
           viewBox="0 0 1440 900"
@@ -68,7 +68,7 @@ export function HeroSection({ cms, bgImage }: { cms?: Record<string, unknown>; b
         <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[600px] rounded-full bg-gold/5 blur-[120px]" />
       </div>
 
-      {/* Content — pt-24 clears the 80px fixed navbar */}
+      {/* Content â€” pt-24 clears the 80px fixed navbar */}
       <div className="relative z-10 max-w-5xl mx-auto px-5 sm:px-6 text-center pt-20 pb-16 sm:pt-24 sm:pb-24">
         {/* Eyebrow */}
         <motion.div
@@ -161,3 +161,4 @@ export function HeroSection({ cms, bgImage }: { cms?: Record<string, unknown>; b
     </section>
   )
 }
+

@@ -352,7 +352,7 @@ export default function DashboardPage() {
   ) : 0
 
   return (
-    <div className="space-y-6 max-w-7xl">
+    <div className="space-y-6 w-full">
 
       {/* Primary stat cards — 3 col on lg, 6 on xl */}
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">

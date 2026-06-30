@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import Image from 'next/image'
 import { motion } from 'framer-motion'
@@ -22,7 +22,7 @@ const DEFAULT_PARTNERS: Partner[] = [
 
 interface Props {
   cms?: Record<string, unknown>
-  /** Raw JSON string from settings API — overrides cms trust_strip_developers */
+  /** Raw JSON string from settings API â€” overrides cms trust_strip_developers */
   partnersJson?: string | null
   speedSeconds?: string | null
   stripLabel?: string | null
@@ -47,7 +47,7 @@ export function TrustStrip({ cms, partnersJson, speedSeconds, stripLabel, bgJson
   return (
     <section className="bg-brand-section py-14 border-y border-gold-border relative overflow-hidden">
       <SectionBackground bgJson={bgJson} opacity={25} />
-      <div className="relative z-10 max-w-7xl mx-auto px-6">
+      <div className="relative z-10 max-w-[1440px] mx-auto px-6">
         <ScrollReveal>
           <p className="text-center text-muted text-[10px] tracking-[0.4em] uppercase mb-8">
             {label}
@@ -93,3 +93,4 @@ export function TrustStrip({ cms, partnersJson, speedSeconds, stripLabel, bgJson
     </section>
   )
 }
+

@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { useState, useEffect } from 'react'
 import { HelpCircle } from 'lucide-react'
@@ -44,3 +44,4 @@ export function CantFindCTA() {
     </>
   )
 }
+

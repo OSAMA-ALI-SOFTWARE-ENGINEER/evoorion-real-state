@@ -85,8 +85,11 @@ export default function LocationDetailPage({ params }: { params: Promise<{ slug:
   const [loading, setLoading] = useState(true)
   const [propsLoading, setPropsLoading] = useState(true)
   const [notFound, setNotFound] = useState(false)
+  const [mapsKey, setMapsKey] = useState('')
 
   useEffect(() => {
+    const api = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000/api/v1'
+    fetch(`${api}/settings`).then(r => r.json()).then(j => setMapsKey(j?.data?.google_maps_key ?? '')).catch(() => {})
     getArea(slug)
       .then((res) => setArea(res.data))
       .catch(() => setNotFound(true))
@@ -133,7 +136,7 @@ export default function LocationDetailPage({ params }: { params: Promise<{ slug:
           sizes="100vw"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-brand via-brand/60 to-transparent" />
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-12 w-full">
+        <div className="relative max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 pb-12 w-full">
           <Link
             href="/locations"
             className="inline-flex items-center gap-2 text-white/60 hover:text-white text-sm mb-6 transition-colors"
@@ -152,7 +155,7 @@ export default function LocationDetailPage({ params }: { params: Promise<{ slug:
 
       {/* Main content */}
       <section className="py-16 bg-brand">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
 
             {/* Left col */}
@@ -175,6 +178,7 @@ export default function LocationDetailPage({ params }: { params: Promise<{ slug:
                     lng={area.longitude}
                     name={area.name}
                     propertyCount={propsLoading ? undefined : properties.length}
+                    apiKey={mapsKey}
                   />
                 </ScrollReveal>
               )}

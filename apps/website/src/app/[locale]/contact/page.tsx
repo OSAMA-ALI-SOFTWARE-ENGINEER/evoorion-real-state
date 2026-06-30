@@ -37,6 +37,7 @@ type ContactSettings = {
   social_linkedin?: string | null
   social_youtube?: string | null
   section_bg_hero_contact?: string | null
+  google_maps_key?: string | null
 }
 
 async function getContactSettings(): Promise<ContactSettings> {
@@ -93,7 +94,7 @@ export default async function ContactPage() {
         <SectionBackground bgJson={s.section_bg_hero_contact} opacity={18} />
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(201,168,76,0.06),transparent_60%)]" />
         <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-gold/20 to-transparent" />
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <div className="relative max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <div className="inline-flex items-center gap-3 mb-5">
             <div className="h-px w-10 bg-gold" />
             <span className="text-gold text-xs tracking-[0.3em] uppercase">
@@ -112,7 +113,7 @@ export default async function ContactPage() {
 
       {/* Two-column layout */}
       <section className="py-16 bg-brand">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-5 gap-12">
             {/* Left: Contact info + map */}
             <div className="lg:col-span-2 space-y-10">
@@ -206,7 +207,7 @@ export default async function ContactPage() {
               )}
 
               <ScrollReveal delay={0.2}>
-                <ContactAddressMap address={address} />
+                <ContactAddressMap address={address} apiKey={s.google_maps_key ?? undefined} />
               </ScrollReveal>
             </div>
 

@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { useEffect } from 'react'
 
@@ -10,3 +10,4 @@ export function ServiceWorkerRegister() {
   }, [])
   return null
 }
+

@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import Image from 'next/image'
 import { parseSectionBg } from '@/lib/sectionBg'
@@ -34,3 +34,4 @@ export function SectionBackground({ bgJson, opacity = 20 }: Props) {
     </>
   )
 }
+

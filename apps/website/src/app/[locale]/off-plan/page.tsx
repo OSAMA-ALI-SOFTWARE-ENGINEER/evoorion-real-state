@@ -92,7 +92,7 @@ export default async function OffPlanPage() {
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(201,168,76,0.08),transparent_55%)]" />
         <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-gold/20 to-transparent" />
 
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="relative max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-3xl">
             <div className="flex items-center gap-3 mb-6">
               <div className="h-px w-10 bg-gold" />
@@ -129,7 +129,7 @@ export default async function OffPlanPage() {
 
       {/* Benefits */}
       <section className="py-20 bg-brand">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
           <ScrollReveal>
             <div className="text-center mb-14">
               <div className="inline-flex items-center gap-3 mb-4">
@@ -164,7 +164,7 @@ export default async function OffPlanPage() {
 
       {/* Available Developments */}
       <section id="developments" className="py-20 bg-brand-section">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
           <ScrollReveal>
             <div className="flex items-end justify-between mb-12">
               <div>
@@ -191,7 +191,7 @@ export default async function OffPlanPage() {
 
       {/* How it Works */}
       <section className="py-20 bg-brand">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
           <ScrollReveal>
             <div className="text-center mb-14">
               <div className="inline-flex items-center gap-3 mb-4">
@@ -225,7 +225,7 @@ export default async function OffPlanPage() {
       {/* CTA — Lead Form */}
       <section className="py-20 bg-brand-section relative overflow-hidden">
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,rgba(201,168,76,0.05),transparent_60%)]" />
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="relative max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-start">
             <ScrollReveal>
               <div className="inline-flex items-center gap-3 mb-5">

@@ -1,4 +1,4 @@
-import Image from 'next/image'
+﻿import Image from 'next/image'
 import { Percent, TrendingUp, Globe, Award } from 'lucide-react'
 import { getTranslations } from 'next-intl/server'
 import { ScrollReveal } from '@/components/ui/ScrollReveal'
@@ -25,7 +25,7 @@ export async function WhyDubai({ cms, bgImage }: { cms?: Record<string, unknown>
     <section className="relative overflow-hidden">
       <div className="grid grid-cols-1 lg:grid-cols-2 min-h-[600px]">
 
-        {/* Left — featured image */}
+        {/* Left â€” featured image */}
         <div className="relative h-72 lg:h-auto order-2 lg:order-1">
           {bgImg ? (
             <Image
@@ -44,7 +44,7 @@ export async function WhyDubai({ cms, bgImage }: { cms?: Record<string, unknown>
           <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-brand to-transparent lg:hidden" />
         </div>
 
-        {/* Right — heading + stats */}
+        {/* Right â€” heading + stats */}
         <div className="order-1 lg:order-2 bg-brand relative py-14 sm:py-20 px-5 sm:px-12 lg:px-16 flex flex-col justify-center">
           {/* Decorative top line */}
           <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-gold/30 via-transparent to-transparent" />
@@ -63,7 +63,7 @@ export async function WhyDubai({ cms, bgImage }: { cms?: Record<string, unknown>
             </div>
           </ScrollReveal>
 
-          {/* 2×2 stat grid */}
+          {/* 2Ã—2 stat grid */}
           <div className="grid grid-cols-2 gap-4">
             {STATS.map((stat, i) => {
               const Icon = stat.icon
@@ -91,3 +91,4 @@ export async function WhyDubai({ cms, bgImage }: { cms?: Record<string, unknown>
     </section>
   )
 }
+

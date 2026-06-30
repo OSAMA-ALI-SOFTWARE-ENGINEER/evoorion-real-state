@@ -9,10 +9,11 @@ interface AreaMapProps {
   name: string
   propertyCount?: number
   zoom?: number
+  apiKey?: string
 }
 
-export function AreaMap({ lat, lng, name, propertyCount, zoom = 14 }: AreaMapProps) {
-  const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_KEY ?? ''
+export function AreaMap({ lat, lng, name, propertyCount, zoom = 14, apiKey: apiKeyProp }: AreaMapProps) {
+  const apiKey = apiKeyProp ?? process.env.NEXT_PUBLIC_GOOGLE_MAPS_KEY ?? ''
 
   if (!apiKey) {
     return (

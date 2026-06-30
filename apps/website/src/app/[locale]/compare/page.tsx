@@ -194,7 +194,7 @@ export default function ComparePage() {
     <>
       <section className="pt-32 pb-10 bg-brand-section relative overflow-hidden">
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(201,168,76,0.06),transparent_60%)]" />
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="relative max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
           <Link
             href="/properties"
             className="flex w-fit items-center gap-2 text-muted hover:text-white text-sm transition-colors mb-10"
@@ -213,7 +213,7 @@ export default function ComparePage() {
       </section>
 
       <section className="py-12 bg-brand min-h-[60vh]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
           <Suspense
             fallback={
               <div className="py-24 flex items-center justify-center">

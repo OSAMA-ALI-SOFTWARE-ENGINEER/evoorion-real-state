@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
@@ -104,7 +104,7 @@ function OpLinkWithLocations({ op, pathname, onClose }: { op: OpType; pathname: 
         <ChevronRight size={14} className={`transition-transform duration-200 group-hover:translate-x-1 ${active ? 'text-gold' : 'text-white/20'}`} />
       </Link>
 
-      {/* Nested locations flyout — fixed so drawer overflow-y-auto cannot clip it */}
+      {/* Nested locations flyout â€” fixed so drawer overflow-y-auto cannot clip it */}
       <AnimatePresence>
         {hovered && areas.length > 0 && (
           <motion.div
@@ -195,7 +195,7 @@ export function Navbar() {
             : 'bg-transparent'
         }`}
       >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-20">
 
             {/* Logo */}
@@ -218,7 +218,7 @@ export function Navbar() {
               {/* Language + Region combined */}
               <LocaleSelector />
 
-              {/* Book Call — hidden on small mobile */}
+              {/* Book Call â€” hidden on small mobile */}
               <Link
                 href="/contact"
                 className="hidden sm:flex items-center gap-2 px-4 py-2.5 bg-gold text-brand text-xs font-semibold tracking-wider uppercase rounded-sm hover:bg-gold-light transition-colors duration-300"
@@ -293,10 +293,10 @@ export function Navbar() {
               </button>
             </div>
 
-            {/* Drawer body — scrollable */}
+            {/* Drawer body â€” scrollable */}
             <div className="flex-1 overflow-y-auto px-6 py-4">
 
-              {/* Properties — dynamic op types with nested location hover */}
+              {/* Properties â€” dynamic op types with nested location hover */}
               {opTypes.length > 0 && (
                 <div className="mb-6">
                   <p className="text-gold/60 text-[10px] tracking-[0.25em] uppercase mb-1 font-medium">Properties</p>
@@ -393,3 +393,4 @@ export function Navbar() {
     </>
   )
 }
+

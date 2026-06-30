@@ -60,7 +60,7 @@ export default async function InvestmentsPage() {
         <SectionBackground bgJson={settings.section_bg_hero_investments} opacity={18} />
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(201,168,76,0.06),transparent_60%)]" />
         <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-gold/20 to-transparent" />
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <div className="relative max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <div className="inline-flex items-center gap-3 mb-5">
             <div className="h-px w-10 bg-gold" />
             <span className="text-gold text-xs tracking-[0.3em] uppercase">{heroEyebrow}</span>
@@ -81,7 +81,7 @@ export default async function InvestmentsPage() {
       {/* Investment type cards */}
       <section className="py-20 bg-brand relative overflow-hidden">
         <SectionBackground bgJson={settings.section_bg_investments_strategies} opacity={20} />
-        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+        <div className="relative z-10 max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
           {investmentTypes.map((type, i) => {
             const Icon = type.icon
             const isReversed = i % 2 === 1

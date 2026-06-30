@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Server-side HTML sanitizer for admin-authored blog content.
  * Removes script/iframe/object/embed elements, event-handler attributes,
  * and javascript:/data: URIs. Admin content is trusted but we still apply
@@ -26,3 +26,4 @@ export function sanitizeBlogContent(html: string): string {
     .replace(DANGEROUS_URIS_RE, '$1#')
     .replace(DANGEROUS_ATTRS_RE, '')
 }
+

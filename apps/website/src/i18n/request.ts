@@ -1,4 +1,4 @@
-import { getRequestConfig } from 'next-intl/server'
+﻿import { getRequestConfig } from 'next-intl/server'
 import { routing } from './routing'
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? ''
@@ -50,3 +50,4 @@ function deepMerge(
   }
   return result
 }
+

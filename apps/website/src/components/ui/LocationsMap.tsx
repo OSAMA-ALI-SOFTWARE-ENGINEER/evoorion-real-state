@@ -23,8 +23,8 @@ function AreaPin({ name, selected }: { name: string; selected: boolean }) {
   )
 }
 
-export function LocationsMap({ areas }: { areas: Area[] }) {
-  const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_KEY ?? ''
+export function LocationsMap({ areas, apiKey: apiKeyProp }: { areas: Area[]; apiKey?: string }) {
+  const apiKey = apiKeyProp ?? process.env.NEXT_PUBLIC_GOOGLE_MAPS_KEY ?? ''
   const [selectedArea, setSelectedArea] = useState<Area | null>(null)
 
   const areasWithCoords = areas.filter(
@@ -131,3 +131,4 @@ export function LocationsMap({ areas }: { areas: Area[] }) {
     </APIProvider>
   )
 }
+

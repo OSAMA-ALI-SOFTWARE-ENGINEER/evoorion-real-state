@@ -1,4 +1,4 @@
-import Link from 'next/link'
+﻿import Link from 'next/link'
 import Image from 'next/image'
 import { MapPin, Mail, Phone } from 'lucide-react'
 import { getTranslations } from 'next-intl/server'
@@ -31,7 +31,7 @@ export async function Footer() {
 
   return (
     <footer className="bg-brand-section border-t border-gold-border">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
+      <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8 md:gap-12">
           {/* Brand column */}
           <div className="lg:col-span-2">
@@ -127,7 +127,7 @@ export async function Footer() {
             </ul>
             <div className="mt-5">
               <h5 className="text-white/60 text-xs tracking-wider uppercase mb-1">{t('officeHours')}</h5>
-              <p className="text-muted text-sm">Mon – Sat: 9:00 AM – 7:00 PM</p>
+              <p className="text-muted text-sm">Mon â€“ Sat: 9:00 AM â€“ 7:00 PM</p>
             </div>
           </div>
         </div>
@@ -146,7 +146,7 @@ export async function Footer() {
               {t('serving')}
             </p>
             <p className="text-muted/60 text-xs">
-              © {new Date().getFullYear()} EVOORION Real Estate. {t('rights')}
+              Â© {new Date().getFullYear()} EVOORION Real Estate. {t('rights')}
             </p>
           </div>
         </div>
@@ -154,3 +154,4 @@ export async function Footer() {
     </footer>
   )
 }
+

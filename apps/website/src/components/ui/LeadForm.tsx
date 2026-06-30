@@ -6,6 +6,7 @@ import { submitLead } from '@/lib/api'
 import { BUDGET_RANGES, type BudgetRange } from '@/types'
 import { PhoneInput } from '@/components/ui/PhoneInput'
 import { useAuth } from '@/context/AuthContext'
+import { useLocale } from 'next-intl'
 
 interface LeadFormProps {
   propertyId?: number
@@ -103,6 +104,12 @@ function BudgetSelect({
 
 // ── Main form ─────────────────────────────────────────────────────────────────
 
+const LOCALE_PHONE: Record<string, string> = {
+  ar: '+966',
+  de: '+49',
+  'en-gb': '+44',
+}
+
 export function LeadForm({
   propertyId,
   variant = 'default',
@@ -110,6 +117,8 @@ export function LeadForm({
   subtitle = 'Our investment advisors will reach out within 24 hours.',
 }: LeadFormProps) {
   const { user } = useAuth()
+  const locale = useLocale()
+  const defaultPhoneCode = LOCALE_PHONE[locale] ?? '+971'
   const [form, setForm] = useState<FormState>(INITIAL)
   const [status, setStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle')
   const [errorMessage, setErrorMessage] = useState('')
@@ -217,11 +226,13 @@ export function LeadForm({
           value={form.phone}
           onChange={v => setForm(prev => ({ ...prev, phone: v }))}
           placeholder="Phone number"
+          defaultCountryCode={defaultPhoneCode}
         />
         <PhoneInput
           value={form.whatsapp}
           onChange={v => setForm(prev => ({ ...prev, whatsapp: v }))}
           placeholder="WhatsApp number"
+          defaultCountryCode={defaultPhoneCode}
         />
 
         <BudgetSelect

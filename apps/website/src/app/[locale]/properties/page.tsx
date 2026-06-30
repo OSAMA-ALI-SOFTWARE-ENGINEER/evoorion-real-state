@@ -295,7 +295,7 @@ function PropertiesPageInner() {
       <section className="pt-32 pb-16 bg-brand-section relative overflow-hidden">
         <SectionBackground bgJson={heroBg} opacity={18} />
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(201,168,76,0.06),transparent_60%)]" />
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <div className="relative max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <div className="inline-flex items-center gap-3 mb-4">
             <div className="h-px w-10 bg-gold" />
             <span className="text-gold text-xs tracking-[0.3em] uppercase">Portfolio</span>
@@ -312,7 +312,7 @@ function PropertiesPageInner() {
 
       {/* Filters */}
       <section className="sticky top-20 z-30 bg-brand/95 backdrop-blur-md border-b border-gold-border">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+        <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-4">
           {/* Row 1: type pills + search + filter toggle */}
           <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
             <div className="flex flex-wrap gap-2">
@@ -474,7 +474,7 @@ function PropertiesPageInner() {
 
       {/* Grid / Map */}
       <section className={`py-16 bg-brand min-h-[60vh] ${compareList.length > 0 ? 'pb-36' : ''}`}>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
           {/* Map view */}
           {viewMode === 'map' && (
             <PropertyMapView properties={properties} areas={areas} />
@@ -542,7 +542,7 @@ function PropertiesPageInner() {
             transition={{ type: 'spring', damping: 25, stiffness: 300 }}
             className="fixed bottom-0 left-0 right-0 z-50 bg-brand-section/95 backdrop-blur-md border-t border-gold-border shadow-2xl"
           >
-            <div className="max-w-7xl mx-auto px-4 py-4 flex flex-col sm:flex-row items-start sm:items-center gap-4">
+            <div className="max-w-[1440px] mx-auto px-4 py-4 flex flex-col sm:flex-row items-start sm:items-center gap-4">
               <div className="flex-1 flex items-center gap-2 overflow-x-auto min-w-0 pb-1 sm:pb-0">
                 {compareList.map((p) => (
                   <div

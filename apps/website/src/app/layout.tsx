@@ -1,11 +1,11 @@
-import type { Metadata } from 'next'
+﻿import type { Metadata } from 'next'
 import './globals.css'
 import { getPublicSettings } from '@/lib/api'
 import { ServiceWorkerRegister } from '@/components/ui/ServiceWorkerRegister'
 
 export const metadata: Metadata = {
   title: {
-    default: 'EVOORION — Luxury Dubai Real Estate Investment',
+    default: 'EVOORION â€” Luxury Dubai Real Estate Investment',
     template: '%s | EVOORION',
   },
   description:
@@ -33,7 +33,7 @@ export const metadata: Metadata = {
   formatDetection: { telephone: false },
 }
 
-// Strict hex-color whitelist — only #rgb, #rrggbb, #rrggbbaa forms allowed.
+// Strict hex-color whitelist â€” only #rgb, #rrggbb, #rrggbbaa forms allowed.
 const HEX_RE = /^#[0-9a-fA-F]{3}(?:[0-9a-fA-F]{3}(?:[0-9a-fA-F]{2})?)?$/
 
 function safeHex(v: string | null | undefined): string | null {
@@ -82,3 +82,4 @@ export default async function RootLayout({ children }: { children: React.ReactNo
     </html>
   )
 }
+

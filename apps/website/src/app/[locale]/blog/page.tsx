@@ -168,7 +168,7 @@ export default function BlogPage() {
       <section className="relative pt-32 pb-20 overflow-hidden bg-brand">
         <SectionBackground bgJson={heroBg} opacity={18} />
         <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-transparent pointer-events-none" />
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
+        <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 relative">
           <ScrollReveal>
             <div className="text-center max-w-2xl mx-auto">
               <p className="text-gold text-xs tracking-[0.3em] uppercase mb-3">Insights &amp; Perspectives</p>
@@ -185,7 +185,7 @@ export default function BlogPage() {
 
       {/* Filters */}
       <section className="sticky top-20 z-30 bg-brand/95 backdrop-blur-md border-b border-gold-border py-4">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row gap-3 items-start sm:items-center">
+        <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row gap-3 items-start sm:items-center">
           {/* Search */}
           <div className="relative flex-1 max-w-sm">
             <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted pointer-events-none" />
@@ -234,7 +234,7 @@ export default function BlogPage() {
 
       {/* Grid */}
       <section className="py-16 bg-brand">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
           {!loading && totalPosts > 0 && (
             <p className="text-muted text-sm mb-6">
               {totalPosts} article{totalPosts !== 1 ? 's' : ''}

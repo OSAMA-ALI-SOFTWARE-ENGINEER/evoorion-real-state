@@ -308,7 +308,7 @@ export function PropertyDetailClient({ property }: Props) {
     <>
       {/* Breadcrumb */}
       <div className="pt-24 pb-6 bg-brand-section border-b border-white/5">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
           <Link href="/properties" className="inline-flex items-center gap-2 text-muted text-sm hover:text-gold transition-colors">
             <ArrowLeft size={15} />
             Back to Properties
@@ -318,14 +318,14 @@ export function PropertyDetailClient({ property }: Props) {
 
       {/* Hero gallery */}
       <section className="bg-brand-section">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 relative">
+        <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-6 relative">
           <HeroGallery images={imageMedia} onOpenLightbox={setLightboxIdx} />
         </div>
       </section>
 
       {/* Details + Form */}
       <section className="py-12 bg-brand">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
 
             {/* Left: property info */}

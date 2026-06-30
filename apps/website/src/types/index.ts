@@ -1,4 +1,4 @@
-export type PropertyMediaType = 'image' | 'video' | 'file'
+﻿export type PropertyMediaType = 'image' | 'video' | 'file'
 
 export interface PropertyImage {
   id: number
@@ -103,7 +103,7 @@ export interface LeadPayload {
 
 export type BudgetRange = 'under_1m' | '1m_3m' | '3m_5m' | '5m_10m' | 'above_10m'
 
-// ── Auth ──────────────────────────────────────────────────────────────────────
+// â”€â”€ Auth â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 export interface AuthUser {
   id: number
@@ -125,7 +125,7 @@ export interface RegisterPayload {
   password_confirmation: string
 }
 
-// ── Blog ──────────────────────────────────────────────────────────────────────
+// â”€â”€ Blog â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 export interface BlogTag {
   id: number
@@ -156,13 +156,13 @@ export interface BlogPost extends BlogPostSummary {
 
 export const BUDGET_RANGES: Record<BudgetRange, { label: string; min: number; max: number }> = {
   under_1m: { label: 'Under AED 1M', min: 0, max: 1_000_000 },
-  '1m_3m': { label: 'AED 1M – 3M', min: 1_000_000, max: 3_000_000 },
-  '3m_5m': { label: 'AED 3M – 5M', min: 3_000_000, max: 5_000_000 },
-  '5m_10m': { label: 'AED 5M – 10M', min: 5_000_000, max: 10_000_000 },
+  '1m_3m': { label: 'AED 1M â€“ 3M', min: 1_000_000, max: 3_000_000 },
+  '3m_5m': { label: 'AED 3M â€“ 5M', min: 3_000_000, max: 5_000_000 },
+  '5m_10m': { label: 'AED 5M â€“ 10M', min: 5_000_000, max: 10_000_000 },
   above_10m: { label: 'AED 10M+', min: 10_000_000, max: 999_999_999 },
 }
 
-// ── Master data ───────────────────────────────────────────────────────────────
+// â”€â”€ Master data â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 export interface PriceRange {
   type: string
@@ -193,7 +193,7 @@ export interface OperationType {
   slug: string
 }
 
-// ── Comparison ────────────────────────────────────────────────────────────────
+// â”€â”€ Comparison â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 export interface ComparisonResult {
   properties: Property[]
@@ -203,3 +203,4 @@ export interface ComparisonResult {
     largest: string
   }
 }
+

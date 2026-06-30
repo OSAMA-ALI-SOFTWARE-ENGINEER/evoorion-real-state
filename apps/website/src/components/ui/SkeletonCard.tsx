@@ -1,4 +1,4 @@
-export function SkeletonCard() {
+﻿export function SkeletonCard() {
   return (
     <div className="rounded-sm overflow-hidden border border-white/5 animate-pulse">
       <div className="h-56 bg-white/5" />
@@ -14,3 +14,4 @@ export function SkeletonCard() {
     </div>
   )
 }
+
