@@ -18,7 +18,7 @@ class DeveloperController
 
     public function index(): JsonResponse
     {
-        $developers = Developer::paginate(15);
+        $developers = Developer::with('region:id,code,name,flag')->paginate(15);
         return $this->paginated($developers->items(), $developers->total(), 15, $developers->currentPage());
     }
 
@@ -29,6 +29,7 @@ class DeveloperController
             'email'       => 'nullable|email|max:255',
             'logo_url'    => 'nullable|url',
             'description' => 'nullable|string',
+            'region_id'   => 'nullable|exists:regions,id',
         ]);
 
         $developer = Developer::create($validated);
@@ -48,6 +49,7 @@ class DeveloperController
             'email'       => 'nullable|email|max:255',
             'logo_url'    => 'nullable|url',
             'description' => 'nullable|string',
+            'region_id'   => 'nullable|exists:regions,id',
         ]);
 
         $developer->update($validated);

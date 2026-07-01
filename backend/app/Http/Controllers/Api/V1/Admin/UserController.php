@@ -26,6 +26,7 @@ class UserController extends Controller
             'password'              => 'required|string|min:8|confirmed',
             'role'                  => 'required|in:super_admin,manager,agent',
             'is_active'             => 'boolean',
+            'region_id'             => 'nullable|exists:regions,id',
         ]);
 
         $data['password'] = Hash::make($data['password']);
@@ -45,6 +46,7 @@ class UserController extends Controller
                   ->orWhere('email', 'like', "%{$request->search}%");
             }))
             ->when($request->has('is_active'), fn ($q) => $q->where('is_active', $request->boolean('is_active')))
+            ->with('region:id,code,name,flag')
             ->withTrashed()
             ->latest()
             ->paginate(20);

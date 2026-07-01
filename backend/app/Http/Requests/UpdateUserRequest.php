@@ -17,6 +17,7 @@ class UpdateUserRequest extends FormRequest
             'role'      => 'sometimes|in:agent,manager,super_admin',
             'is_active' => 'sometimes|boolean',
             'name'      => 'sometimes|string|max:255',
+            'region_id' => 'nullable|exists:regions,id',
         ];
     }
 }

@@ -21,6 +21,7 @@ class UpdateAgencyRequest extends FormRequest
             'contact_email' => 'sometimes|nullable|email|max:255',
             'phone'         => 'sometimes|nullable|string|max:30',
             'address'       => 'sometimes|nullable|string|max:500',
+            'region_id'     => 'nullable|exists:regions,id',
         ];
     }
 }

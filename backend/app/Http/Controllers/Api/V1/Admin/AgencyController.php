@@ -19,6 +19,7 @@ class AgencyController extends Controller
     public function index(Request $request): JsonResponse
     {
         $agencies = Agency::withCount('agents')
+            ->with('region:id,code,name,flag')
             ->when($request->search, fn ($q) => $q->where('name', 'like', "%{$request->search}%"))
             ->latest()
             ->paginate(20);
