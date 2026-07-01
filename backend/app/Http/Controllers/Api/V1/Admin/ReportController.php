@@ -38,11 +38,12 @@ class ReportController extends Controller
      *   }
      * }
      */
-    public function leadFunnel(): JsonResponse
+    public function leadFunnel(Request $request): JsonResponse
     {
         $statuses = ['new', 'contacted', 'qualified', 'closed', 'lost'];
 
         $counts = Lead::select('status', DB::raw('count(*) as total'))
+            ->when($request->region, fn ($q) => $q->whereHas('property.region', fn ($r) => $r->where('code', $request->region)))
             ->groupBy('status')
             ->pluck('total', 'status');
 
@@ -91,6 +92,7 @@ class ReportController extends Controller
             DB::raw("date(created_at) as date"),
             DB::raw('count(*) as total')
         )
+            ->when($request->region, fn ($q) => $q->whereHas('property.region', fn ($r) => $r->where('code', $request->region)))
             ->where('created_at', '>=', $from)
             ->groupBy(DB::raw('date(created_at)'))
             ->orderBy('date')
@@ -110,10 +112,11 @@ class ReportController extends Controller
         return response()->json(['success' => true, 'data' => $series]);
     }
 
-    public function propertyPerformance(): JsonResponse
+    public function propertyPerformance(Request $request): JsonResponse
     {
         $properties = Property::select('properties.*')
             ->addSelect(DB::raw('(SELECT COUNT(*) FROM leads WHERE leads.property_id = properties.id) as leads_count'))
+            ->when($request->region, fn ($q) => $q->whereHas('region', fn ($r) => $r->where('code', $request->region)))
             ->with('area')
             ->orderByDesc('views_count')
             ->limit(20)
@@ -146,15 +149,20 @@ class ReportController extends Controller
      *   ]
      * }
      */
-    public function agentLeaderboard(): JsonResponse
+    public function agentLeaderboard(Request $request): JsonResponse
     {
+        $region = $request->input('region');
+
+        // Build the region EXISTS clause using a parameterized subquery to avoid SQL injection.
+        $regionJoin = $region
+            ? ' AND EXISTS (SELECT 1 FROM properties p JOIN regions r ON p.region_id = r.id WHERE p.id = leads.property_id AND r.code = ?)'
+            : '';
+
         $agents = Agent::with('user')
-            ->addSelect([
-                'agents.*',
-                DB::raw('(SELECT COUNT(*) FROM leads WHERE leads.assigned_to = agents.user_id) as leads_total'),
-                DB::raw('(SELECT COUNT(*) FROM leads WHERE leads.assigned_to = agents.user_id AND leads.status = \'closed\') as leads_closed'),
-                DB::raw('(SELECT COUNT(*) FROM leads WHERE leads.assigned_to = agents.user_id AND leads.status = \'new\') as leads_new'),
-            ])
+            ->select('agents.*')
+            ->selectRaw('(SELECT COUNT(*) FROM leads WHERE leads.assigned_to = agents.user_id' . $regionJoin . ') as leads_total', $region ? [$region] : [])
+            ->selectRaw('(SELECT COUNT(*) FROM leads WHERE leads.assigned_to = agents.user_id AND leads.status = \'closed\'' . $regionJoin . ') as leads_closed', $region ? [$region] : [])
+            ->selectRaw('(SELECT COUNT(*) FROM leads WHERE leads.assigned_to = agents.user_id AND leads.status = \'new\'' . $regionJoin . ') as leads_new', $region ? [$region] : [])
             ->get()
             ->map(fn ($a) => [
                 'id'           => $a->id,
@@ -172,9 +180,10 @@ class ReportController extends Controller
         return response()->json(['success' => true, 'data' => $agents]);
     }
 
-    public function leadsBySource(): JsonResponse
+    public function leadsBySource(Request $request): JsonResponse
     {
         $data = Lead::select('source', DB::raw('count(*) as total'))
+            ->when($request->region, fn ($q) => $q->whereHas('property.region', fn ($r) => $r->where('code', $request->region)))
             ->groupBy('source')
             ->orderByDesc('total')
             ->get()

@@ -4,8 +4,10 @@ import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import {
   getLeadFunnel, getLeadsOverTime, getPropertyPerformance,
-  getAgentLeaderboard, getLeadsBySource,
+  getAgentLeaderboard, getLeadsBySource, getRegions,
 } from '@/lib/api'
+import type { Region } from '@/types'
+import { CustomSelect } from '@/components/ui/CustomSelect'
 
 const GOLD   = '#C9A84C'
 const STATUS_COLORS: Record<string, string> = {
@@ -111,45 +113,62 @@ const TABS: { key: Tab; label: string }[] = [
 
 const card = 'bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700'
 
+type FunnelData = { funnel: { status: string; count: number }[]; total: number; conversion_rate: number }
+type PropRow    = { id: number; title: string; slug: string; area: string | null; price: string; views: number; leads: number; status: string; is_featured: boolean }
+type AgentRow   = { id: number; name: string; leads_total: number; leads_closed: number; leads_new: number; close_rate: number }
+
 export default function ReportsPage() {
   const [tab,  setTab]  = useState<Tab>('funnel')
   const [days, setDays] = useState(30)
 
-  const [funnel,    setFunnel]    = useState<{ funnel: { status: string; count: number }[]; total: number; conversion_rate: number } | null>(null)
+  const [regions,    setRegions]    = useState<Region[]>([])
+  const [regionCode, setRegionCode] = useState('')
+
+  const [funnel,    setFunnel]    = useState<FunnelData | null>(null)
   const [funnelL,   setFunnelL]   = useState(true)
   const [timeline,  setTimeline]  = useState<{ date: string; total: number }[]>([])
   const [timelineL, setTimelineL] = useState(true)
-  const [props,     setProps]     = useState<Record<string, unknown>[]>([])
+  const [props,     setProps]     = useState<PropRow[]>([])
   const [propsL,    setPropsL]    = useState(true)
-  const [board,     setBoard]     = useState<Record<string, unknown>[]>([])
+  const [board,     setBoard]     = useState<AgentRow[]>([])
   const [boardL,    setBoardL]    = useState(true)
   const [sources,   setSources]   = useState<{ source: string; total: number }[]>([])
   const [sourcesL,  setSourcesL]  = useState(true)
 
+  // Load regions once on mount
+  useEffect(() => {
+    getRegions().then(r => setRegions(r.data ?? [])).catch(() => {})
+  }, [])
+
   useEffect(() => {
     setFunnelL(true)
-    getLeadFunnel().then(res => setFunnel(res.data as typeof funnel)).finally(() => setFunnelL(false))
-  }, [])
+    getLeadFunnel(regionCode || undefined).then(res => setFunnel(res.data)).finally(() => setFunnelL(false))
+  }, [regionCode])
 
   useEffect(() => {
     setTimelineL(true)
-    getLeadsOverTime(days).then(res => setTimeline(res.data as typeof timeline)).finally(() => setTimelineL(false))
-  }, [days])
+    getLeadsOverTime(days, regionCode || undefined).then(res => setTimeline(res.data)).finally(() => setTimelineL(false))
+  }, [days, regionCode])
 
   useEffect(() => {
     setPropsL(true)
-    getPropertyPerformance().then(res => setProps(res.data as typeof props)).finally(() => setPropsL(false))
-  }, [])
+    getPropertyPerformance(regionCode || undefined).then(res => setProps(res.data)).finally(() => setPropsL(false))
+  }, [regionCode])
 
   useEffect(() => {
     setBoardL(true)
-    getAgentLeaderboard().then(res => setBoard(res.data as typeof board)).finally(() => setBoardL(false))
-  }, [])
+    getAgentLeaderboard(regionCode || undefined).then(res => setBoard(res.data)).finally(() => setBoardL(false))
+  }, [regionCode])
 
   useEffect(() => {
     setSourcesL(true)
-    getLeadsBySource().then(res => setSources(res.data as typeof sources)).finally(() => setSourcesL(false))
-  }, [])
+    getLeadsBySource(regionCode || undefined).then(res => setSources(res.data)).finally(() => setSourcesL(false))
+  }, [regionCode])
+
+  const regionOptions = [
+    { value: '', label: 'All Regions' },
+    ...regions.filter(r => r.is_active).map(r => ({ value: r.code, label: `${r.flag ?? ''} ${r.name}`.trim() })),
+  ]
 
   const spinner = (
     <div className="py-16 flex justify-center">
@@ -159,6 +178,17 @@ export default function ReportsPage() {
 
   return (
     <div className="space-y-5 max-w-5xl">
+      {/* Region filter + Tabs header */}
+      <div className="flex items-center justify-between gap-4 flex-wrap">
+        <CustomSelect
+          value={regionCode}
+          onChange={v => setRegionCode(v)}
+          options={regionOptions}
+          placeholder="All Regions"
+          className="w-44"
+        />
+      </div>
+
       {/* Tabs */}
       <div className="flex gap-1 border-b border-slate-200 dark:border-slate-700 overflow-x-auto">
         {TABS.map(t => (
@@ -266,26 +296,26 @@ export default function ReportsPage() {
                   {props.length === 0 ? (
                     <tr><td colSpan={7} className="px-5 py-8 text-center text-slate-400">No data.</td></tr>
                   ) : props.map((p, i) => (
-                    <tr key={String(p.id)} className="hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors">
+                    <tr key={p.id} className="hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors">
                       <td className="px-5 py-3.5 text-slate-400 text-xs">{i + 1}</td>
                       <td className="px-4 py-3.5">
                         <Link href={`/properties/${p.slug}`} className="font-medium text-slate-800 dark:text-slate-100 hover:text-[#C9A84C] transition-colors line-clamp-1">
-                          {String(p.title)}
+                          {p.title}
                         </Link>
-                        {Boolean(p.is_featured) && (
+                        {p.is_featured && (
                           <span className="inline-block mt-0.5 text-[10px] bg-amber-50 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 px-1.5 py-0.5 rounded font-semibold">Featured</span>
                         )}
                       </td>
-                      <td className="px-4 py-3.5 text-slate-500 dark:text-slate-400 text-xs">{String(p.area ?? '—')}</td>
-                      <td className="px-4 py-3.5 text-slate-700 dark:text-slate-300 text-xs">{fmtPrice(p.price as string)}</td>
-                      <td className="px-4 py-3.5 text-right font-medium text-slate-800 dark:text-slate-100">{Number(p.views).toLocaleString()}</td>
-                      <td className="px-4 py-3.5 text-right text-slate-600 dark:text-slate-300">{Number(p.leads)}</td>
+                      <td className="px-4 py-3.5 text-slate-500 dark:text-slate-400 text-xs">{p.area ?? '—'}</td>
+                      <td className="px-4 py-3.5 text-slate-700 dark:text-slate-300 text-xs">{fmtPrice(p.price)}</td>
+                      <td className="px-4 py-3.5 text-right font-medium text-slate-800 dark:text-slate-100">{p.views.toLocaleString()}</td>
+                      <td className="px-4 py-3.5 text-right text-slate-600 dark:text-slate-300">{p.leads}</td>
                       <td className="px-5 py-3.5">
                         <span className={`inline-flex px-2 py-0.5 rounded-full text-[11px] font-semibold capitalize ${
                           p.status === 'available' ? 'bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400'
                           : p.status === 'sold'    ? 'bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300'
                           : 'bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400'
-                        }`}>{String(p.status)}</span>
+                        }`}>{p.status}</span>
                       </td>
                     </tr>
                   ))}
@@ -304,7 +334,7 @@ export default function ReportsPage() {
           </div>
           {boardL ? spinner : (
             <div className="divide-y divide-slate-100 dark:divide-slate-700">
-              {(board as { id: number; name: string; leads_total: number; leads_closed: number; close_rate: number }[]).map((a, i) => (
+              {board.map((a, i) => (
                 <div key={a.id} className="px-6 py-4 flex items-center gap-4 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors">
                   <span className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold shrink-0 ${
                     i === 0 ? 'bg-amber-400 text-white' : i === 1 ? 'bg-slate-300 text-slate-700' : i === 2 ? 'bg-orange-300 text-white' : 'bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-300'

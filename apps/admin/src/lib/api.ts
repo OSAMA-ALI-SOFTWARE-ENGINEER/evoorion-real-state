@@ -544,24 +544,24 @@ export async function updateSettings(settings: Record<string, string | null>) {
 
 // ── Reports ───────────────────────────────────────────────────────────────────
 
-export async function getLeadFunnel() {
-  return request<ApiResponse<unknown>>('/admin/reports/lead-funnel')
+export async function getLeadFunnel(region?: string) {
+  return request<ApiResponse<{ funnel: { status: string; count: number }[]; total: number; conversion_rate: number }>>(`/admin/reports/lead-funnel${qs({ region })}`)
 }
 
-export async function getLeadsOverTime(days: number = 30) {
-  return request<ApiResponse<unknown>>(`/admin/reports/leads-over-time?days=${days}`)
+export async function getLeadsOverTime(days: number = 30, region?: string) {
+  return request<ApiResponse<{ date: string; total: number }[]>>(`/admin/reports/leads-over-time${qs({ days, region })}`)
 }
 
-export async function getPropertyPerformance() {
-  return request<ApiResponse<unknown>>('/admin/reports/property-performance')
+export async function getPropertyPerformance(region?: string) {
+  return request<ApiResponse<{ id: number; title: string; slug: string; area: string | null; price: string; views: number; leads: number; status: string; is_featured: boolean }[]>>(`/admin/reports/property-performance${qs({ region })}`)
 }
 
-export async function getAgentLeaderboard() {
-  return request<ApiResponse<unknown>>('/admin/reports/agent-leaderboard')
+export async function getAgentLeaderboard(region?: string) {
+  return request<ApiResponse<{ id: number; name: string; leads_total: number; leads_closed: number; leads_new: number; close_rate: number }[]>>(`/admin/reports/agent-leaderboard${qs({ region })}`)
 }
 
-export async function getLeadsBySource() {
-  return request<ApiResponse<unknown>>('/admin/reports/leads-by-source')
+export async function getLeadsBySource(region?: string) {
+  return request<ApiResponse<{ source: string; total: number }[]>>(`/admin/reports/leads-by-source${qs({ region })}`)
 }
 
 // ── Create user ───────────────────────────────────────────────────────────────
