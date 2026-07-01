@@ -37,7 +37,7 @@ class PropertyController
         $sortDir   = $request->input('sort_direction', 'desc');
         $perPage   = $request->input('per_page', 15);
         $properties = $query
-            ->with(['images' => fn ($q) => $q->where('is_primary', true)->orderBy('order'), 'area'])
+            ->with(['images' => fn ($q) => $q->where('is_primary', true)->orderBy('order'), 'area', 'region:id,code,name,flag'])
             ->orderBy($sortBy, $sortDir)
             ->paginate($perPage);
 

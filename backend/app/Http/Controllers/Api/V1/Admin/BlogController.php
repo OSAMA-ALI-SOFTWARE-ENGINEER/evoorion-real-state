@@ -26,7 +26,7 @@ class BlogController
         $perPage = min($request->integer('per_page', 15), 50);
 
         $posts = BlogPost::withTrashed()
-            ->with(['author:id,name', 'tags:id,name,slug'])
+            ->with(['author:id,name', 'tags:id,name,slug', 'region:id,code,name,flag'])
             ->when($request->search, fn ($q) => $q->where('title', 'like', "%{$request->search}%"))
             ->when($request->status, fn ($q) => $q->where('status', $request->status))
             ->latest()

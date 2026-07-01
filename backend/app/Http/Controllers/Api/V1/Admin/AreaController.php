@@ -14,7 +14,7 @@ class AreaController
 
     public function index(): JsonResponse
     {
-        $areas = Area::paginate(50);
+        $areas = Area::with('region:id,code,name,flag')->paginate(50);
         return $this->paginated($areas->items(), $areas->total(), 50, $areas->currentPage());
     }
 

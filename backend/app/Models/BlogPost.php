@@ -46,6 +46,11 @@ class BlogPost extends Model
         return $this->belongsToMany(BlogTag::class, 'blog_post_tag');
     }
 
+    public function region(): BelongsTo
+    {
+        return $this->belongsTo(\App\Models\Region::class);
+    }
+
     public function scopePublished($query)
     {
         return $query->where('status', 'published')
