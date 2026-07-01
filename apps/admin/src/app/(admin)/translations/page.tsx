@@ -1,11 +1,13 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { getSettings, updateSettings } from '@/lib/api'
+import { getSettings, updateSettings, getRegions } from '@/lib/api'
 import { useAuth } from '@/context/AuthContext'
 import { IconCheck } from '@/components/ui/icons'
+import type { Region } from '@/types'
 
 type Locale = 'en' | 'ar' | 'de'
+type ActiveTab = Locale | 'regions'
 
 interface FieldDef {
   key: string[]
@@ -179,7 +181,7 @@ function setNestedValue(obj: Translations, path: string[], value: string): Trans
 
 export default function TranslationsPage() {
   const { user: me } = useAuth()
-  const [activeLocale, setActiveLocale] = useState<Locale>('en')
+  const [activeTab, setActiveTab] = useState<ActiveTab>('en')
   const [allTranslations, setAllTranslations] = useState<Record<Locale, Translations>>({
     en: {}, ar: {}, de: {},
   })
@@ -188,6 +190,9 @@ export default function TranslationsPage() {
   const [saved,    setSaved]    = useState(false)
   const [error,    setError]    = useState('')
   const [activeSection, setActiveSection] = useState(SECTIONS[0].id)
+  const [regions,    setRegions]    = useState<Region[]>([])
+  const [openRegion, setOpenRegion] = useState<string | null>(null)
+  const [settings,   setSettings]   = useState<Record<string, string>>({})
 
   useEffect(() => {
     getSettings()
@@ -201,9 +206,16 @@ export default function TranslationsPage() {
           }
         }
         setAllTranslations(parsed)
+        // Store all settings (including region keys) for the Regions tab
+        const flat: Record<string, string> = {}
+        for (const [k, v] of Object.entries(data)) {
+          if (v != null) flat[k] = v
+        }
+        setSettings(flat)
       })
       .catch(() => setError('Failed to load translations'))
       .finally(() => setLoading(false))
+    getRegions().then(r => setRegions(r.data ?? [])).catch(() => {})
   }, [])
 
   if (me?.role !== 'super_admin') {
@@ -217,11 +229,27 @@ export default function TranslationsPage() {
   async function save() {
     setError(''); setSaving(true); setSaved(false)
     try {
-      const settings: Record<string, string> = {}
+      const payload: Record<string, string> = {}
       for (const locale of ['en', 'ar', 'de'] as Locale[]) {
-        settings[`translations_${locale}`] = JSON.stringify(allTranslations[locale])
+        payload[`translations_${locale}`] = JSON.stringify(allTranslations[locale])
       }
-      await updateSettings(settings)
+      await updateSettings(payload)
+      setSaved(true)
+      setTimeout(() => setSaved(false), 3000)
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Save failed')
+    } finally { setSaving(false) }
+  }
+
+  async function handleSave() {
+    setError(''); setSaving(true); setSaved(false)
+    try {
+      // Save only region-related keys from settings
+      const regionKeys: Record<string, string> = {}
+      for (const [k, v] of Object.entries(settings)) {
+        if (k.startsWith('region_')) regionKeys[k] = v
+      }
+      await updateSettings(regionKeys)
       setSaved(true)
       setTimeout(() => setSaved(false), 3000)
     } catch (err) {
@@ -232,15 +260,16 @@ export default function TranslationsPage() {
   function setValue(path: string[], value: string) {
     setAllTranslations(prev => ({
       ...prev,
-      [activeLocale]: setNestedValue(prev[activeLocale], path, value),
+      [activeTab as Locale]: setNestedValue(prev[activeTab as Locale], path, value),
     }))
   }
 
   function getValue(path: string[]): string {
-    return getNestedValue(allTranslations[activeLocale], path)
+    return getNestedValue(allTranslations[activeTab as Locale], path)
   }
 
-  const meta = LOCALE_META[activeLocale]
+  const activeLocale = activeTab as Locale
+  const meta = activeTab !== 'regions' ? LOCALE_META[activeLocale] : LOCALE_META['en']
   const currentSection = SECTIONS.find(s => s.id === activeSection) ?? SECTIONS[0]
 
   if (loading) {
@@ -266,26 +295,33 @@ export default function TranslationsPage() {
           <button
             key={locale}
             type="button"
-            onClick={() => setActiveLocale(locale)}
+            onClick={() => setActiveTab(locale)}
             className={[
               'flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors',
-              activeLocale === locale
+              activeTab === locale
                 ? 'bg-[#C9A84C] text-slate-900'
                 : 'bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:border-[#C9A84C]',
             ].join(' ')}
           >
             <span>{lm.flag}</span>
             {lm.label}
-            {activeLocale === locale && lm.dir === 'rtl' && (
+            {activeTab === locale && lm.dir === 'rtl' && (
               <span className="text-xs opacity-70">(RTL)</span>
             )}
           </button>
         ))}
+        <button
+          type="button"
+          onClick={() => setActiveTab('regions')}
+          className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${activeTab === 'regions' ? 'bg-[#C9A84C] text-slate-900' : 'bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:border-[#C9A84C]'}`}
+        >
+          Regions
+        </button>
 
         <div className="ml-auto">
           <button
             type="button"
-            onClick={save}
+            onClick={activeTab === 'regions' ? handleSave : save}
             disabled={saving}
             className="flex items-center gap-2 px-5 py-2 rounded-lg bg-[#C9A84C] hover:bg-[#D4B668] text-slate-900 font-semibold text-sm disabled:opacity-50"
           >
@@ -293,6 +329,8 @@ export default function TranslationsPage() {
               <><IconCheck size={15} /> Saved</>
             ) : saving ? (
               'Saving…'
+            ) : activeTab === 'regions' ? (
+              'Save Regions'
             ) : (
               'Save All Locales'
             )}
@@ -300,76 +338,149 @@ export default function TranslationsPage() {
         </div>
       </div>
 
-      <div className="flex flex-col sm:flex-row gap-4">
-        {/* Section nav */}
-        <nav className="flex flex-row sm:flex-col gap-1 sm:w-48 sm:shrink-0 overflow-x-auto pb-1 sm:pb-0">
-          {SECTIONS.map(sec => (
-            <button
-              key={sec.id}
-              type="button"
-              onClick={() => setActiveSection(sec.id)}
-              className={[
-                'shrink-0 sm:w-full text-left px-3 py-2 rounded-lg text-sm font-medium transition-colors whitespace-nowrap',
-                activeSection === sec.id
-                  ? 'bg-[#C9A84C]/10 text-[#C9A84C]'
-                  : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700',
-              ].join(' ')}
-            >
-              {sec.title}
-            </button>
-          ))}
-        </nav>
+      {activeTab !== 'regions' && (
+        <div className="flex flex-col sm:flex-row gap-4">
+          {/* Section nav */}
+          <nav className="flex flex-row sm:flex-col gap-1 sm:w-48 sm:shrink-0 overflow-x-auto pb-1 sm:pb-0">
+            {SECTIONS.map(sec => (
+              <button
+                key={sec.id}
+                type="button"
+                onClick={() => setActiveSection(sec.id)}
+                className={[
+                  'shrink-0 sm:w-full text-left px-3 py-2 rounded-lg text-sm font-medium transition-colors whitespace-nowrap',
+                  activeSection === sec.id
+                    ? 'bg-[#C9A84C]/10 text-[#C9A84C]'
+                    : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700',
+                ].join(' ')}
+              >
+                {sec.title}
+              </button>
+            ))}
+          </nav>
 
-        {/* Fields */}
-        <div className="flex-1 min-w-0 bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700">
-          {/* Header */}
-          <div className="flex items-center gap-3 px-6 py-4 border-b border-slate-100 dark:border-slate-700">
-            <span className="text-lg">{meta.flag}</span>
-            <div>
-              <h2 className="text-sm font-semibold text-slate-800 dark:text-slate-100">
-                {meta.label} — {currentSection.title}
-              </h2>
-              <p className="text-xs text-slate-400 mt-0.5">
-                {meta.dir === 'rtl' ? 'Text direction: Right-to-Left' : 'Text direction: Left-to-Right'}
-              </p>
+          {/* Fields */}
+          <div className="flex-1 min-w-0 bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700">
+            {/* Header */}
+            <div className="flex items-center gap-3 px-6 py-4 border-b border-slate-100 dark:border-slate-700">
+              <span className="text-lg">{meta.flag}</span>
+              <div>
+                <h2 className="text-sm font-semibold text-slate-800 dark:text-slate-100">
+                  {meta.label} — {currentSection.title}
+                </h2>
+                <p className="text-xs text-slate-400 mt-0.5">
+                  {meta.dir === 'rtl' ? 'Text direction: Right-to-Left' : 'Text direction: Left-to-Right'}
+                </p>
+              </div>
+            </div>
+
+            {/* Field list */}
+            <div className="p-6 space-y-5" dir={meta.dir}>
+              {currentSection.fields.map(field => {
+                const val = getValue(field.key)
+                return (
+                  <div key={field.key.join('.')}>
+                    <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
+                      {field.label}
+                      <span className="ml-2 font-mono text-[10px] text-slate-400">
+                        {field.key.join('.')}
+                      </span>
+                    </label>
+                    {field.multiline ? (
+                      <textarea
+                        rows={3}
+                        title={field.label}
+                        value={val}
+                        onChange={e => setValue(field.key, e.target.value)}
+                        dir={meta.dir}
+                        className={inp + ' resize-y'}
+                      />
+                    ) : (
+                      <input
+                        type="text"
+                        title={field.label}
+                        value={val}
+                        onChange={e => setValue(field.key, e.target.value)}
+                        dir={meta.dir}
+                        className={inp}
+                      />
+                    )}
+                  </div>
+                )
+              })}
             </div>
           </div>
-
-          {/* Field list */}
-          <div className="p-6 space-y-5" dir={meta.dir}>
-            {currentSection.fields.map(field => {
-              const val = getValue(field.key)
-              return (
-                <div key={field.key.join('.')}>
-                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
-                    {field.label}
-                    <span className="ml-2 font-mono text-[10px] text-slate-400">
-                      {field.key.join('.')}
-                    </span>
-                  </label>
-                  {field.multiline ? (
-                    <textarea
-                      rows={3}
-                      value={val}
-                      onChange={e => setValue(field.key, e.target.value)}
-                      dir={meta.dir}
-                      className={inp + ' resize-y'}
-                    />
-                  ) : (
-                    <input
-                      type="text"
-                      value={val}
-                      onChange={e => setValue(field.key, e.target.value)}
-                      dir={meta.dir}
-                      className={inp}
-                    />
-                  )}
-                </div>
-              )
-            })}
-          </div>
         </div>
-      </div>
+      )}
+
+      {activeTab === 'regions' && (
+        <div className="space-y-3">
+          {regions.length === 0 ? (
+            <div className="py-12 text-center">
+              <p className="text-slate-400 text-sm">No regions configured.</p>
+              <a href="/regions" className="text-[#C9A84C] text-sm hover:underline">Go to Regions →</a>
+            </div>
+          ) : regions.filter(r => r.is_active).map(region => {
+            const fields = [
+              { key: `region_${region.code}_hero_title`,             label: 'Hero Title' },
+              { key: `region_${region.code}_hero_subtitle`,          label: 'Hero Subtitle' },
+              { key: `region_${region.code}_investment_description`, label: 'Investment Description', multiline: true },
+              { key: `region_${region.code}_cta_label`,             label: 'CTA Button Label' },
+            ]
+            return (
+              <div key={region.code} className="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden">
+                <button
+                  type="button"
+                  onClick={() => setOpenRegion(openRegion === region.code ? null : region.code)}
+                  className="w-full flex items-center justify-between px-5 py-4 text-left hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors"
+                >
+                  <div className="flex items-center gap-2">
+                    {region.flag && <span className="text-lg">{region.flag}</span>}
+                    <span className="font-medium text-slate-800 dark:text-slate-100">{region.name}</span>
+                    <span className="text-xs text-slate-400 uppercase">{region.code}</span>
+                  </div>
+                  <span className="text-slate-400">{openRegion === region.code ? '▲' : '▼'}</span>
+                </button>
+                {openRegion === region.code && (
+                  <div className="px-5 pb-5 space-y-4 border-t border-slate-100 dark:border-slate-700 pt-4">
+                    {fields.map(field => (
+                      <div key={field.key}>
+                        <label className="block text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400 mb-1.5">
+                          {field.label}
+                        </label>
+                        {field.multiline ? (
+                          <textarea
+                            rows={3}
+                            title={field.label}
+                            value={settings[field.key] ?? ''}
+                            onChange={e => setSettings(prev => ({ ...prev, [field.key]: e.target.value }))}
+                            className="w-full px-3.5 py-2.5 rounded-lg border border-slate-200 dark:border-slate-600 text-sm focus:outline-none focus:border-[#C9A84C] bg-white dark:bg-slate-700 text-slate-800 dark:text-slate-100"
+                          />
+                        ) : (
+                          <input
+                            type="text"
+                            title={field.label}
+                            value={settings[field.key] ?? ''}
+                            onChange={e => setSettings(prev => ({ ...prev, [field.key]: e.target.value }))}
+                            className="w-full px-3.5 py-2.5 rounded-lg border border-slate-200 dark:border-slate-600 text-sm focus:outline-none focus:border-[#C9A84C] bg-white dark:bg-slate-700 text-slate-800 dark:text-slate-100"
+                          />
+                        )}
+                      </div>
+                    ))}
+                    <button
+                      type="button"
+                      onClick={handleSave}
+                      className="px-5 py-2 rounded-lg bg-[#C9A84C] hover:bg-[#D4B668] text-slate-900 font-semibold text-sm"
+                    >
+                      Save Region Copy
+                    </button>
+                  </div>
+                )}
+              </div>
+            )
+          })}
+        </div>
+      )}
 
       <p className="text-xs text-slate-400 dark:text-slate-500">
         Empty fields fall back to the built-in default translations. Only non-empty values override the defaults.
