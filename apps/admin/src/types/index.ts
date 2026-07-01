@@ -75,6 +75,7 @@ export interface Area {
   meta_title?: string | null
   meta_description?: string | null
   region_id?: number | null
+  region?: Region | null
 }
 
 export interface PriceRange {
@@ -106,12 +107,23 @@ export interface Language {
   sort_order: number
 }
 
+export interface Region {
+  id: number
+  code: string
+  name: string
+  flag: string | null
+  is_active: boolean
+  sort_order: number
+}
+
 export interface Developer {
   id: number
   name: string
   slug: string
   email?: string | null
   logo_url?: string
+  region_id?: number | null
+  region?: Region | null
 }
 
 export interface OperationType {
@@ -154,6 +166,7 @@ export interface Property {
   developer_id?: number
   operation_type_id?: number
   region_id?: number
+  region?: Region | null
   primary_agent_id?: number | null
   meta_title?: string | null
   meta_description?: string | null
@@ -185,7 +198,7 @@ export interface Lead {
   message?: string
   assigned_to?: number | null
   property_id?: number | null
-  property?: Pick<Property, 'id' | 'slug' | 'title' | 'type' | 'status' | 'price' | 'currency' | 'bedrooms' | 'bathrooms' | 'location' | 'area_sqft'> & { images?: PropertyImage[]; area?: Area }
+  property?: Pick<Property, 'id' | 'slug' | 'title' | 'type' | 'status' | 'price' | 'currency' | 'bedrooms' | 'bathrooms' | 'location' | 'area_sqft'> & { images?: PropertyImage[]; area?: Area; region?: Region | null }
   assigned_user?: Pick<AuthUser, 'id' | 'name' | 'email'>
   created_at: string
   updated_at: string
@@ -221,6 +234,8 @@ export interface Agency {
   phone?: string | null
   address?: string | null
   agents_count?: number
+  region_id?: number | null
+  region?: Region | null
   created_at: string
 }
 
@@ -246,6 +261,8 @@ export interface AdminUser {
   is_active: boolean
   deleted_at?: string | null
   created_at: string
+  region_id?: number | null
+  region?: Region | null
 }
 
 // ── Blog ──────────────────────────────────────────────────────────────────────
@@ -274,6 +291,7 @@ export interface BlogPost {
   view_count: number
   reading_time?: number | null
   region_id?: number | null
+  region?: Region | null
   author?: Pick<AuthUser, 'id' | 'name'>
   tags?: BlogTag[]
   deleted_at?: string | null
