@@ -174,7 +174,7 @@ export function GlobalSearch({ open, onClose }: { open: boolean; onClose: () => 
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
-            className="fixed inset-0 z-[60] bg-overlay backdrop-blur-sm"
+            className="fixed inset-0 z-[2100] bg-overlay backdrop-blur-sm"
             onClick={onClose}
           />
 
@@ -184,7 +184,7 @@ export function GlobalSearch({ open, onClose }: { open: boolean; onClose: () => 
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -16 }}
             transition={{ duration: 0.22 }}
-            className="fixed top-0 left-0 right-0 z-[61] bg-brand border-b border-gold-border shadow-2xl"
+            className="fixed top-0 left-0 right-0 z-[2101] bg-brand border-b border-gold-border shadow-2xl"
           >
             <div className="max-w-4xl mx-auto px-4 sm:px-6 pt-5 pb-4">
 
