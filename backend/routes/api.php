@@ -220,6 +220,7 @@ Route::prefix('v1')->group(function () {
             // Media library
             Route::get('media',         [MediaController::class, 'index']);
             Route::post('media/upload', [MediaController::class, 'upload']);
+            Route::post('media/bulk-delete', [MediaController::class, 'bulkDestroy']);
             Route::delete('media/{id}', [MediaController::class, 'destroy']);
 
             // Master data endpoints

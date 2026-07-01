@@ -70,4 +70,23 @@ class MediaController
 
         return $this->success(null, 'File deleted');
     }
+
+    public function bulkDestroy(Request $request): JsonResponse
+    {
+        $data = $request->validate([
+            'ids'   => 'required|array|min:1',
+            'ids.*' => 'integer|exists:media_files,id',
+        ]);
+
+        $files = MediaFile::whereIn('id', $data['ids'])->get();
+
+        foreach ($files as $file) {
+            try {
+                $this->media->deleteMedia($file->public_id);
+            } catch (\Throwable) {}
+            $file->delete();
+        }
+
+        return $this->success(null, count($data['ids']) . ' files deleted');
+    }
 }

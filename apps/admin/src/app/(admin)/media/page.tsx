@@ -1,7 +1,7 @@
 'use client'
 
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { getMedia, uploadMedia, deleteMedia } from '@/lib/api'
+import { getMedia, uploadMedia, deleteMedia, bulkDeleteMedia } from '@/lib/api'
 import type { MediaFile } from '@/types'
 import { ConfirmModal } from '@/components/ui/ConfirmModal'
 import { IconTrash, IconSearch } from '@/components/ui/icons'
@@ -30,6 +30,11 @@ export default function MediaPage() {
   const [uploading,setUploading]= useState(false)
   const [selected, setSelected] = useState<MediaFile | null>(null)
   const fileRef = useRef<HTMLInputElement>(null)
+
+  const [selectMode,   setSelectMode]   = useState(false)
+  const [selectedIds,  setSelectedIds]  = useState<Set<number>>(new Set())
+  const [bulkActing,   setBulkActing]   = useState(false)
+  const [bulkConfirm,  setBulkConfirm]  = useState(false)
 
   const load = useCallback(async () => {
     setLoading(true)
@@ -74,6 +79,31 @@ export default function MediaPage() {
     } finally { setActing(false) }
   }
 
+  function toggleSelect(id: number) {
+    setSelectedIds(prev => {
+      const next = new Set(prev)
+      next.has(id) ? next.delete(id) : next.add(id)
+      return next
+    })
+  }
+
+  function exitSelectMode() {
+    setSelectMode(false)
+    setSelectedIds(new Set())
+  }
+
+  async function confirmBulkDelete() {
+    setBulkActing(true)
+    try {
+      await bulkDeleteMedia(Array.from(selectedIds))
+      setBulkConfirm(false)
+      exitSelectMode()
+      load()
+    } catch (err) {
+      alert(err instanceof Error ? err.message : 'Bulk delete failed')
+    } finally { setBulkActing(false) }
+  }
+
   return (
     <div className="space-y-4">
       {/* Top bar */}
@@ -90,6 +120,37 @@ export default function MediaPage() {
         </div>
         <p className="text-sm text-slate-500 dark:text-slate-400 shrink-0">{total} file{total !== 1 ? 's' : ''}</p>
         <input ref={fileRef} type="file" accept="image/*,application/pdf" className="hidden" onChange={handleUpload} />
+        {selectMode ? (
+          <>
+            <span className="text-sm text-slate-500 dark:text-slate-400 shrink-0">
+              {selectedIds.size} selected
+            </span>
+            {selectedIds.size > 0 && (
+              <button
+                type="button"
+                onClick={() => setBulkConfirm(true)}
+                className="px-4 py-2 rounded-lg bg-red-500 hover:bg-red-600 text-white font-semibold text-sm shrink-0"
+              >
+                Delete ({selectedIds.size})
+              </button>
+            )}
+            <button
+              type="button"
+              onClick={exitSelectMode}
+              className="px-4 py-2 rounded-lg border border-slate-200 dark:border-slate-600 text-slate-700 dark:text-slate-200 font-medium text-sm shrink-0"
+            >
+              Cancel
+            </button>
+          </>
+        ) : (
+          <button
+            type="button"
+            onClick={() => setSelectMode(true)}
+            className="px-4 py-2 rounded-lg border border-slate-200 dark:border-slate-600 text-slate-600 dark:text-slate-300 font-medium text-sm hover:bg-slate-50 dark:hover:bg-slate-700 shrink-0"
+          >
+            Select
+          </button>
+        )}
         <button
           type="button"
           onClick={() => fileRef.current?.click()}
@@ -137,9 +198,11 @@ export default function MediaPage() {
               {files.map(file => (
                 <div
                   key={file.id}
-                  onClick={() => setSelected(file)}
+                  onClick={() => selectMode ? toggleSelect(file.id) : setSelected(file)}
                   className={`group relative aspect-square rounded-xl overflow-hidden border-2 cursor-pointer transition-colors ${
-                    selected?.id === file.id
+                    selectMode && selectedIds.has(file.id)
+                      ? 'border-[#C9A84C]'
+                      : selected?.id === file.id && !selectMode
                       ? 'border-[#C9A84C]'
                       : 'border-transparent hover:border-slate-200 dark:hover:border-slate-600'
                   }`}
@@ -150,15 +213,24 @@ export default function MediaPage() {
                     className="w-full h-full object-cover bg-slate-100 dark:bg-slate-700"
                     onError={e => { (e.target as HTMLImageElement).src = '/placeholder-image.svg' }}
                   />
-                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-colors flex items-end justify-end p-1.5 opacity-0 group-hover:opacity-100">
-                    <button
-                      type="button"
-                      onClick={ev => { ev.stopPropagation(); setToDelete(file) }}
-                      className="p-1.5 rounded-lg bg-red-500 text-white hover:bg-red-600 transition-colors"
-                    >
-                      <IconTrash size={12} />
-                    </button>
-                  </div>
+                  {selectMode ? (
+                    <div className="absolute top-1.5 left-1.5">
+                      <div className={`w-5 h-5 rounded border-2 flex items-center justify-center ${selectedIds.has(file.id) ? 'bg-[#C9A84C] border-[#C9A84C]' : 'bg-white/80 border-white/80'}`}>
+                        {selectedIds.has(file.id) && <span className="text-slate-900 text-[10px] font-bold">✓</span>}
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-colors flex items-end justify-end p-1.5 opacity-0 group-hover:opacity-100">
+                      <button
+                        type="button"
+                        title="Delete file"
+                        onClick={ev => { ev.stopPropagation(); setToDelete(file) }}
+                        className="p-1.5 rounded-lg bg-red-500 text-white hover:bg-red-600 transition-colors"
+                      >
+                        <IconTrash size={12} />
+                      </button>
+                    </div>
+                  )}
                 </div>
               ))}
             </div>
@@ -166,7 +238,7 @@ export default function MediaPage() {
         </div>
 
         {/* Detail panel */}
-        {selected && (
+        {selected && !selectMode && (
           <div className="w-56 shrink-0 hidden lg:block">
             <div className="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 p-4 sticky top-4">
               <img
@@ -206,6 +278,16 @@ export default function MediaPage() {
           onConfirm={confirmDelete}
           onCancel={() => setToDelete(null)}
           loading={acting}
+        />
+      )}
+
+      {bulkConfirm && (
+        <ConfirmModal
+          title="Delete selected files"
+          message={`Delete ${selectedIds.size} file${selectedIds.size !== 1 ? 's' : ''}? This cannot be undone.`}
+          onConfirm={confirmBulkDelete}
+          onCancel={() => setBulkConfirm(false)}
+          loading={bulkActing}
         />
       )}
     </div>

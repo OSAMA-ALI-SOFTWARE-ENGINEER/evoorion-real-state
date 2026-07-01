@@ -601,6 +601,13 @@ export async function deleteMedia(id: number) {
   return request<ApiResponse<null>>(`/admin/media/${id}`, { method: 'DELETE' })
 }
 
+export async function bulkDeleteMedia(ids: number[]) {
+  return request<ApiResponse<null>>('/admin/media/bulk-delete', {
+    method: 'POST',
+    body: JSON.stringify({ ids }),
+  })
+}
+
 // ── CMS ───────────────────────────────────────────────────────────────────────
 
 export async function getCmsPages() {
