@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 import Image from 'next/image'
-import { getSettings, updateSettings, uploadMedia } from '@/lib/api'
+import { getSettings, updateSettings, uploadMedia, getRegions, type Region } from '@/lib/api'
 import { useAuth } from '@/context/AuthContext'
 import { ImageCropperModal } from '@/components/ui/ImageCropperModal'
 import { SectionBgEditor } from '@/components/ui/SectionBgEditor'
@@ -781,81 +781,114 @@ function SectionsBgTab({ values, set }: { values: Settings; set: (k: string, v: 
 
 // ── Regional Offices tab ─────────────────────────────────────────────────────
 
-const OFFICE_GROUPS = [
-  {
-    id: 'de',
-    flag: '🇩🇪',
-    label: 'Germany Office',
-    fields: [
-      { key: 'contact_phone_de',   label: 'Phone',        type: 'phone' as const },
-      { key: 'contact_email_de',   label: 'Email',        type: 'email' as const },
-      { key: 'contact_address_de', label: 'Address',      placeholder: 'Am Sandtorkai 48, 20457 Hamburg, Germany' },
-      { key: 'contact_hours_de',   label: 'Office Hours', placeholder: 'Monday – Friday: 9:00 AM – 6:00 PM CET' },
-    ],
-  },
-  {
-    id: 'gb',
-    flag: '🇬🇧',
-    label: 'United Kingdom Office',
-    fields: [
-      { key: 'contact_phone_gb',   label: 'Phone',        type: 'phone' as const },
-      { key: 'contact_email_gb',   label: 'Email',        type: 'email' as const },
-      { key: 'contact_address_gb', label: 'Address',      placeholder: '30 St Mary Axe (The Gherkin), London EC3A 8BF, UK' },
-      { key: 'contact_hours_gb',   label: 'Office Hours', placeholder: 'Monday – Friday: 9:00 AM – 6:00 PM GMT' },
-    ],
-  },
-  {
-    id: 'it',
-    flag: '🇮🇹',
-    label: 'Italy Office',
-    fields: [
-      { key: 'contact_phone_it',   label: 'Phone',        type: 'phone' as const },
-      { key: 'contact_email_it',   label: 'Email',        type: 'email' as const },
-      { key: 'contact_address_it', label: 'Address',      placeholder: 'Via Monte Napoleone 8, 20121 Milan, Italy' },
-      { key: 'contact_hours_it',   label: 'Office Hours', placeholder: 'Monday – Friday: 9:00 AM – 6:00 PM CET' },
-    ],
-  },
-]
-
 const officeInp = 'w-full px-3.5 py-2.5 rounded-lg border border-slate-200 dark:border-slate-600 text-sm focus:outline-none focus:border-[#C9A84C] focus:ring-1 focus:ring-[#C9A84C] bg-white dark:bg-slate-700 text-slate-800 dark:text-slate-100 placeholder-slate-400'
+const officeLbl = 'block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5'
 
 function OfficesTab({ values, set }: { values: Settings; set: (k: string, v: string) => void }) {
+  const [regions,  setRegions]  = useState<Region[]>([])
+  const [openCode, setOpenCode] = useState<string | null>(null)
+
+  useEffect(() => {
+    getRegions()
+      .then(res => {
+        const all = (res.data ?? []).filter((r: Region) => r.code !== 'uae')
+        setRegions(all)
+        if (all.length > 0) setOpenCode(all[0].code)
+      })
+      .catch(() => {})
+  }, [])
+
+  if (regions.length === 0) {
+    return (
+      <div className="p-8 text-center">
+        <p className="text-slate-500 dark:text-slate-400 text-sm">No regional offices configured.</p>
+        <p className="text-xs text-slate-400 dark:text-slate-500 mt-1">
+          Add regions in <strong className="text-slate-600 dark:text-slate-300">Master Data → Regions</strong> first.
+        </p>
+      </div>
+    )
+  }
+
   return (
-    <div className="p-6 space-y-8">
-      {OFFICE_GROUPS.map(group => (
-        <div key={group.id}>
-          <p className="text-sm font-semibold text-slate-700 dark:text-slate-200 mb-4 flex items-center gap-2">
-            <span>{group.flag}</span>
-            {group.label}
-          </p>
-          <div className="space-y-4 pl-6 border-l-2 border-slate-100 dark:border-slate-700">
-            {group.fields.map(field => (
-              <div key={field.key}>
-                <label htmlFor={field.key} className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
-                  {field.label}
-                </label>
-                {field.type === 'phone' ? (
+    <div className="p-5 space-y-2">
+      {regions.map(region => {
+        const c      = region.code
+        const isOpen = openCode === c
+        return (
+          <div key={c} className="border border-slate-200 dark:border-slate-700 rounded-xl overflow-hidden">
+            {/* Accordion header */}
+            <button
+              type="button"
+              onClick={() => setOpenCode(isOpen ? null : c)}
+              className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors"
+            >
+              <span className="text-xl leading-none select-none">{region.flag ?? '🌍'}</span>
+              <span className="flex-1 text-sm font-semibold text-slate-800 dark:text-slate-100">{region.name} Office</span>
+              {/* filled dot if any field has a value */}
+              {(values[`contact_phone_${c}`] || values[`contact_email_${c}`]) && (
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 shrink-0" />
+              )}
+              <svg
+                width={14} height={14} viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round"
+                className={`text-slate-400 shrink-0 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}
+              >
+                <polyline points="6 9 12 15 18 9" />
+              </svg>
+            </button>
+
+            {/* Accordion body */}
+            {isOpen && (
+              <div className="px-4 pb-5 pt-3 space-y-4 border-t border-slate-100 dark:border-slate-700">
+                <div>
+                  <label className={officeLbl}>Phone</label>
                   <PhoneSettingInput
-                    id={field.key}
-                    value={values[field.key] ?? ''}
-                    onChange={v => set(field.key, v)}
+                    id={`contact_phone_${c}`}
+                    value={values[`contact_phone_${c}`] ?? ''}
+                    onChange={v => set(`contact_phone_${c}`, v)}
                   />
-                ) : (
+                </div>
+                <div>
+                  <label htmlFor={`contact_email_${c}`} className={officeLbl}>Email</label>
                   <input
-                    id={field.key}
-                    type={field.type ?? 'text'}
-                    value={values[field.key] ?? ''}
-                    onChange={e => set(field.key, e.target.value)}
-                    placeholder={'placeholder' in field ? field.placeholder : undefined}
+                    id={`contact_email_${c}`}
+                    type="email"
+                    value={values[`contact_email_${c}`] ?? ''}
+                    onChange={e => set(`contact_email_${c}`, e.target.value)}
+                    placeholder={`office@evoorion.com`}
                     className={officeInp}
                     autoComplete="off"
                   />
-                )}
+                </div>
+                <div>
+                  <label htmlFor={`contact_address_${c}`} className={officeLbl}>Address</label>
+                  <input
+                    id={`contact_address_${c}`}
+                    type="text"
+                    value={values[`contact_address_${c}`] ?? ''}
+                    onChange={e => set(`contact_address_${c}`, e.target.value)}
+                    placeholder="Street, City, Country"
+                    className={officeInp}
+                    autoComplete="off"
+                  />
+                </div>
+                <div>
+                  <label htmlFor={`contact_hours_${c}`} className={officeLbl}>Office Hours</label>
+                  <input
+                    id={`contact_hours_${c}`}
+                    type="text"
+                    value={values[`contact_hours_${c}`] ?? ''}
+                    onChange={e => set(`contact_hours_${c}`, e.target.value)}
+                    placeholder="Monday – Friday: 9:00 AM – 6:00 PM"
+                    className={officeInp}
+                    autoComplete="off"
+                  />
+                </div>
               </div>
-            ))}
+            )}
           </div>
-        </div>
-      ))}
+        )
+      })}
     </div>
   )
 }
