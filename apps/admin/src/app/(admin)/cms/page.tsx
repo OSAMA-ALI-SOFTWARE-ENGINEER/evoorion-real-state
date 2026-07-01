@@ -7,7 +7,17 @@ import { ConfirmModal } from '@/components/ui/ConfirmModal'
 import { useAuth } from '@/context/AuthContext'
 import { IconPencil, IconTrash, IconX, IconShield } from '@/components/ui/icons'
 
-const KNOWN_PAGES = ['home', 'about', 'contact', 'investments']
+const KNOWN_PAGES = [
+  'home',
+  'about',
+  'contact',
+  'investments',
+  'off-plan',
+  'sell',
+  'agents',
+  'services',
+  'property-management',
+]
 
 const inp = 'w-full px-3.5 py-2.5 rounded-lg border border-slate-200 dark:border-slate-600 text-sm focus:outline-none focus:border-[#C9A84C] focus:ring-1 focus:ring-[#C9A84C] bg-white dark:bg-slate-700 text-slate-800 dark:text-slate-100 placeholder-slate-400'
 const lbl = 'block text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400 mb-1.5'
