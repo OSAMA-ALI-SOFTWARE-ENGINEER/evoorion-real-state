@@ -101,14 +101,22 @@ class LeadController extends Controller
     {
         $user = auth()->user();
 
+        $perPage = min((int) ($request->per_page ?? 15), 100);
+
         $leads = Lead::query()
+            ->with([
+                'assignedUser:id,name,email',
+                'property:id,slug,title,type,status,price,currency,bedrooms,bathrooms,location,area_sqft',
+                'property.region:id,code,name,flag',
+            ])
             ->when(! $user->hasRole('manager'), fn ($q) => $q->where(function ($q) use ($user) {
                 $q->whereNull('assigned_to')->orWhere('assigned_to', $user->id);
             }))
             ->when($request->status, fn ($q) => $q->byStatus($request->status))
             ->when($request->search, fn ($q) => $q->search($request->search))
             ->when($request->date_from && $request->date_to, fn ($q) => $q->byDateRange($request->date_from, $request->date_to))
-            ->paginate(15);
+            ->when($request->region, fn ($q) => $q->whereHas('property.region', fn ($r) => $r->where('code', $request->region)))
+            ->paginate($perPage);
 
         return response()->json([
             'success' => true,

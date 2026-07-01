@@ -175,7 +175,7 @@ export default function LeadsPage() {
           onChange={v => { setRegion(v); setPage(1) }}
           options={[
             { value: '', label: 'All regions' },
-            ...regions.filter(r => r.is_active).map(r => ({ value: String(r.id), label: `${r.flag ?? ''} ${r.name}`.trim() })),
+            ...regions.filter(r => r.is_active).map(r => ({ value: r.code, label: `${r.flag ?? ''} ${r.name}`.trim() })),
           ]}
           placeholder="All regions"
           className="sm:w-44"
