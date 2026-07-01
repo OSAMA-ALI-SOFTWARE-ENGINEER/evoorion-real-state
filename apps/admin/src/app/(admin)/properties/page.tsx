@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { getAdminProperties, deleteProperty, restoreProperty, updateProperty, getAreas, getDevelopers } from '@/lib/api'
 import type { Area, Developer, Property, PropertyStatus, PropertyType } from '@/types'
 import { PropertyStatusBadge, PropertyTypeBadge } from '@/components/ui/Badge'
+import { RegionBadge } from '@/components/ui/RegionBadge'
 import { Pagination } from '@/components/ui/Pagination'
 import { ConfirmModal } from '@/components/ui/ConfirmModal'
 import { CustomSelect } from '@/components/ui/CustomSelect'
@@ -123,6 +124,7 @@ function TableRow({
         <div>
           <p className="font-medium text-slate-800 dark:text-slate-100 truncate max-w-[220px]">{property.title}</p>
           <p className="text-xs text-slate-400 font-mono">{property.area?.name ?? property.slug}</p>
+          {property.region && <div className="mt-0.5"><RegionBadge region={property.region} /></div>}
         </div>
       </td>
       <td className="hidden sm:table-cell px-4 py-3.5"><PropertyTypeBadge type={property.type as PropertyType} /></td>
@@ -233,6 +235,7 @@ function PropertyCard({
 
         <div className="flex items-center gap-1.5 flex-wrap mb-2">
           <PropertyTypeBadge type={property.type as PropertyType} />
+          <RegionBadge region={property.region} />
         </div>
 
         <p className="text-[#C9A84C] font-bold text-sm mb-1">{fmtPrice(property.price)}</p>

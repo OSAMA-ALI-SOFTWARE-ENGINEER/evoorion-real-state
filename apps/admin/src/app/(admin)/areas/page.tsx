@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { getAreas, deleteArea, updateAreaStatus } from '@/lib/api'
 import type { Area } from '@/types'
 import { ConfirmModal } from '@/components/ui/ConfirmModal'
+import { RegionBadge } from '@/components/ui/RegionBadge'
 import {
   IconGrid, IconList, IconMap, IconMapPin, IconSearch,
   IconPencil, IconTrash, IconToggleLeft, IconToggleRight,
@@ -81,7 +82,8 @@ function AreaCard({ area, onDelete, onStatusChange }: { area: Area; onDelete: ()
           <p className="font-semibold text-slate-800 dark:text-slate-100 leading-tight">{area.name}</p>
           {hasGeo && <span title="Has coordinates"><IconMapPin size={13} className="text-emerald-500 shrink-0 mt-0.5" /></span>}
         </div>
-        <p className="text-xs text-slate-400 font-mono mb-3">{area.slug}</p>
+        <p className="text-xs text-slate-400 font-mono mb-1">{area.slug}</p>
+        {area.region && <div className="mb-2"><RegionBadge region={area.region} /></div>}
 
         {(area.long_term_roi || area.short_term_roi || area.appreciation) && (
           <div className="grid grid-cols-3 gap-1.5 mb-3">
@@ -258,6 +260,7 @@ export default function AreasPage() {
                       <div>
                         <p>{a.name}</p>
                         <p className="text-xs text-slate-400 font-mono">{a.slug}</p>
+                        {a.region && <div className="mt-0.5"><RegionBadge region={a.region} /></div>}
                       </div>
                     </div>
                   </td>

@@ -9,6 +9,7 @@ import {
 import type { BlogPost, BlogTag, BlogStatus } from '@/types'
 import { useAuth } from '@/context/AuthContext'
 import { ConfirmModal } from '@/components/ui/ConfirmModal'
+import { RegionBadge } from '@/components/ui/RegionBadge'
 import { CustomSelect } from '@/components/ui/CustomSelect'
 import { Pagination } from '@/components/ui/Pagination'
 import {
@@ -184,7 +185,8 @@ function PostCard({
       </div>
       <div className="p-4 flex flex-col flex-1">
         <p className="font-semibold text-slate-800 dark:text-slate-100 line-clamp-2 leading-snug mb-1 text-sm">{post.title}</p>
-        <p className="text-[11px] text-slate-400 font-mono mb-2 truncate">{post.slug}</p>
+        <p className="text-[11px] text-slate-400 font-mono mb-1 truncate">{post.slug}</p>
+        {post.region && <div className="mb-1"><RegionBadge region={post.region} /></div>}
         {post.author && <p className="text-xs text-slate-400 dark:text-slate-500 mb-1">by {post.author.name}</p>}
         <div className="flex items-center gap-2 text-xs text-slate-400 dark:text-slate-500 mt-auto pt-3 border-t border-slate-100 dark:border-slate-700">
           <IconEye size={12} /> {post.view_count}
@@ -482,6 +484,7 @@ function PostsTab({ isSuperAdmin }: { isSuperAdmin: boolean }) {
                     <td className="px-5 py-3.5">
                       <p className="font-medium text-slate-800 dark:text-slate-100 truncate max-w-xs">{p.title}</p>
                       <p className="text-xs text-slate-400 font-mono">{p.slug}</p>
+                      {p.region && <div className="mt-0.5"><RegionBadge region={p.region} /></div>}
                     </td>
                     <td className="px-4 py-3.5">
                       <QuickStatus post={p} onChanged={load} isSuperAdmin={isSuperAdmin} />
