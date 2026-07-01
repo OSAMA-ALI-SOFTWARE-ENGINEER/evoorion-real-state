@@ -2,8 +2,8 @@
 
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
-import { getDashboardStats, getAgentPerformance, getAdminProperties, getAdminBlogPosts } from '@/lib/api'
-import type { AgentPerformance, BlogPost, DashboardStats, Property } from '@/types'
+import { getDashboardStats, getAgentPerformance, getAdminProperties, getAdminBlogPosts, getRegionBreakdown } from '@/lib/api'
+import type { AgentPerformance, BlogPost, DashboardStats, Property, RegionBreakdown } from '@/types'
 import {
   IconBuilding,
   IconTrendingDown,
@@ -305,13 +305,41 @@ function RecentBlogPosts({ items }: { items: BlogPost[] }) {
   )
 }
 
+// ── Region breakdown panel ────────────────────────────────────────────────────
+
+function RegionBreakdownPanel({ data }: { data: RegionBreakdown[] }) {
+  if (!data.length) return null
+  return (
+    <div className="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 p-5">
+      <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-200 mb-4">Content by Region</h3>
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+        {data.map(item => (
+          <div key={item.region.code} className="bg-slate-50 dark:bg-slate-700/50 rounded-lg p-3 text-center">
+            {item.region.flag && <div className="text-2xl mb-1">{item.region.flag}</div>}
+            <p className="text-xs font-semibold text-slate-700 dark:text-slate-200 mb-2">{item.region.name}</p>
+            <div className="space-y-0.5">
+              <p className="text-xs text-slate-500 dark:text-slate-400">
+                <span className="font-semibold text-slate-700 dark:text-slate-200">{item.properties_count}</span> properties
+              </p>
+              <p className="text-xs text-slate-500 dark:text-slate-400">
+                <span className="font-semibold text-slate-700 dark:text-slate-200">{item.leads_count}</span> leads
+              </p>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
 // ── Page ──────────────────────────────────────────────────────────────────────
 
 export default function DashboardPage() {
-  const [stats,      setStats]      = useState<DashboardStats | null>(null)
-  const [agents,     setAgents]     = useState<AgentPerformance[]>([])
-  const [properties, setProperties] = useState<Property[]>([])
-  const [blogPosts,  setBlogPosts]  = useState<BlogPost[]>([])
+  const [stats,           setStats]           = useState<DashboardStats | null>(null)
+  const [agents,          setAgents]          = useState<AgentPerformance[]>([])
+  const [properties,      setProperties]      = useState<Property[]>([])
+  const [blogPosts,       setBlogPosts]       = useState<BlogPost[]>([])
+  const [regionBreakdown, setRegionBreakdown] = useState<RegionBreakdown[]>([])
   const [loading, setLoading] = useState(true)
   const [error,   setError]   = useState('')
 
@@ -321,12 +349,14 @@ export default function DashboardPage() {
       getAgentPerformance(),
       getAdminProperties({ per_page: 5, status: 'available' }),
       getAdminBlogPosts({ per_page: 5 }),
+      getRegionBreakdown(),
     ])
-      .then(([s, a, p, b]) => {
+      .then(([s, a, p, b, rb]) => {
         setStats(s.data)
         setAgents(a.data)
         setProperties(p.data ?? [])
         setBlogPosts(b.data ?? [])
+        setRegionBreakdown(rb.data ?? [])
       })
       .catch(err => setError(err instanceof Error ? err.message : 'Failed to load data'))
       .finally(() => setLoading(false))
@@ -423,6 +453,9 @@ export default function DashboardPage() {
           <FunnelCard stats={stats} />
         </div>
       ) : null}
+
+      {/* Region breakdown */}
+      {!loading && <RegionBreakdownPanel data={regionBreakdown} />}
 
       {/* Recent properties + recent blog posts */}
       {!loading && (properties.length > 0 || blogPosts.length > 0) && (

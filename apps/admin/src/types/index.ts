@@ -41,6 +41,12 @@ export interface AgentPerformance {
   close_rate: number
 }
 
+export interface RegionBreakdown {
+  region: { id: number; code: string; name: string; flag: string | null }
+  properties_count: number
+  leads_count: number
+}
+
 // ── Properties ────────────────────────────────────────────────────────────────
 
 export type PropertyType   = 'villa' | 'apartment' | 'penthouse' | 'townhouse' | 'commercial'

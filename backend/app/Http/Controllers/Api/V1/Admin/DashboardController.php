@@ -132,4 +132,40 @@ class DashboardController extends Controller
 
         return response()->json(['success' => true, 'data' => $agents]);
     }
+
+    /**
+     * Region breakdown
+     *
+     * Per-region counts of properties and leads.
+     *
+     * @response 200 {
+     *   "success": true,
+     *   "data": [
+     *     {
+     *       "region": {"id": 1, "code": "ae", "name": "UAE", "flag": "🇦🇪"},
+     *       "properties_count": 42,
+     *       "leads_count": 18
+     *     }
+     *   ]
+     * }
+     */
+    public function regionBreakdown(): JsonResponse
+    {
+        $rows = \App\Models\Region::query()
+            ->where('is_active', true)
+            ->orderBy('sort_order')
+            ->withCount('properties')
+            ->addSelect([
+                'regions.*',
+                DB::raw('(SELECT COUNT(*) FROM leads INNER JOIN properties ON leads.property_id = properties.id WHERE properties.region_id = regions.id AND leads.deleted_at IS NULL) as leads_count'),
+            ])
+            ->get()
+            ->map(fn ($r) => [
+                'region'           => ['id' => $r->id, 'code' => $r->code, 'name' => $r->name, 'flag' => $r->flag],
+                'properties_count' => (int) $r->properties_count,
+                'leads_count'      => (int) $r->leads_count,
+            ]);
+
+        return response()->json(['success' => true, 'data' => $rows]);
+    }
 }

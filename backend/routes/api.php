@@ -135,6 +135,7 @@ Route::prefix('v1')->group(function () {
             // Dashboard stats (all admin roles)
             Route::get('dashboard/stats', [DashboardController::class, 'stats']);
             Route::get('dashboard/agent-performance', [DashboardController::class, 'agentPerformance']);
+            Route::get('dashboard/region-breakdown', [DashboardController::class, 'regionBreakdown']);
 
             // Notifications (all admin roles — own notifications only)
             Route::get('notifications', [NotificationController::class, 'index']);

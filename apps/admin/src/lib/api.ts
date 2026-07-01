@@ -22,6 +22,7 @@ import type {
   PaginatedResponse,
   Property,
   PropertyImage,
+  RegionBreakdown,
 } from '@/types'
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000/api/v1'
@@ -109,6 +110,10 @@ export async function getDashboardStats() {
 
 export async function getAgentPerformance() {
   return request<ApiResponse<AgentPerformance[]>>('/admin/dashboard/agent-performance')
+}
+
+export async function getRegionBreakdown() {
+  return request<ApiResponse<RegionBreakdown[]>>('/admin/dashboard/region-breakdown')
 }
 
 // ── Properties ────────────────────────────────────────────────────────────────
