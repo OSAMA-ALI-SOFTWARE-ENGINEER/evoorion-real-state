@@ -195,6 +195,7 @@ export async function getLeads(params?: {
   search?: string
   status?: string
   source?: string
+  region?: string
 }) {
   return request<PaginatedResponse<Lead>>(`/admin/leads${qs(params)}`)
 }
@@ -562,7 +563,7 @@ export async function getLeadsBySource() {
 
 export async function createUser(data: {
   name: string; email: string; password: string; password_confirmation: string
-  role: string; is_active?: boolean
+  role: string; is_active?: boolean; region_id?: number | null
 }) {
   return request<ApiResponse<AdminUser>>('/admin/users', { method: 'POST', body: JSON.stringify(data) })
 }

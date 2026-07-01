@@ -1,8 +1,9 @@
 'use client'
 
-import { useState, type FormEvent } from 'react'
+import { useEffect, useState, type FormEvent } from 'react'
 import { useRouter } from 'next/navigation'
-import { createUser } from '@/lib/api'
+import { createUser, getRegions } from '@/lib/api'
+import type { Region } from '@/types'
 import { CustomSelect } from '@/components/ui/CustomSelect'
 import { useAuth } from '@/context/AuthContext'
 import { IconShield } from '@/components/ui/icons'
@@ -28,6 +29,12 @@ export default function NewUserPage() {
   const [active,   setActive]   = useState(true)
   const [error,    setError]    = useState('')
   const [saving,   setSaving]   = useState(false)
+  const [regions,  setRegions]  = useState<Region[]>([])
+  const [regionId, setRegionId] = useState<string>('')
+
+  useEffect(() => {
+    getRegions().then(r => setRegions(r.data ?? [])).catch(() => {})
+  }, [])
 
   if (me?.role !== 'super_admin') {
     return (
@@ -44,7 +51,7 @@ export default function NewUserPage() {
     if (password !== confirm) { setError('Passwords do not match'); return }
     setSaving(true)
     try {
-      await createUser({ name, email, password, password_confirmation: confirm, role, is_active: active })
+      await createUser({ name, email, password, password_confirmation: confirm, role, is_active: active, region_id: regionId ? Number(regionId) : null })
       router.push('/users')
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Create failed')
@@ -85,6 +92,21 @@ export default function NewUserPage() {
           <div>
             <label className={lbl}>Role <span className="text-red-400 normal-case">*</span></label>
             <CustomSelect value={role} onChange={setRole} options={ROLE_OPTIONS} />
+          </div>
+
+          <div>
+            <label htmlFor="new-user-region" className={lbl}>Region</label>
+            <select
+              id="new-user-region"
+              value={regionId}
+              onChange={e => setRegionId(e.target.value)}
+              className={inp}
+            >
+              <option value="">No region (global)</option>
+              {regions.filter(r => r.is_active).map(r => (
+                <option key={r.id} value={String(r.id)}>{r.flag} {r.name}</option>
+              ))}
+            </select>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">

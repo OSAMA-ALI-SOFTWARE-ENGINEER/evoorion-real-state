@@ -1,9 +1,10 @@
 'use client'
 
-import { useRef, useState, type FormEvent } from 'react'
+import { useEffect, useRef, useState, type FormEvent } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { createAgency, uploadMedia } from '@/lib/api'
+import { createAgency, uploadMedia, getRegions } from '@/lib/api'
+import type { Region } from '@/types'
 import { ImageCropper } from '@/components/ui/ImageCropper'
 import { IconChevronRight, IconBriefcase, IconUpload, IconX } from '@/components/ui/icons'
 
@@ -20,7 +21,13 @@ export default function NewAgencyPage() {
   const [uploading, setUploading] = useState(false)
   const [error,     setError]     = useState('')
   const [saving,    setSaving]    = useState(false)
+  const [regions,   setRegions]   = useState<Region[]>([])
+  const [regionId,  setRegionId]  = useState<string>('')
   const fileRef = useRef<HTMLInputElement>(null)
+
+  useEffect(() => {
+    getRegions().then(r => setRegions(r.data ?? [])).catch(() => {})
+  }, [])
 
   function onFileChange(e: React.ChangeEvent<HTMLInputElement>) {
     const f = e.target.files?.[0]
@@ -52,6 +59,7 @@ export default function NewAgencyPage() {
         phone: phone.trim() || undefined,
         address: address.trim() || undefined,
         logo_url: logoUrl.trim() || undefined,
+        region_id: regionId ? Number(regionId) : null,
       })
       router.push('/agencies')
     } catch (err) {
@@ -112,6 +120,21 @@ export default function NewAgencyPage() {
           <div>
             <label htmlFor="ag-addr" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Address</label>
             <input id="ag-addr" type="text" value={address} onChange={e => setAddress(e.target.value)} className={inp} />
+          </div>
+
+          <div>
+            <label htmlFor="ag-region" className="block text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400 mb-1.5">Region</label>
+            <select
+              id="ag-region"
+              value={regionId}
+              onChange={e => setRegionId(e.target.value)}
+              className="w-full px-3.5 py-2.5 rounded-lg border border-slate-200 dark:border-slate-600 text-sm focus:outline-none focus:border-[#C9A84C] bg-white dark:bg-slate-700 text-slate-800 dark:text-slate-100"
+            >
+              <option value="">No region (global)</option>
+              {regions.filter(r => r.is_active).map(r => (
+                <option key={r.id} value={String(r.id)}>{r.flag} {r.name}</option>
+              ))}
+            </select>
           </div>
 
           <div className="flex justify-end gap-3 pt-2 border-t border-slate-100 dark:border-slate-700">

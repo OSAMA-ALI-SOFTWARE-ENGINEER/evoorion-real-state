@@ -2,10 +2,11 @@
 
 import Link from 'next/link'
 import { useCallback, useEffect, useState } from 'react'
-import { getUsers, updateUser, deleteUser, restoreUser } from '@/lib/api'
-import type { AdminUser, UserRole } from '@/types'
+import { getUsers, updateUser, deleteUser, restoreUser, getRegions } from '@/lib/api'
+import type { AdminUser, UserRole, Region } from '@/types'
 import { ConfirmModal } from '@/components/ui/ConfirmModal'
 import { CustomSelect } from '@/components/ui/CustomSelect'
+import { RegionBadge } from '@/components/ui/RegionBadge'
 import { useAuth } from '@/context/AuthContext'
 import { IconSearch, IconPencil, IconTrash, IconRotateCcw, IconUser, IconUsers, IconShield } from '@/components/ui/icons'
 
@@ -43,15 +44,17 @@ const STATUS_OPTIONS = [
 
 interface EditModalProps {
   user: AdminUser
-  onSave: (data: { role: UserRole; is_active: boolean }) => Promise<void>
+  regions: Region[]
+  onSave: (data: { role: UserRole; is_active: boolean; region_id: number | null }) => Promise<void>
   onClose: () => void
 }
 
-function EditModal({ user, onSave, onClose }: EditModalProps) {
-  const [role,   setRole]   = useState<UserRole>(user.role)
-  const [active, setActive] = useState(user.is_active)
-  const [error,  setError]  = useState('')
-  const [saving, setSaving] = useState(false)
+function EditModal({ user, regions, onSave, onClose }: EditModalProps) {
+  const [role,     setRole]     = useState<UserRole>(user.role)
+  const [active,   setActive]   = useState(user.is_active)
+  const [regionId, setRegionId] = useState<string>(String(user.region_id ?? ''))
+  const [error,    setError]    = useState('')
+  const [saving,   setSaving]   = useState(false)
 
   const ROLE_SELECT_OPTIONS = [
     { value: 'agent',       label: 'Agent',      icon: <IconUser size={14} /> },
@@ -63,7 +66,7 @@ function EditModal({ user, onSave, onClose }: EditModalProps) {
     setError('')
     setSaving(true)
     try {
-      await onSave({ role, is_active: active })
+      await onSave({ role, is_active: active, region_id: regionId ? Number(regionId) : null })
       onClose()
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Save failed')
@@ -85,6 +88,20 @@ function EditModal({ user, onSave, onClose }: EditModalProps) {
               onChange={v => setRole(v as UserRole)}
               options={ROLE_SELECT_OPTIONS}
             />
+          </div>
+          <div>
+            <label htmlFor="user-region" className="block text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400 mb-1.5">Region</label>
+            <select
+              id="user-region"
+              value={regionId}
+              onChange={e => setRegionId(e.target.value)}
+              className="w-full px-3.5 py-2.5 rounded-lg border border-slate-200 dark:border-slate-600 text-sm focus:outline-none focus:border-[#C9A84C] bg-white dark:bg-slate-700 text-slate-800 dark:text-slate-100"
+            >
+              <option value="">No region (global)</option>
+              {regions.filter(r => r.is_active).map(r => (
+                <option key={r.id} value={String(r.id)}>{r.flag} {r.name}</option>
+              ))}
+            </select>
           </div>
           <div className="flex items-center gap-3 p-3 rounded-lg border border-slate-200 dark:border-slate-600">
             <input
@@ -121,6 +138,11 @@ export default function UsersPage() {
   const [toDelete,    setToDelete]    = useState<AdminUser | null>(null)
   const [toRestore,   setToRestore]   = useState<AdminUser | null>(null)
   const [acting,      setActing]      = useState(false)
+  const [regions,     setRegions]     = useState<Region[]>([])
+
+  useEffect(() => {
+    getRegions().then(r => setRegions(r.data ?? [])).catch(() => {})
+  }, [])
 
   const load = useCallback(() => {
     setLoading(true)
@@ -141,7 +163,7 @@ export default function UsersPage() {
     return true
   })
 
-  async function handleSave(data: { role: UserRole; is_active: boolean }) {
+  async function handleSave(data: { role: UserRole; is_active: boolean; region_id: number | null }) {
     if (!editing) return
     await updateUser(editing.id, data)
     load()
@@ -210,6 +232,7 @@ export default function UsersPage() {
               <th className="px-5 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">User</th>
               <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Role</th>
               <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Status</th>
+              <th className="hidden md:table-cell px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Region</th>
               <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Joined</th>
               <th className="px-5 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Actions</th>
             </tr>
@@ -218,13 +241,13 @@ export default function UsersPage() {
             {loading ? (
               Array.from({ length: 6 }).map((_, i) => (
                 <tr key={i} className="animate-pulse">
-                  {Array.from({ length: 5 }).map((__, j) => (
-                    <td key={j} className="px-5 py-3.5"><div className="h-3.5 bg-slate-100 dark:bg-slate-700 rounded w-28" /></td>
+                  {Array.from({ length: 6 }).map((__, j) => (
+                    <td key={j} className={`px-5 py-3.5${j === 3 ? ' hidden md:table-cell' : ''}`}><div className="h-3.5 bg-slate-100 dark:bg-slate-700 rounded w-28" /></td>
                   ))}
                 </tr>
               ))
             ) : filtered.length === 0 ? (
-              <tr><td colSpan={5} className="px-5 py-8 text-center text-slate-400">No users found.</td></tr>
+              <tr><td colSpan={6} className="px-5 py-8 text-center text-slate-400">No users found.</td></tr>
             ) : filtered.map(u => {
               const isDeleted = !!u.deleted_at
               const isSelf    = u.id === me?.id
@@ -255,6 +278,7 @@ export default function UsersPage() {
                       {isDeleted ? 'Deleted' : u.is_active ? 'Active' : 'Inactive'}
                     </span>
                   </td>
+                  <td className="hidden md:table-cell px-4 py-3.5"><RegionBadge region={u.region} /></td>
                   <td className="px-4 py-3.5 text-slate-500 dark:text-slate-400 text-xs">{fmt(u.created_at)}</td>
                   <td className="px-5 py-3.5">
                     <div className="flex items-center gap-1">
@@ -298,7 +322,7 @@ export default function UsersPage() {
       </div>
 
       {editing && (
-        <EditModal user={editing} onSave={handleSave} onClose={() => setEditing(null)} />
+        <EditModal user={editing} regions={regions} onSave={handleSave} onClose={() => setEditing(null)} />
       )}
       {toDelete && (
         <ConfirmModal

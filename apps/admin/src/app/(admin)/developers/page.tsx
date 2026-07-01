@@ -1,10 +1,11 @@
 'use client'
 
 import { useEffect, useRef, useState, type FormEvent } from 'react'
-import { getDevelopers, createDeveloper, updateDeveloper, deleteDeveloper, uploadMedia } from '@/lib/api'
-import type { Developer } from '@/types'
+import { getDevelopers, createDeveloper, updateDeveloper, deleteDeveloper, uploadMedia, getRegions } from '@/lib/api'
+import type { Developer, Region } from '@/types'
 import { ConfirmModal } from '@/components/ui/ConfirmModal'
 import { ImageCropper } from '@/components/ui/ImageCropper'
+import { RegionBadge } from '@/components/ui/RegionBadge'
 import { IconGrid, IconList, IconLayers, IconSearch, IconPencil, IconTrash, IconUpload, IconX } from '@/components/ui/icons'
 
 const VIEW_KEY = 'evoorion_developers_view'
@@ -29,7 +30,13 @@ function DeveloperModal({ developer, onSave, onClose }: ModalProps) {
   const [saving,      setSaving]      = useState(false)
   const [cropSrc,     setCropSrc]     = useState<string | null>(null)
   const [uploading,   setUploading]   = useState(false)
+  const [regions,     setRegions]     = useState<Region[]>([])
+  const [regionId,    setRegionId]    = useState<string>(String(developer?.region_id ?? ''))
   const fileRef = useRef<HTMLInputElement>(null)
+
+  useEffect(() => {
+    getRegions().then(r => setRegions(r.data ?? [])).catch(() => {})
+  }, [])
 
   function handleName(v: string) { setName(v); if (auto) setSlug(slugify(v)) }
 
@@ -57,7 +64,7 @@ function DeveloperModal({ developer, onSave, onClose }: ModalProps) {
   async function submit(e: FormEvent) {
     e.preventDefault(); setError(''); setSaving(true)
     try {
-      await onSave({ name: name.trim(), email: email.trim() || undefined, slug: slug.trim(), logo_url: logoUrl.trim() || undefined })
+      await onSave({ name: name.trim(), email: email.trim() || undefined, slug: slug.trim(), logo_url: logoUrl.trim() || undefined, region_id: regionId ? Number(regionId) : null })
       onClose()
     } catch (err) { setError(err instanceof Error ? err.message : 'Save failed') }
     finally { setSaving(false) }
@@ -93,6 +100,22 @@ function DeveloperModal({ developer, onSave, onClose }: ModalProps) {
             <div>
               <label htmlFor="dev-slug" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Slug <span className="text-red-400">*</span></label>
               <input id="dev-slug" type="text" required value={slug} onChange={e => { setAuto(false); setSlug(e.target.value) }} className={inp + ' font-mono'} />
+            </div>
+            <div>
+              <label htmlFor="dev-region" className="block text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400 mb-1.5">
+                Region
+              </label>
+              <select
+                id="dev-region"
+                value={regionId}
+                onChange={e => setRegionId(e.target.value)}
+                className="w-full px-3.5 py-2.5 rounded-lg border border-slate-200 dark:border-slate-600 text-sm focus:outline-none focus:border-[#C9A84C] bg-white dark:bg-slate-700 text-slate-800 dark:text-slate-100"
+              >
+                <option value="">No region (global)</option>
+                {regions.filter(r => r.is_active).map(r => (
+                  <option key={r.id} value={String(r.id)}>{r.flag} {r.name}</option>
+                ))}
+              </select>
             </div>
             <div>
               <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Logo</label>
@@ -162,7 +185,8 @@ function DeveloperCard({ dev, onEdit, onDelete }: { dev: Developer; onEdit: () =
       </div>
       <div className="p-4 flex flex-col flex-1">
         <p className="font-semibold text-slate-800 dark:text-slate-100 mb-0.5">{dev.name}</p>
-        <p className="text-xs text-slate-400 font-mono mb-4">{dev.slug}</p>
+        <p className="text-xs text-slate-400 font-mono mb-1">{dev.slug}</p>
+        {dev.region && <div className="mb-3"><RegionBadge region={dev.region} /></div>}
         <div className="flex gap-2 mt-auto pt-3 border-t border-slate-100 dark:border-slate-700">
           <button type="button" onClick={onEdit} title="Edit developer" className="flex-1 flex items-center justify-center gap-1.5 text-xs font-semibold text-blue-600 hover:text-blue-700 py-1.5 rounded-md hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors">
             <IconPencil size={12} /> Edit
@@ -255,6 +279,7 @@ export default function DevelopersPage() {
               <tr className="bg-slate-50 dark:bg-slate-700/50 border-b border-slate-100 dark:border-slate-700">
                 <th className="px-5 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Developer</th>
                 <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Slug</th>
+                <th className="hidden md:table-cell px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Region</th>
                 <th className="px-4 py-3 text-center text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Logo</th>
                 <th className="px-5 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Actions</th>
               </tr>
@@ -263,17 +288,18 @@ export default function DevelopersPage() {
               {loading ? (
                 Array.from({ length: 5 }).map((_, i) => (
                   <tr key={i} className="animate-pulse">
-                    {Array.from({ length: 4 }).map((__, j) => (
-                      <td key={j} className="px-5 py-3.5"><div className="h-3.5 bg-slate-100 dark:bg-slate-700 rounded w-full" /></td>
+                    {Array.from({ length: 5 }).map((__, j) => (
+                      <td key={j} className={`px-5 py-3.5${j === 2 ? ' hidden md:table-cell' : ''}`}><div className="h-3.5 bg-slate-100 dark:bg-slate-700 rounded w-full" /></td>
                     ))}
                   </tr>
                 ))
               ) : filtered.length === 0 ? (
-                <tr><td colSpan={4} className="px-5 py-8 text-center text-slate-400">{search ? 'No developers match your search.' : 'No developers yet.'}</td></tr>
+                <tr><td colSpan={5} className="px-5 py-8 text-center text-slate-400">{search ? 'No developers match your search.' : 'No developers yet.'}</td></tr>
               ) : filtered.map(d => (
                 <tr key={d.id} className="hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors">
                   <td className="px-5 py-3.5 font-medium text-slate-800 dark:text-slate-100">{d.name}</td>
                   <td className="px-4 py-3.5 text-slate-400 dark:text-slate-500 font-mono text-xs">{d.slug}</td>
+                  <td className="hidden md:table-cell px-4 py-3.5"><RegionBadge region={d.region} /></td>
                   <td className="px-4 py-3.5 text-center">
                     {d.logo_url ? (
                       <div className="w-8 h-8 rounded-md overflow-hidden bg-slate-50 dark:bg-slate-700 inline-flex items-center justify-center">

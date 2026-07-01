@@ -2,9 +2,10 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
-import { getLeads, deleteLead, exportLeadsCSV } from '@/lib/api'
-import type { Lead, LeadStatus, LeadSource } from '@/types'
+import { getLeads, deleteLead, exportLeadsCSV, getRegions } from '@/lib/api'
+import type { Lead, LeadStatus, LeadSource, Region } from '@/types'
 import { LeadStatusBadge } from '@/components/ui/Badge'
+import { RegionBadge } from '@/components/ui/RegionBadge'
 import { Pagination } from '@/components/ui/Pagination'
 import { ConfirmModal } from '@/components/ui/ConfirmModal'
 import { CustomSelect } from '@/components/ui/CustomSelect'
@@ -65,23 +66,29 @@ export default function LeadsPage() {
   const { user } = useAuth()
   const canDelete = user?.role === 'manager' || user?.role === 'super_admin'
 
-  const [leads,    setLeads]    = useState<Lead[]>([])
-  const [total,    setTotal]    = useState(0)
-  const [page,     setPage]     = useState(1)
-  const [search,   setSearch]   = useState('')
-  const [status,   setStatus]   = useState('')
-  const [source,   setSource]   = useState('')
-  const [loading,  setLoading]  = useState(true)
-  const [error,    setError]    = useState('')
-  const [toDelete, setToDelete] = useState<Lead | null>(null)
-  const [acting,   setActing]   = useState(false)
+  const [leads,     setLeads]     = useState<Lead[]>([])
+  const [total,     setTotal]     = useState(0)
+  const [page,      setPage]      = useState(1)
+  const [search,    setSearch]    = useState('')
+  const [status,    setStatus]    = useState('')
+  const [source,    setSource]    = useState('')
+  const [region,    setRegion]    = useState('')
+  const [regions,   setRegions]   = useState<Region[]>([])
+  const [loading,   setLoading]   = useState(true)
+  const [error,     setError]     = useState('')
+  const [toDelete,  setToDelete]  = useState<Lead | null>(null)
+  const [acting,    setActing]    = useState(false)
   const [exporting, setExporting] = useState(false)
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
-  const load = useCallback(async (p: number, s: string, st: string, src: string) => {
+  useEffect(() => {
+    getRegions().then(r => setRegions(r.data ?? [])).catch(() => {})
+  }, [])
+
+  const load = useCallback(async (p: number, s: string, st: string, src: string, rgn: string) => {
     setLoading(true); setError('')
     try {
-      const res = await getLeads({ page: p, per_page: PER_PAGE, search: s || undefined, status: st || undefined, source: src || undefined })
+      const res = await getLeads({ page: p, per_page: PER_PAGE, search: s || undefined, status: st || undefined, source: src || undefined, region: rgn || undefined })
       setLeads(res.data ?? [])
       setTotal(res.meta?.pagination?.total ?? 0)
     } catch (err) {
@@ -91,12 +98,12 @@ export default function LeadsPage() {
     }
   }, [])
 
-  useEffect(() => { load(page, search, status, source) }, [page, status, source, load])
+  useEffect(() => { load(page, search, status, source, region) }, [page, status, source, region, load])
 
   function handleSearch(val: string) {
     setSearch(val); setPage(1)
     if (debounceRef.current) clearTimeout(debounceRef.current)
-    debounceRef.current = setTimeout(() => load(1, val, status, source), 400)
+    debounceRef.current = setTimeout(() => load(1, val, status, source, region), 400)
   }
 
   async function confirmDelete() {
@@ -105,7 +112,7 @@ export default function LeadsPage() {
     try {
       await deleteLead(toDelete.id)
       setToDelete(null)
-      load(page, search, status, source)
+      load(page, search, status, source, region)
     } catch (err) {
       alert(err instanceof Error ? err.message : 'Delete failed')
     } finally { setActing(false) }
@@ -163,6 +170,16 @@ export default function LeadsPage() {
           placeholder="All sources"
           className="sm:w-44"
         />
+        <CustomSelect
+          value={region}
+          onChange={v => { setRegion(v); setPage(1) }}
+          options={[
+            { value: '', label: 'All regions' },
+            ...regions.filter(r => r.is_active).map(r => ({ value: String(r.id), label: `${r.flag ?? ''} ${r.name}`.trim() })),
+          ]}
+          placeholder="All regions"
+          className="sm:w-44"
+        />
       </div>
 
       {/* Table */}
@@ -178,6 +195,7 @@ export default function LeadsPage() {
                   <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Status</th>
                   <th className="hidden sm:table-cell px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Source</th>
                   <th className="hidden sm:table-cell px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Assigned</th>
+                  <th className="hidden md:table-cell px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Region</th>
                   <th className="hidden lg:table-cell px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Received</th>
                   <th className="px-5 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Actions</th>
                 </tr>
@@ -186,14 +204,14 @@ export default function LeadsPage() {
                 {loading ? (
                   Array.from({ length: 10 }).map((_, i) => (
                     <tr key={i} className="animate-pulse">
-                      {Array.from({ length: 6 }).map((__, j) => (
-                        <td key={j} className={`px-5 py-4${[2,3].includes(j) ? ' hidden sm:table-cell' : j === 4 ? ' hidden lg:table-cell' : ''}`}><div className="h-3.5 bg-slate-100 dark:bg-slate-700 rounded w-full" /></td>
+                      {Array.from({ length: 7 }).map((__, j) => (
+                        <td key={j} className={`px-5 py-4${[2,3].includes(j) ? ' hidden sm:table-cell' : j === 4 ? ' hidden md:table-cell' : j === 5 ? ' hidden lg:table-cell' : ''}`}><div className="h-3.5 bg-slate-100 dark:bg-slate-700 rounded w-full" /></td>
                       ))}
                     </tr>
                   ))
                 ) : leads.length === 0 ? (
                   <tr>
-                    <td colSpan={6} className="px-5 py-12 text-center text-slate-400">No leads found.</td>
+                    <td colSpan={7} className="px-5 py-12 text-center text-slate-400">No leads found.</td>
                   </tr>
                 ) : (
                   leads.map(lead => (
@@ -219,6 +237,9 @@ export default function LeadsPage() {
                       </td>
                       <td className="hidden sm:table-cell px-4 py-3.5 text-slate-500 dark:text-slate-400 text-xs">
                         {lead.assigned_user ? lead.assigned_user.name : <span className="text-amber-500">Unassigned</span>}
+                      </td>
+                      <td className="hidden md:table-cell px-4 py-3.5">
+                        <RegionBadge region={(lead.property as { region?: import('@/types').Region | null } | undefined)?.region ?? null} />
                       </td>
                       <td className="hidden lg:table-cell px-4 py-3.5 text-slate-400 dark:text-slate-500 text-xs">
                         {relativeDate(lead.created_at)}

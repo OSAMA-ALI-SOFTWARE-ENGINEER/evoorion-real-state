@@ -10,6 +10,7 @@ import {
 import type { Agency, Agent } from '@/types'
 import { ConfirmModal } from '@/components/ui/ConfirmModal'
 import { CustomSelect } from '@/components/ui/CustomSelect'
+import { RegionBadge } from '@/components/ui/RegionBadge'
 import {
   IconBriefcase, IconGrid, IconList, IconPhone, IconMail,
   IconSearch, IconUser, IconPencil, IconTrash, IconRotateCcw,
@@ -30,6 +31,7 @@ function AgencyCard({ agency, onDelete }: { agency: Agency; onDelete: () => void
       </div>
       <div className="p-4 flex flex-col flex-1">
         <p className="font-semibold text-slate-800 dark:text-slate-100 mb-1">{agency.name}</p>
+        {agency.region && <div className="mb-1"><RegionBadge region={agency.region} /></div>}
         {agency.contact_email && (
           <p className="text-xs text-slate-400 flex items-center gap-1 mb-0.5">
             <IconMail size={11} /> {agency.contact_email}
@@ -153,6 +155,7 @@ function AgenciesTab() {
                 <th className="px-5 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Agency</th>
                 <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Contact</th>
                 <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Phone</th>
+                <th className="hidden md:table-cell px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Region</th>
                 <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Address</th>
                 <th className="px-4 py-3 text-center text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Agents</th>
                 <th className="px-5 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Actions</th>
@@ -162,11 +165,11 @@ function AgenciesTab() {
               {loading ? (
                 Array.from({ length: 4 }).map((_, i) => (
                   <tr key={i} className="animate-pulse">
-                    {Array.from({ length: 6 }).map((__, j) => <td key={j} className="px-5 py-3.5"><div className="h-3.5 bg-slate-100 dark:bg-slate-700 rounded" /></td>)}
+                    {Array.from({ length: 7 }).map((__, j) => <td key={j} className={`px-5 py-3.5${j === 3 ? ' hidden md:table-cell' : ''}`}><div className="h-3.5 bg-slate-100 dark:bg-slate-700 rounded" /></td>)}
                   </tr>
                 ))
               ) : agencies.length === 0 ? (
-                <tr><td colSpan={6} className="px-5 py-8 text-center text-slate-400">No agencies found.</td></tr>
+                <tr><td colSpan={7} className="px-5 py-8 text-center text-slate-400">No agencies found.</td></tr>
               ) : agencies.map(a => (
                 <tr key={a.id} className="hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors">
                   <td className="px-5 py-3.5">
@@ -183,6 +186,7 @@ function AgenciesTab() {
                   </td>
                   <td className="px-4 py-3.5 text-slate-500 dark:text-slate-400 text-xs">{a.contact_email ?? '—'}</td>
                   <td className="px-4 py-3.5 text-slate-500 dark:text-slate-400 text-xs">{a.phone ?? '—'}</td>
+                  <td className="hidden md:table-cell px-4 py-3.5"><RegionBadge region={a.region} /></td>
                   <td className="px-4 py-3.5 text-slate-500 dark:text-slate-400 text-xs max-w-[180px] truncate">{a.address ?? '—'}</td>
                   <td className="px-4 py-3.5 text-center">
                     <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 text-xs font-semibold">{a.agents_count ?? 0}</span>
