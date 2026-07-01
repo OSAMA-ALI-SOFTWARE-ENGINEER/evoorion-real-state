@@ -415,7 +415,7 @@ export default function TranslationsPage() {
 
       {activeTab === 'regions' && (
         <div className="space-y-3">
-          {regions.length === 0 ? (
+          {regions.filter(r => r.is_active).length === 0 ? (
             <div className="py-12 text-center">
               <p className="text-slate-400 text-sm">No regions configured.</p>
               <a href="/regions" className="text-[#C9A84C] text-sm hover:underline">Go to Regions →</a>
