@@ -21,25 +21,25 @@ class CloudinaryServiceTest extends TestCase
 
     public function test_service_can_be_instantiated(): void
     {
-        $service = new CloudinaryService();
+        $service = $this->app->make(CloudinaryService::class);
         $this->assertInstanceOf(CloudinaryService::class, $service);
     }
 
     public function test_service_has_upload_image_method(): void
     {
-        $service = new CloudinaryService();
+        $service = $this->app->make(CloudinaryService::class);
         $this->assertTrue(method_exists($service, 'uploadImage'));
     }
 
     public function test_service_has_upload_video_method(): void
     {
-        $service = new CloudinaryService();
+        $service = $this->app->make(CloudinaryService::class);
         $this->assertTrue(method_exists($service, 'uploadVideo'));
     }
 
     public function test_service_has_delete_media_method(): void
     {
-        $service = new CloudinaryService();
+        $service = $this->app->make(CloudinaryService::class);
         $this->assertTrue(method_exists($service, 'deleteMedia'));
     }
 }

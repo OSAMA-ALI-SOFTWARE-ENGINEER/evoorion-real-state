@@ -223,7 +223,7 @@ class LeadController extends Controller
         $this->authorize('view', $lead);
         $notes = $lead->notes()->with('user')->latest()->get();
 
-        return response()->json(['success' => true, 'data' => $notes]);
+        return response()->json(['success' => true, 'data' => $notes, 'meta' => []]);
     }
 
     public function deleteNote(Lead $lead, LeadNote $note): JsonResponse
