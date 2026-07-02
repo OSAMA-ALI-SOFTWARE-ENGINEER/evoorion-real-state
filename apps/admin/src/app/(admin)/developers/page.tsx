@@ -11,10 +11,6 @@ import { IconGrid, IconList, IconLayers, IconSearch, IconPencil, IconTrash, Icon
 
 const VIEW_KEY = 'evoorion_developers_view'
 
-function slugify(s: string) {
-  return s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
-}
-
 const inp = 'w-full px-3.5 py-2.5 rounded-lg border border-slate-200 dark:border-slate-600 text-sm focus:outline-none focus:border-[#C9A84C] focus:ring-1 focus:ring-[#C9A84C] bg-white dark:bg-slate-700 text-slate-800 dark:text-slate-100 placeholder-slate-400'
 
 // ── Modal ─────────────────────────────────────────────────────────────────────
@@ -24,9 +20,7 @@ interface ModalProps { developer?: Developer | null; onSave: (data: Partial<Deve
 function DeveloperModal({ developer, onSave, onClose }: ModalProps) {
   const [name,        setName]        = useState(developer?.name ?? '')
   const [email,       setEmail]       = useState(developer?.email ?? '')
-  const [slug,        setSlug]        = useState(developer?.slug ?? '')
   const [logoUrl,     setLogoUrl]     = useState(developer?.logo_url ?? '')
-  const [auto,        setAuto]        = useState(!developer)
   const [error,       setError]       = useState('')
   const [saving,      setSaving]      = useState(false)
   const [cropSrc,     setCropSrc]     = useState<string | null>(null)
@@ -38,8 +32,6 @@ function DeveloperModal({ developer, onSave, onClose }: ModalProps) {
   useEffect(() => {
     getRegions().then(r => setRegions(r.data ?? [])).catch(() => {})
   }, [])
-
-  function handleName(v: string) { setName(v); if (auto) setSlug(slugify(v)) }
 
   function onFileChange(e: React.ChangeEvent<HTMLInputElement>) {
     const f = e.target.files?.[0]
@@ -65,7 +57,7 @@ function DeveloperModal({ developer, onSave, onClose }: ModalProps) {
   async function submit(e: FormEvent) {
     e.preventDefault(); setError(''); setSaving(true)
     try {
-      await onSave({ name: name.trim(), email: email.trim() || undefined, slug: slug.trim(), logo_url: logoUrl.trim() || undefined, region_id: regionId ? Number(regionId) : null })
+      await onSave({ name: name.trim(), email: email.trim() || undefined, logo_url: logoUrl.trim() || undefined, region_id: regionId ? Number(regionId) : null })
       onClose()
     } catch (err) { setError(err instanceof Error ? err.message : 'Save failed') }
     finally { setSaving(false) }
@@ -89,7 +81,7 @@ function DeveloperModal({ developer, onSave, onClose }: ModalProps) {
             {error && <p className="text-red-500 text-sm">{error}</p>}
             <div>
               <label htmlFor="dev-name" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Name <span className="text-red-400">*</span></label>
-              <input id="dev-name" type="text" required value={name} onChange={e => handleName(e.target.value)} className={inp} placeholder="e.g. Emaar Properties" />
+              <input id="dev-name" type="text" required value={name} onChange={e => setName(e.target.value)} className={inp} placeholder="e.g. Emaar Properties" />
             </div>
             <div>
               <label htmlFor="dev-email" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
@@ -97,10 +89,6 @@ function DeveloperModal({ developer, onSave, onClose }: ModalProps) {
                 <span className="ml-1 text-xs text-slate-400 font-normal">(receives lead notifications)</span>
               </label>
               <input id="dev-email" type="email" value={email} onChange={e => setEmail(e.target.value)} className={inp} placeholder="developer@example.com" />
-            </div>
-            <div>
-              <label htmlFor="dev-slug" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Slug <span className="text-red-400">*</span></label>
-              <input id="dev-slug" type="text" required value={slug} onChange={e => { setAuto(false); setSlug(e.target.value) }} className={inp + ' font-mono'} />
             </div>
             <div>
               <label htmlFor="dev-region" className="block text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400 mb-1.5">
@@ -183,7 +171,6 @@ function DeveloperCard({ dev, onEdit, onDelete }: { dev: Developer; onEdit: () =
       </div>
       <div className="p-4 flex flex-col flex-1">
         <p className="font-semibold text-slate-800 dark:text-slate-100 mb-0.5">{dev.name}</p>
-        <p className="text-xs text-slate-400 font-mono mb-1">{dev.slug}</p>
         {dev.region && <div className="mb-3"><RegionBadge region={dev.region} /></div>}
         <div className="flex gap-2 mt-auto pt-3 border-t border-slate-100 dark:border-slate-700">
           <button type="button" onClick={onEdit} title="Edit developer" className="flex-1 flex items-center justify-center gap-1.5 text-xs font-semibold text-blue-600 hover:text-blue-700 py-1.5 rounded-md hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors">
@@ -237,7 +224,7 @@ export default function DevelopersPage() {
   }
 
   const filtered = devs.filter(d =>
-    !search || d.name.toLowerCase().includes(search.toLowerCase()) || d.slug.includes(search.toLowerCase())
+    !search || d.name.toLowerCase().includes(search.toLowerCase()) || (d.email ?? '').toLowerCase().includes(search.toLowerCase())
   )
 
   return (
@@ -276,7 +263,7 @@ export default function DevelopersPage() {
             <thead>
               <tr className="bg-slate-50 dark:bg-slate-700/50 border-b border-slate-100 dark:border-slate-700">
                 <th className="px-5 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Developer</th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Slug</th>
+                <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Email</th>
                 <th className="hidden md:table-cell px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Region</th>
                 <th className="px-4 py-3 text-center text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Logo</th>
                 <th className="px-5 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Actions</th>
@@ -296,7 +283,7 @@ export default function DevelopersPage() {
               ) : filtered.map(d => (
                 <tr key={d.id} className="hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors">
                   <td className="px-5 py-3.5 font-medium text-slate-800 dark:text-slate-100">{d.name}</td>
-                  <td className="px-4 py-3.5 text-slate-400 dark:text-slate-500 font-mono text-xs">{d.slug}</td>
+                  <td className="px-4 py-3.5 text-slate-400 dark:text-slate-500 text-xs">{d.email ?? '—'}</td>
                   <td className="hidden md:table-cell px-4 py-3.5"><RegionBadge region={d.region} /></td>
                   <td className="px-4 py-3.5 text-center">
                     {d.logo_url ? (
