@@ -97,6 +97,15 @@ class SettingController
         'section_bg_investments_strategies',
     ];
 
+    // Region copy fields: region_{code}_{field} — codes are dynamic (regions table)
+    private const REGION_KEY_PATTERN = '/^region_[a-z0-9_\-]+_(hero_title|hero_subtitle|investment_description|cta_label)$/';
+
+    private function isAllowedKey(string $key): bool
+    {
+        return in_array($key, self::ALLOWED_KEYS, true)
+            || preg_match(self::REGION_KEY_PATTERN, $key) === 1;
+    }
+
     public function index(): JsonResponse
     {
         $stored = Setting::all()->keyBy('key')->map(fn ($s) => $s->value);
@@ -104,6 +113,12 @@ class SettingController
         $result = collect(self::ALLOWED_KEYS)
             ->mapWithKeys(fn ($k) => [$k => $stored->get($k)])
             ->toArray();
+
+        foreach ($stored as $key => $value) {
+            if (preg_match(self::REGION_KEY_PATTERN, $key) === 1) {
+                $result[$key] = $value;
+            }
+        }
 
         return $this->success($result);
     }
@@ -116,7 +131,7 @@ class SettingController
         ]);
 
         foreach ($data['settings'] as $key => $value) {
-            if (!in_array($key, self::ALLOWED_KEYS, true)) {
+            if (!$this->isAllowedKey($key)) {
                 continue;
             }
             Setting::updateOrCreate(
@@ -147,6 +162,7 @@ class SettingController
             $key === 'partners_list'               => 'partners',
             str_starts_with($key, 'section_bg_')    => 'sections',
             str_starts_with($key, 'translations_')  => 'translations',
+            str_starts_with($key, 'region_')        => 'regions',
             default                               => 'integrations',
         };
     }

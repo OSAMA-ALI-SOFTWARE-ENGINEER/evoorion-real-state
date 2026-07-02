@@ -64,9 +64,13 @@ class PublicSettingController
         'translations_de',
     ];
 
+    // Region copy fields: region_{code}_{field} — codes are dynamic (regions table)
+    private const REGION_KEY_PATTERN = '/^region_[a-z0-9_\-]+_(hero_title|hero_subtitle|investment_description|cta_label)$/';
+
     public function index(): JsonResponse
     {
         $stored = Setting::whereIn('key', self::PUBLIC_KEYS)
+            ->orWhere('key', 'like', 'region\_%')
             ->get()
             ->keyBy('key')
             ->map(fn ($s) => $s->value);
@@ -74,6 +78,12 @@ class PublicSettingController
         $result = collect(self::PUBLIC_KEYS)
             ->mapWithKeys(fn ($k) => [$k => $stored->get($k)])
             ->toArray();
+
+        foreach ($stored as $key => $value) {
+            if (preg_match(self::REGION_KEY_PATTERN, $key) === 1) {
+                $result[$key] = $value;
+            }
+        }
 
         return $this->success($result);
     }
