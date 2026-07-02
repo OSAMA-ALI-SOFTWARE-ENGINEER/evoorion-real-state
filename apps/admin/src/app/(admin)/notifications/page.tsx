@@ -61,7 +61,7 @@ export default function NotificationsPage() {
   const unreadCount = notifications.filter(n => !n.read_at).length
 
   return (
-    <div className="max-w-2xl space-y-4">
+    <div className="space-y-4">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>

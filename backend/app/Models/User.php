@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Traits\LogsActivity;
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -16,7 +17,15 @@ use Laravel\Sanctum\HasApiTokens;
 class User extends Authenticatable
 {
     /** @use HasFactory<UserFactory> */
-    use HasApiTokens, HasFactory, Notifiable, SoftDeletes;
+    use HasApiTokens, HasFactory, LogsActivity, Notifiable, SoftDeletes;
+
+    /**
+     * Routine login-timestamp touches would flood the audit trail with an
+     * "updated User" row on every sign-in, so keep them out of activity logs.
+     *
+     * @var list<string>
+     */
+    protected array $activityLogExcluded = ['last_login_at', 'email_verified_at'];
 
     /**
      * The attributes that are mass assignable.

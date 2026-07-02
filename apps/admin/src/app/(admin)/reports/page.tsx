@@ -177,7 +177,7 @@ export default function ReportsPage() {
   )
 
   return (
-    <div className="space-y-5 max-w-5xl">
+    <div className="space-y-5">
       {/* Region filter + Tabs header */}
       <div className="flex items-center justify-between gap-4 flex-wrap">
         <CustomSelect

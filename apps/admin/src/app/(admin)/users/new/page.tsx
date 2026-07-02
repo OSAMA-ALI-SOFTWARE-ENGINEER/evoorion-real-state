@@ -59,7 +59,7 @@ export default function NewUserPage() {
   }
 
   return (
-    <div className="max-w-lg">
+    <div>
       <div className="flex items-center gap-3 mb-6">
         <button type="button" onClick={() => router.push('/users')}
           className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 text-sm transition-colors">

@@ -105,7 +105,7 @@ export default function EditAgencyPage() {
   return (
     <>
       {cropSrc && <ImageCropper src={cropSrc} aspect={1} onConfirm={onCropConfirm} onCancel={() => setCropSrc(null)} />}
-      <div className="max-w-xl">
+      <div>
         <nav className="flex items-center gap-2 text-sm text-slate-400 mb-6">
           <Link href="/agencies" className="hover:text-[#C9A84C] transition-colors">Agencies</Link>
           <IconChevronRight size={14} />

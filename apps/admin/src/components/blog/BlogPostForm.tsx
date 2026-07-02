@@ -144,7 +144,7 @@ export function BlogPostForm({ post, initialTags }: Props) {
   const lbl = 'block text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400 mb-1.5'
 
   return (
-    <div className="max-w-6xl">
+    <div>
       {/* Top bar */}
       <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
         <div className="flex items-center gap-2 min-w-0">

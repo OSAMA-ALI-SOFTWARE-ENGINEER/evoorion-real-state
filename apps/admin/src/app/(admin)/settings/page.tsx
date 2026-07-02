@@ -943,7 +943,7 @@ export default function SettingsPage() {
 
   if (loading) {
     return (
-      <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 max-w-4xl">
+      <div className="flex flex-col sm:flex-row gap-4 sm:gap-6">
         <div className="flex flex-row sm:flex-col gap-1 sm:w-48 sm:shrink-0 overflow-x-auto pb-1 sm:pb-0">
           {TABS.map((_, i) => (
             <div key={i} className="h-9 shrink-0 sm:w-full w-24 bg-slate-100 dark:bg-slate-700 rounded-lg animate-pulse" />
@@ -962,7 +962,7 @@ export default function SettingsPage() {
   }
 
   return (
-    <div className="max-w-4xl">
+    <div>
       {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
 
       <div className="flex flex-col sm:flex-row gap-4 sm:gap-6">

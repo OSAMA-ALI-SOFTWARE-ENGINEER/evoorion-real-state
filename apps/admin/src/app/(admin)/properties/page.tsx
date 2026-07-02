@@ -368,7 +368,7 @@ export default function PropertiesPage() {
   const hasActiveFilters = !!(status || type || areaId || featured)
 
   return (
-    <div className="max-w-7xl space-y-4">
+    <div className="space-y-4">
       {/* Header */}
       <div className="flex items-center justify-between">
         <p className="text-sm text-slate-500 dark:text-slate-400">{total} properties</p>

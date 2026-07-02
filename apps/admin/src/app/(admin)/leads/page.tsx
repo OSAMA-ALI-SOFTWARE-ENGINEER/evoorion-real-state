@@ -131,7 +131,7 @@ export default function LeadsPage() {
   const lastPage = Math.max(1, Math.ceil(total / PER_PAGE))
 
   return (
-    <div className="max-w-7xl space-y-4">
+    <div className="space-y-4">
       {/* Header */}
       <div className="flex items-center justify-between">
         <p className="text-sm text-slate-500 dark:text-slate-400">{total} leads</p>

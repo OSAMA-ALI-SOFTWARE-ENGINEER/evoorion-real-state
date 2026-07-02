@@ -2,11 +2,14 @@
 
 namespace App\Models;
 
+use App\Traits\LogsActivity;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class MediaFile extends Model
 {
+    use LogsActivity;
+
     protected $fillable = ['name', 'url', 'public_id', 'mime_type', 'folder', 'size', 'uploaded_by'];
 
     public function uploader(): BelongsTo

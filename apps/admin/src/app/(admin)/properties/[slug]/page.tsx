@@ -21,7 +21,7 @@ export default function EditPropertyPage({ params }: { params: Promise<{ slug: s
 
   if (loading) {
     return (
-      <div className="max-w-5xl space-y-6">
+      <div className="space-y-6">
         <div className="h-7 bg-slate-100 rounded w-64 animate-pulse mb-6" />
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2 bg-white rounded-xl border border-slate-200 h-96 animate-pulse" />

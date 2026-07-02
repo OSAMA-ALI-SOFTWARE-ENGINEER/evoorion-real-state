@@ -24,7 +24,7 @@ export default function EditBlogPostPage({ params }: { params: Promise<{ id: str
   )
 
   if (!post) return (
-    <div className="max-w-6xl animate-pulse space-y-4">
+    <div className="animate-pulse space-y-4">
       <div className="h-8 bg-slate-100 dark:bg-slate-700 rounded w-48" />
       <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-6">
         <div className="bg-slate-100 dark:bg-slate-700 rounded-xl h-[600px]" />

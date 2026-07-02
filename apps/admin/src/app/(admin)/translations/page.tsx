@@ -286,7 +286,7 @@ export default function TranslationsPage() {
   }
 
   return (
-    <div className="max-w-5xl space-y-4">
+    <div className="space-y-4">
       {error && <p className="text-red-500 text-sm">{error}</p>}
 
       {/* Locale tabs */}

@@ -457,7 +457,7 @@ export function PropertyForm({ property }: PropertyFormProps) {
   ]
 
   return (
-    <div className="max-w-5xl space-y-6">
+    <div className="space-y-6">
     <form ref={formRef} onSubmit={handleSubmit} className="space-y-6">
       {error && (
         <div className="px-4 py-3 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-600 dark:text-red-400 text-sm">{error}</div>

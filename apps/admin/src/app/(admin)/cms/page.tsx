@@ -159,7 +159,7 @@ export default function CmsPage() {
   }
 
   return (
-    <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 max-w-4xl">
+    <div className="flex flex-col sm:flex-row gap-4 sm:gap-6">
       {/* Page nav */}
       <nav className="flex flex-row sm:flex-col gap-1 sm:gap-0.5 sm:w-44 sm:shrink-0 overflow-x-auto pb-1 sm:pb-0 sm:overflow-x-visible">
         {pages.map(slug => (

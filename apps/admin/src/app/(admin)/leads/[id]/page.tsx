@@ -314,7 +314,7 @@ export default function LeadDetailPage({ params }: { params: Promise<{ id: strin
 
   if (loading) {
     return (
-      <div className="max-w-5xl animate-pulse space-y-4">
+      <div className="animate-pulse space-y-4">
         <div className="h-5 bg-slate-100 dark:bg-slate-700 rounded w-48" />
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2 bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 h-96" />
@@ -336,7 +336,7 @@ export default function LeadDetailPage({ params }: { params: Promise<{ id: strin
   }
 
   return (
-    <div className="max-w-5xl space-y-6">
+    <div className="space-y-6">
       {/* Breadcrumb */}
       <div className="flex items-center gap-2 text-sm">
         <button

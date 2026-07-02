@@ -2,10 +2,13 @@
 
 namespace App\Models;
 
+use App\Traits\LogsActivity;
 use Illuminate\Database\Eloquent\Model;
 
 class Currency extends Model
 {
+    use LogsActivity;
+
     protected $fillable = [
         'code', 'name', 'symbol', 'is_active', 'is_default', 'sort_order',
     ];
