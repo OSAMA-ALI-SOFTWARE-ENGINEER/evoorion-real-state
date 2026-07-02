@@ -157,7 +157,7 @@ class DashboardController extends Controller
             ->withCount('properties')
             ->addSelect([
                 'regions.*',
-                DB::raw('(SELECT COUNT(*) FROM leads INNER JOIN properties ON leads.property_id = properties.id WHERE properties.region_id = regions.id AND leads.deleted_at IS NULL) as leads_count'),
+                DB::raw('(SELECT COUNT(*) FROM leads INNER JOIN properties ON leads.property_id = properties.id WHERE properties.region_id = regions.id AND leads.deleted_at IS NULL AND properties.deleted_at IS NULL) as leads_count'),
             ])
             ->get()
             ->map(fn ($r) => [

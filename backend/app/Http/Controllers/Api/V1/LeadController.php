@@ -101,12 +101,12 @@ class LeadController extends Controller
     {
         $user = auth()->user();
 
-        $perPage = min((int) ($request->per_page ?? 15), 100);
+        $perPage = max(1, min((int) ($request->per_page ?? 15), 100));
 
         $leads = Lead::query()
             ->with([
                 'assignedUser:id,name,email',
-                'property:id,slug,title,type,status,price,currency,bedrooms,bathrooms,location,area_sqft',
+                'property:id,region_id,slug,title,type,status,price,currency,bedrooms,bathrooms,location,area_sqft',
                 'property.region:id,code,name,flag',
             ])
             ->when(! $user->hasRole('manager'), fn ($q) => $q->where(function ($q) use ($user) {

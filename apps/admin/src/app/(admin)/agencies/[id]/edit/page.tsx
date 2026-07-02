@@ -6,6 +6,7 @@ import Link from 'next/link'
 import { getAgencies, updateAgency, uploadMedia, getRegions } from '@/lib/api'
 import type { Agency, Region } from '@/types'
 import { ImageCropper } from '@/components/ui/ImageCropper'
+import { CustomSelect } from '@/components/ui/CustomSelect'
 import { IconChevronRight, IconBriefcase, IconUpload, IconX, IconLoader } from '@/components/ui/icons'
 
 const inp = 'w-full px-3.5 py-2.5 rounded-lg border border-slate-200 dark:border-slate-600 text-sm focus:outline-none focus:border-[#C9A84C] focus:ring-1 focus:ring-[#C9A84C] bg-white dark:bg-slate-700 text-slate-800 dark:text-slate-100 placeholder-slate-400'
@@ -158,17 +159,14 @@ export default function EditAgencyPage() {
 
           <div>
             <label htmlFor="ag-region" className="block text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400 mb-1.5">Region</label>
-            <select
-              id="ag-region"
+            <CustomSelect
               value={regionId}
-              onChange={e => setRegionId(e.target.value)}
-              className="w-full px-3.5 py-2.5 rounded-lg border border-slate-200 dark:border-slate-600 text-sm focus:outline-none focus:border-[#C9A84C] bg-white dark:bg-slate-700 text-slate-800 dark:text-slate-100"
-            >
-              <option value="">No region (global)</option>
-              {regions.filter(r => r.is_active).map(r => (
-                <option key={r.id} value={String(r.id)}>{r.flag} {r.name}</option>
-              ))}
-            </select>
+              onChange={setRegionId}
+              options={[
+                { value: '', label: 'No region (global)' },
+                ...regions.filter(r => r.is_active).map(r => ({ value: String(r.id), label: `${r.flag ?? ''} ${r.name}`.trim() })),
+              ]}
+            />
           </div>
 
           <div className="flex justify-end gap-3 pt-2 border-t border-slate-100 dark:border-slate-700">

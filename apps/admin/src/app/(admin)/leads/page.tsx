@@ -239,7 +239,7 @@ export default function LeadsPage() {
                         {lead.assigned_user ? lead.assigned_user.name : <span className="text-amber-500">Unassigned</span>}
                       </td>
                       <td className="hidden md:table-cell px-4 py-3.5">
-                        <RegionBadge region={(lead.property as { region?: import('@/types').Region | null } | undefined)?.region ?? null} />
+                        <RegionBadge region={lead.property?.region ?? null} />
                       </td>
                       <td className="hidden lg:table-cell px-4 py-3.5 text-slate-400 dark:text-slate-500 text-xs">
                         {relativeDate(lead.created_at)}

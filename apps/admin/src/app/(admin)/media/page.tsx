@@ -51,6 +51,8 @@ export default function MediaPage() {
 
   useEffect(() => { load() }, [load])
 
+  useEffect(() => { setSelectedIds(new Set()) }, [folder, search])
+
   async function handleUpload(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0]
     if (!file) return
@@ -122,6 +124,15 @@ export default function MediaPage() {
         <input ref={fileRef} type="file" accept="image/*,application/pdf" className="hidden" onChange={handleUpload} />
         {selectMode ? (
           <>
+            <label className="flex items-center gap-1.5 text-sm text-slate-500 dark:text-slate-400 shrink-0 cursor-pointer select-none">
+              <input
+                type="checkbox"
+                checked={files.length > 0 && files.every(f => selectedIds.has(f.id))}
+                onChange={e => setSelectedIds(e.target.checked ? new Set(files.map(f => f.id)) : new Set())}
+                className="w-4 h-4 accent-[#C9A84C]"
+              />
+              Select all
+            </label>
             <span className="text-sm text-slate-500 dark:text-slate-400 shrink-0">
               {selectedIds.size} selected
             </span>

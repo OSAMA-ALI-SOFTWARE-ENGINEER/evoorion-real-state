@@ -349,7 +349,7 @@ export default function DashboardPage() {
       getAgentPerformance(),
       getAdminProperties({ per_page: 5, status: 'available' }),
       getAdminBlogPosts({ per_page: 5 }),
-      getRegionBreakdown(),
+      getRegionBreakdown().catch(() => ({ data: [] as RegionBreakdown[] })),
     ])
       .then(([s, a, p, b, rb]) => {
         setStats(s.data)
@@ -455,7 +455,18 @@ export default function DashboardPage() {
       ) : null}
 
       {/* Region breakdown */}
-      {!loading && <RegionBreakdownPanel data={regionBreakdown} />}
+      {loading ? (
+        <div className="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 p-5">
+          <div className="h-4 bg-slate-100 dark:bg-slate-700 rounded w-40 mb-4 animate-pulse" />
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+            {Array.from({ length: 5 }).map((_, i) => (
+              <div key={i} className="animate-pulse bg-slate-100 dark:bg-slate-700 rounded-lg h-24" />
+            ))}
+          </div>
+        </div>
+      ) : (
+        <RegionBreakdownPanel data={regionBreakdown} />
+      )}
 
       {/* Recent properties + recent blog posts */}
       {!loading && (properties.length > 0 || blogPosts.length > 0) && (

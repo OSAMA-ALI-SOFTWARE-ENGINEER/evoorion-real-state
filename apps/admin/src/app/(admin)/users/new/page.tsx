@@ -96,17 +96,14 @@ export default function NewUserPage() {
 
           <div>
             <label htmlFor="new-user-region" className={lbl}>Region</label>
-            <select
-              id="new-user-region"
+            <CustomSelect
               value={regionId}
-              onChange={e => setRegionId(e.target.value)}
-              className={inp}
-            >
-              <option value="">No region (global)</option>
-              {regions.filter(r => r.is_active).map(r => (
-                <option key={r.id} value={String(r.id)}>{r.flag} {r.name}</option>
-              ))}
-            </select>
+              onChange={setRegionId}
+              options={[
+                { value: '', label: 'No region (global)' },
+                ...regions.filter(r => r.is_active).map(r => ({ value: String(r.id), label: `${r.flag ?? ''} ${r.name}`.trim() })),
+              ]}
+            />
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">

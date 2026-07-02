@@ -91,17 +91,14 @@ function EditModal({ user, regions, onSave, onClose }: EditModalProps) {
           </div>
           <div>
             <label htmlFor="user-region" className="block text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400 mb-1.5">Region</label>
-            <select
-              id="user-region"
+            <CustomSelect
               value={regionId}
-              onChange={e => setRegionId(e.target.value)}
-              className="w-full px-3.5 py-2.5 rounded-lg border border-slate-200 dark:border-slate-600 text-sm focus:outline-none focus:border-[#C9A84C] bg-white dark:bg-slate-700 text-slate-800 dark:text-slate-100"
-            >
-              <option value="">No region (global)</option>
-              {regions.filter(r => r.is_active).map(r => (
-                <option key={r.id} value={String(r.id)}>{r.flag} {r.name}</option>
-              ))}
-            </select>
+              onChange={setRegionId}
+              options={[
+                { value: '', label: 'No region (global)' },
+                ...regions.filter(r => r.is_active).map(r => ({ value: String(r.id), label: `${r.flag ?? ''} ${r.name}`.trim() })),
+              ]}
+            />
           </div>
           <div className="flex items-center gap-3 p-3 rounded-lg border border-slate-200 dark:border-slate-600">
             <input

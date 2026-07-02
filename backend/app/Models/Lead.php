@@ -76,9 +76,11 @@ class Lead extends Model
 
     public function scopeSearch($query, $searchTerm)
     {
-        return $query->where('name', 'like', "%$searchTerm%")
-            ->orWhere('email', 'like', "%$searchTerm%")
-            ->orWhere('phone', 'like', "%$searchTerm%");
+        return $query->where(function ($q) use ($searchTerm) {
+            $q->where('name', 'like', "%$searchTerm%")
+                ->orWhere('email', 'like', "%$searchTerm%")
+                ->orWhere('phone', 'like', "%$searchTerm%");
+        });
     }
 
     public function scopeAssignedToAgent($query, $agentId)

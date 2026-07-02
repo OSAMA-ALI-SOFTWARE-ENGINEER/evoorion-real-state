@@ -42,7 +42,7 @@ export interface AgentPerformance {
 }
 
 export interface RegionBreakdown {
-  region: { id: number; code: string; name: string; flag: string | null }
+  region: Pick<Region, 'id' | 'code' | 'name' | 'flag'>
   properties_count: number
   leads_count: number
 }

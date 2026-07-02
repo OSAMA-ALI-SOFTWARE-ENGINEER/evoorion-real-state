@@ -276,7 +276,7 @@ export default function TranslationsPage() {
     return (
       <div className="space-y-4 animate-pulse">
         <div className="flex gap-2">
-          {['en', 'ar', 'de'].map(l => (
+          {['en', 'ar', 'de', 'regions'].map(l => (
             <div key={l} className="h-9 w-28 bg-slate-100 dark:bg-slate-700 rounded-lg" />
           ))}
         </div>
