@@ -228,6 +228,7 @@ function ImageManager({ slug, initial }: { slug: string; initial: PropertyImage[
   const [images,    setImages]    = useState<PropertyImage[]>(initial)
   const [uploading, setUploading] = useState(false)
   const [error,     setError]     = useState('')
+  const [dragOver,  setDragOver]  = useState(false)
   const fileRef = useRef<HTMLInputElement>(null)
 
   async function handleFiles(files: FileList | null) {
@@ -246,6 +247,21 @@ function ImageManager({ slug, initial }: { slug: string; initial: PropertyImage[
       setUploading(false)
       if (fileRef.current) fileRef.current.value = ''
     }
+  }
+
+  function onDragOver(e: React.DragEvent) {
+    e.preventDefault()
+    setDragOver(true)
+  }
+
+  function onDragLeave() {
+    setDragOver(false)
+  }
+
+  function onDrop(e: React.DragEvent) {
+    e.preventDefault()
+    setDragOver(false)
+    if (e.dataTransfer.files?.length) handleFiles(e.dataTransfer.files)
   }
 
   async function setPrimary(img: PropertyImage) {
@@ -355,10 +371,21 @@ function ImageManager({ slug, initial }: { slug: string; initial: PropertyImage[
             ))}
 
           <div
-            className="aspect-[4/3] rounded-lg border-2 border-dashed border-slate-200 dark:border-slate-600 flex items-center justify-center cursor-pointer hover:border-[#C9A84C]/40 transition-colors"
+            className={`aspect-[4/3] rounded-lg border-2 border-dashed flex items-center justify-center cursor-pointer transition-colors ${
+              dragOver
+                ? 'border-[#C9A84C] bg-amber-50/50 dark:bg-amber-900/10'
+                : 'border-slate-200 dark:border-slate-600 hover:border-[#C9A84C]/40'
+            }`}
             onClick={() => fileRef.current?.click()}
+            onDragOver={onDragOver}
+            onDragLeave={onDragLeave}
+            onDrop={onDrop}
           >
-            <span className="text-slate-300 dark:text-slate-500 text-2xl">+</span>
+            {dragOver ? (
+              <span className="text-[11px] font-medium text-[#9A7A2E] dark:text-[#C9A84C] text-center px-1">Drop files to upload</span>
+            ) : (
+              <span className="text-slate-300 dark:text-slate-500 text-2xl">+</span>
+            )}
           </div>
         </div>
       )}

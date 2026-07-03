@@ -35,6 +35,7 @@ export default function MediaPage() {
   const [selectedIds,  setSelectedIds]  = useState<Set<number>>(new Set())
   const [bulkActing,   setBulkActing]   = useState(false)
   const [bulkConfirm,  setBulkConfirm]  = useState(false)
+  const [dragOver,     setDragOver]     = useState(false)
 
   const load = useCallback(async () => {
     setLoading(true)
@@ -53,12 +54,13 @@ export default function MediaPage() {
 
   useEffect(() => { setSelectedIds(new Set()) }, [folder, search])
 
-  async function handleUpload(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0]
-    if (!file) return
+  async function uploadFiles(files: File[]) {
+    if (!files.length) return
     setUploading(true)
     try {
-      await uploadMedia(file, folder === 'all' ? 'misc' : folder)
+      for (const file of files) {
+        await uploadMedia(file, folder === 'all' ? 'misc' : folder)
+      }
       load()
     } catch (err) {
       alert(err instanceof Error ? err.message : 'Upload failed')
@@ -66,6 +68,26 @@ export default function MediaPage() {
       setUploading(false)
       if (fileRef.current) fileRef.current.value = ''
     }
+  }
+
+  function handleUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    uploadFiles(Array.from(e.target.files ?? []))
+  }
+
+  function onDragOver(e: React.DragEvent) {
+    e.preventDefault()
+    setDragOver(true)
+  }
+
+  function onDragLeave() {
+    setDragOver(false)
+  }
+
+  function onDrop(e: React.DragEvent) {
+    e.preventDefault()
+    setDragOver(false)
+    const files = Array.from(e.dataTransfer.files)
+    if (files.length) uploadFiles(files)
   }
 
   async function confirmDelete() {
@@ -192,7 +214,19 @@ export default function MediaPage() {
 
       <div className="flex gap-4">
         {/* Grid */}
-        <div className="flex-1 min-w-0">
+        <div
+          className={`flex-1 min-w-0 rounded-xl border-2 border-dashed transition-colors relative ${
+            dragOver ? 'border-[#C9A84C] bg-amber-50/50 dark:bg-amber-900/10' : 'border-transparent'
+          }`}
+          onDragOver={onDragOver}
+          onDragLeave={onDragLeave}
+          onDrop={onDrop}
+        >
+          {dragOver && (
+            <div className="absolute inset-0 z-10 flex items-center justify-center pointer-events-none rounded-xl bg-amber-50/50 dark:bg-amber-900/10">
+              <p className="text-sm font-medium text-[#9A7A2E] dark:text-[#C9A84C]">Drop files to upload</p>
+            </div>
+          )}
           {loading ? (
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3">
               {Array.from({ length: 12 }).map((_, i) => (
