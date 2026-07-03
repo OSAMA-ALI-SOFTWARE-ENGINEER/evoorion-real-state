@@ -31,6 +31,14 @@ class CloudinaryService
         $result = $this->sdk()->uploadApi()->upload($file->getRealPath(), [
             'folder'        => $folder,
             'resource_type' => 'auto',
+            // Cap huge camera originals and let Cloudinary pick optimal quality/format
+            'transformation' => [
+                'width'   => 2560,
+                'height'  => 2560,
+                'crop'    => 'limit',
+                'quality' => 'auto:good',
+                'fetch_format' => 'auto',
+            ],
         ]);
 
         return ['url' => $result['secure_url'], 'public_id' => $result['public_id']];
