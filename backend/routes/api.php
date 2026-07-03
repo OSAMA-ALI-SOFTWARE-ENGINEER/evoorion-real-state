@@ -89,6 +89,7 @@ Route::prefix('v1')->group(function () {
         Route::get('operation-types', [OperationTypeController::class, 'index']);
         Route::get('agents', [PublicAgentController::class, 'index']);
         Route::get('jobs', [JobListingController::class, 'index']);
+        Route::get('testimonials', [\App\Http\Controllers\Api\V1\PublicTestimonialController::class, 'index']);
 
         // Public property endpoints
         Route::get('properties', [PropertyController::class, 'index']);
@@ -203,6 +204,12 @@ Route::prefix('v1')->group(function () {
             Route::put('agents/{agent}', [AgentController::class, 'update']);
             Route::delete('agents/{agent}', [AgentController::class, 'destroy']);
             Route::post('agents/{id}/restore', [AgentController::class, 'restore']);
+
+            // Testimonials management (manager+)
+            Route::get('testimonials', [\App\Http\Controllers\Api\V1\Admin\TestimonialController::class, 'index']);
+            Route::post('testimonials', [\App\Http\Controllers\Api\V1\Admin\TestimonialController::class, 'store']);
+            Route::put('testimonials/{testimonial}', [\App\Http\Controllers\Api\V1\Admin\TestimonialController::class, 'update']);
+            Route::delete('testimonials/{testimonial}', [\App\Http\Controllers\Api\V1\Admin\TestimonialController::class, 'destroy']);
 
             // Property-Agent assignment (manager+)
             Route::post('properties/{property}/agents/{agent}', [PropertyAgentController::class, 'assign']);
