@@ -31,6 +31,8 @@ class PublicSettingController
         'social_twitter',
         'social_linkedin',
         'social_youtube',
+        // Integrations
+        'google_analytics_id',
         // Theme colours
         'color_brand',
         'color_brand_section',

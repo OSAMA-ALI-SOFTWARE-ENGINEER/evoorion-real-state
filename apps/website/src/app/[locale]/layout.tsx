@@ -1,6 +1,7 @@
 import { NextIntlClientProvider } from 'next-intl'
 import { getMessages } from 'next-intl/server'
 import { notFound } from 'next/navigation'
+import Script from 'next/script'
 import NextTopLoader from 'nextjs-toploader'
 import { Navbar } from '@/components/layout/Navbar'
 import { Footer } from '@/components/layout/Footer'
@@ -37,6 +38,17 @@ export default async function LocaleLayout({
           <main className="flex-1">{children}</main>
           <Footer />
           <WhatsAppButton number={settings.contact_whatsapp} />
+          {settings.google_analytics_id && (
+            <>
+              <Script src={`https://www.googletagmanager.com/gtag/js?id=${settings.google_analytics_id}`} strategy="afterInteractive" />
+              <Script id="ga4-init" strategy="afterInteractive">{`
+                window.dataLayer = window.dataLayer || [];
+                function gtag(){dataLayer.push(arguments);}
+                gtag('js', new Date());
+                gtag('config', '${settings.google_analytics_id}');
+              `}</Script>
+            </>
+          )}
         </AuthProvider>
       </CountryProvider>
     </NextIntlClientProvider>
