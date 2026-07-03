@@ -299,3 +299,7 @@ export function IconPhoto(p: IconProps) {
 export function IconPlus(p: IconProps) {
   return <Icon {...p}><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></Icon>
 }
+
+export function IconMessageSquare(p: IconProps) {
+  return <Icon {...p}><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></Icon>
+}

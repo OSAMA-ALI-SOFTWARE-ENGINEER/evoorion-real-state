@@ -305,6 +305,21 @@ export interface BlogPost {
   updated_at: string
 }
 
+// ── Testimonials ──────────────────────────────────────────────────────────────
+
+export interface Testimonial {
+  id: number
+  author_name: string
+  author_title?: string | null
+  quote: string
+  rating?: number | null
+  avatar_url?: string | null
+  is_active: boolean
+  sort_order: number
+  created_at?: string
+  updated_at?: string
+}
+
 // ── API helpers ───────────────────────────────────────────────────────────────
 
 export interface ApiResponse<T> {

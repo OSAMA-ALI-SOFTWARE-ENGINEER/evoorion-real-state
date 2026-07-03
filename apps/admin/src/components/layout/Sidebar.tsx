@@ -19,6 +19,7 @@ import {
   IconMap,
   IconMapPin,
   IconImage,
+  IconMessageSquare,
   IconSettings,
   IconSliders,
   IconTag,
@@ -71,6 +72,7 @@ const NAV: Array<{ group?: string; items: NavItem[] }> = [
     group: 'Content',
     items: [
       { label: 'Blog',     href: '/blog',     icon: <IconFileText />,  roles: ['manager', 'super_admin'] },
+      { label: 'Testimonials', href: '/testimonials', icon: <IconMessageSquare />, roles: ['manager', 'super_admin'] },
       { label: 'Media',    href: '/media',    icon: <IconImage />,     roles: ['manager', 'super_admin'] },
       { label: 'CMS',          href: '/cms',          icon: <IconSliders />,   roles: ['super_admin'] },
       { label: 'Translations', href: '/translations',  icon: <IconGlobe />,     roles: ['super_admin'] },

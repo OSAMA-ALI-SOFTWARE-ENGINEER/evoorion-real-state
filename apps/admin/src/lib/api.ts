@@ -23,6 +23,7 @@ import type {
   Property,
   PropertyImage,
   RegionBreakdown,
+  Testimonial,
 } from '@/types'
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000/api/v1'
@@ -378,6 +379,24 @@ export async function updateOperationType(id: number, data: Partial<OperationTyp
 
 export async function deleteOperationType(id: number) {
   return request<ApiResponse<null>>(`/admin/operation-types/${id}`, { method: 'DELETE' })
+}
+
+// ── Testimonials ──────────────────────────────────────────────────────────────
+
+export async function getTestimonials() {
+  return request<ApiResponse<Testimonial[]>>('/admin/testimonials')
+}
+
+export async function createTestimonial(data: Partial<Testimonial>) {
+  return request<ApiResponse<Testimonial>>('/admin/testimonials', { method: 'POST', body: JSON.stringify(data) })
+}
+
+export async function updateTestimonial(id: number, data: Partial<Testimonial>) {
+  return request<ApiResponse<Testimonial>>(`/admin/testimonials/${id}`, { method: 'PUT', body: JSON.stringify(data) })
+}
+
+export async function deleteTestimonial(id: number) {
+  return request<ApiResponse<null>>(`/admin/testimonials/${id}`, { method: 'DELETE' })
 }
 
 // ── Agencies & Agents ─────────────────────────────────────────────────────────
