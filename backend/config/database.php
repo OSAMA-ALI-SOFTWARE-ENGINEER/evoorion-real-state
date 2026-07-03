@@ -63,10 +63,10 @@ return [
                 (PHP_VERSION_ID >= 80500 ? Mysql::ATTR_SSL_CA : PDO::MYSQL_ATTR_SSL_CA) => env('MYSQL_ATTR_SSL_CA'),
             ]) : [],
 
-            // Local dev (Windows/Laragon) does not have mysqldump on PATH; point
-            // spatie/laravel-backup's db-dumper at the bundled MySQL client tools.
+            // On Windows/Laragon, set MYSQL_DUMP_BINARY_PATH in .env.
+            // On Linux production, leave empty so mysqldump is resolved from PATH.
             'dump' => [
-                'dump_binary_path' => 'D:\\laragon\\bin\\mysql\\mysql-8.0.30-winx64\\bin',
+                'dump_binary_path' => env('MYSQL_DUMP_BINARY_PATH', ''),
             ],
         ],
 
