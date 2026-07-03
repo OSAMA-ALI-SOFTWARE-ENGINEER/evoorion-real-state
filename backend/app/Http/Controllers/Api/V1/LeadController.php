@@ -55,7 +55,12 @@ class LeadController extends Controller
      */
     public function store(StoreLeadRequest $request): JsonResponse
     {
-        $lead = $this->leadService->createLead($request->validated());
+        // Honeypot: real users never see this field; bots fill it. Pretend success.
+        if ($request->filled('company_website')) {
+            return response()->json(['success' => true, 'data' => null, 'message' => 'Lead submitted successfully'], 201);
+        }
+
+        $lead = $this->leadService->createLead(collect($request->validated())->except('company_website')->all());
 
         return response()->json([
             'success' => true,

@@ -130,4 +130,14 @@ class LeadControllerTest extends TestCase
 
         $response->assertStatus(200);
     }
+
+    public function test_lead_with_filled_honeypot_is_silently_discarded(): void
+    {
+        $this->postJson('/api/v1/leads', [
+            'name' => 'Bot', 'email' => 'bot@spam.com', 'source' => 'website',
+            'company_website' => 'https://spam.example',
+        ])->assertStatus(201)->assertJsonPath('success', true);
+
+        $this->assertDatabaseMissing('leads', ['email' => 'bot@spam.com']);
+    }
 }

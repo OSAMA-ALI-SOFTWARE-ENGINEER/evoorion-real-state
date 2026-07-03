@@ -22,6 +22,7 @@ interface FormState {
   whatsapp: string
   budget: BudgetRange | ''
   message: string
+  company_website: string
 }
 
 const INITIAL: FormState = {
@@ -31,6 +32,7 @@ const INITIAL: FormState = {
   whatsapp: '',
   budget: '',
   message: '',
+  company_website: '',
 }
 
 // ── Custom budget dropdown ─────────────────────────────────────────────────────
@@ -155,6 +157,7 @@ export function LeadForm({
         budget_max: budgetRange?.max,
         message: form.message || undefined,
         source: 'website',
+        company_website: form.company_website || undefined,
       })
       setStatus('success')
       setForm(INITIAL)
@@ -203,6 +206,17 @@ export function LeadForm({
       )}
 
       <form onSubmit={handleSubmit} className="space-y-4">
+        {/* Honeypot — invisible to humans, bots auto-fill it */}
+        <input
+          type="text"
+          name="company_website"
+          value={form.company_website}
+          onChange={e => setForm(prev => ({ ...prev, company_website: e.target.value }))}
+          tabIndex={-1}
+          autoComplete="off"
+          aria-hidden="true"
+          className="absolute -left-[9999px] h-0 w-0 opacity-0"
+        />
         <div className="space-y-4">
           <input
             type="text"

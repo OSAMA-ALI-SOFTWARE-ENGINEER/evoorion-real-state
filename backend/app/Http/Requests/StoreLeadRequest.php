@@ -31,6 +31,7 @@ class StoreLeadRequest extends FormRequest
             'requirement_data.property_types.*'       => 'string|max:50',
             'requirement_data.bedrooms'               => 'nullable|array',
             'requirement_data.bedrooms.*'             => 'string|max:10',
+            'company_website'                         => 'nullable|string|max:255',
         ];
     }
 }

@@ -351,8 +351,12 @@ export async function getJobs(): Promise<JobListing[]> {
 
 // â”€â”€ Newsletter â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-export async function subscribeNewsletter(email: string, name?: string): Promise<void> {
-  await api.post('/newsletter/subscribe', { email, name })
+export async function subscribeNewsletter(
+  email: string,
+  name?: string,
+  company_website?: string,
+): Promise<void> {
+  await api.post('/newsletter/subscribe', { email, name, company_website })
 }
 
 export default api

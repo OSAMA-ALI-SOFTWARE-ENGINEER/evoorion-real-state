@@ -118,6 +118,7 @@ export interface LeadPayload {
   budget_max?: number
   message?: string
   source: 'website' | 'instagram' | 'facebook' | 'whatsapp' | 'referral' | 'other'
+  company_website?: string
 }
 
 export type BudgetRange = 'under_1m' | '1m_3m' | '3m_5m' | '5m_10m' | 'above_10m'

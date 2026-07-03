@@ -6,6 +6,7 @@ import { subscribeNewsletter } from '@/lib/api'
 
 export function NewsletterSignup() {
   const [email, setEmail]     = useState('')
+  const [companyWebsite, setCompanyWebsite] = useState('')
   const [loading, setLoading] = useState(false)
   const [done, setDone]       = useState(false)
   const [error, setError]     = useState('')
@@ -16,7 +17,7 @@ export function NewsletterSignup() {
     setLoading(true)
     setError('')
     try {
-      await subscribeNewsletter(email.trim())
+      await subscribeNewsletter(email.trim(), undefined, companyWebsite || undefined)
       setDone(true)
     } catch {
       setError('Something went wrong. Please try again.')
@@ -44,6 +45,17 @@ export function NewsletterSignup() {
         Get Dubai market reports and exclusive listings delivered to your inbox.
       </p>
       <form onSubmit={handleSubmit} className="flex gap-2">
+        {/* Honeypot — invisible to humans, bots auto-fill it */}
+        <input
+          type="text"
+          name="company_website"
+          value={companyWebsite}
+          onChange={e => setCompanyWebsite(e.target.value)}
+          tabIndex={-1}
+          autoComplete="off"
+          aria-hidden="true"
+          className="absolute -left-[9999px] h-0 w-0 opacity-0"
+        />
         <input
           type="email"
           value={email}
