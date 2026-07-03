@@ -291,6 +291,7 @@ export interface BlogPost {
   content?: string
   featured_image_url?: string
   status: BlogStatus
+  is_featured?: boolean
   published_at?: string | null
   meta_title?: string | null
   meta_description?: string | null

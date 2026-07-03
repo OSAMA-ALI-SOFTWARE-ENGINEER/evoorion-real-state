@@ -21,6 +21,7 @@ class BlogPost extends Model
         'content',
         'featured_image_url',
         'status',
+        'is_featured',
         'published_at',
         'meta_title',
         'meta_description',
@@ -34,6 +35,7 @@ class BlogPost extends Model
         return [
             'published_at' => 'datetime',
             'view_count'   => 'integer',
+            'is_featured'  => 'boolean',
         ];
     }
 

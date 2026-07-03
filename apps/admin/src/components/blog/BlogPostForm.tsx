@@ -36,6 +36,7 @@ export function BlogPostForm({ post, initialTags }: Props) {
   )
   const [metaTitle,    setMetaTitle]    = useState(post?.meta_title ?? '')
   const [metaDesc,     setMetaDesc]     = useState(post?.meta_description ?? '')
+  const [isFeatured,   setIsFeatured]   = useState(post?.is_featured ?? false)
   const [selectedTags, setSelectedTags] = useState<number[]>(post?.tags?.map(t => t.id) ?? [])
   const [autoSlug,     setAutoSlug]     = useState(!post)
   const [error,        setError]        = useState('')
@@ -119,6 +120,7 @@ export function BlogPostForm({ post, initialTags }: Props) {
         content,
         featured_image_url: imageUrl || undefined,
         status:             effectiveStatus,
+        is_featured:        isFeatured,
         published_at:       publishedAt || undefined,
         meta_title:         metaTitle.trim() || undefined,
         meta_description:   metaDesc.trim() || undefined,
@@ -138,7 +140,7 @@ export function BlogPostForm({ post, initialTags }: Props) {
       if (msg.toLowerCase().includes('title')) setTitleError(msg)
       else setError(msg)
     } finally { setSaving(false) }
-  }, [title, slug, excerpt, content, imageUrl, effectiveStatus, publishedAt, metaTitle, metaDesc, selectedTags, regionId, post, router])
+  }, [title, slug, excerpt, content, imageUrl, effectiveStatus, isFeatured, publishedAt, metaTitle, metaDesc, selectedTags, regionId, post, router])
 
   const inp = 'w-full px-3.5 py-2.5 rounded-lg border border-slate-200 dark:border-slate-600 text-sm focus:outline-none focus:border-[#C9A84C] focus:ring-1 focus:ring-[#C9A84C] bg-white dark:bg-slate-700 text-slate-800 dark:text-slate-100 placeholder-slate-400 transition-colors'
   const lbl = 'block text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400 mb-1.5'
@@ -303,6 +305,15 @@ export function BlogPostForm({ post, initialTags }: Props) {
                   </p>
                 )}
               </div>
+              <label className="flex items-center gap-2.5 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={isFeatured}
+                  onChange={e => setIsFeatured(e.target.checked)}
+                  className="w-4 h-4 rounded border-slate-300 dark:border-slate-600 text-[#C9A84C] focus:ring-[#C9A84C]"
+                />
+                <span className="text-sm text-slate-700 dark:text-slate-300">Featured post</span>
+              </label>
             </div>
           )}
 

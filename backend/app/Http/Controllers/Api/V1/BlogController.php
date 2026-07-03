@@ -23,8 +23,9 @@ class BlogController
             ->with(['author:id,name', 'tags:id,name,slug'])
             ->select([
                 'id', 'author_id', 'title', 'slug', 'excerpt',
-                'featured_image_url', 'published_at', 'updated_at', 'reading_time', 'view_count', 'region_id',
+                'featured_image_url', 'published_at', 'updated_at', 'reading_time', 'view_count', 'region_id', 'is_featured',
             ])
+            ->when($request->boolean('featured'), fn ($q) => $q->where('is_featured', true))
             ->orderByDesc('published_at');
 
         if ($tag) {
@@ -69,7 +70,7 @@ class BlogController
             ->whereHas('tags', fn($q) => $q->whereIn('blog_tags.id', $post->tags->pluck('id')))
             ->where('id', '!=', $post->id)
             ->with(['tags:id,name,slug'])
-            ->select(['id', 'title', 'slug', 'excerpt', 'featured_image_url', 'published_at', 'updated_at', 'reading_time'])
+            ->select(['id', 'title', 'slug', 'excerpt', 'featured_image_url', 'published_at', 'updated_at', 'reading_time', 'is_featured'])
             ->limit(3)
             ->get();
 
