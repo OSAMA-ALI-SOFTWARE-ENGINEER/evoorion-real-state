@@ -14,6 +14,7 @@ import type {
   Property,
   PropertySummary,
   RegisterPayload,
+  Testimonial,
 } from '@/types'
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000/api/v1'
@@ -263,6 +264,20 @@ export async function getPublicSettings(): Promise<PublicSettings> {
     return (json?.data as PublicSettings) ?? {}
   } catch {
     return {}
+  }
+}
+
+// â”€â”€ Testimonials (public) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+
+export async function getTestimonials(): Promise<Testimonial[]> {
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000/api/v1'
+  try {
+    const res = await fetch(`${apiUrl}/testimonials`, { next: { revalidate: 300 } })
+    if (!res.ok) return []
+    const json = await res.json()
+    return (json?.data as Testimonial[]) ?? []
+  } catch {
+    return []
   }
 }
 

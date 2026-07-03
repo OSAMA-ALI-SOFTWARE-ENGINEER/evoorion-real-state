@@ -1,16 +1,18 @@
-import { getCmsContent, getPublicSettings } from '@/lib/api'
+import { getCmsContent, getPublicSettings, getTestimonials } from '@/lib/api'
 import { HeroSection } from '@/components/home/HeroSection'
 import { TrustStrip } from '@/components/home/TrustStrip'
 import { WhatWeDo } from '@/components/home/WhatWeDo'
 import { FeaturedProperties } from '@/components/home/FeaturedProperties'
 import { WhyDubai } from '@/components/home/WhyDubai'
 import { OurProcess } from '@/components/home/OurProcess'
+import { Testimonials } from '@/components/home/Testimonials'
 import { CTABanner } from '@/components/home/CTABanner'
 
 export default async function HomePage() {
-  const [cms, settings] = await Promise.all([
+  const [cms, settings, testimonials] = await Promise.all([
     getCmsContent('home'),
     getPublicSettings(),
+    getTestimonials(),
   ])
 
   return (
@@ -27,6 +29,7 @@ export default async function HomePage() {
       <FeaturedProperties />
       <WhyDubai cms={cms} bgImage={settings.image_why_dubai} />
       <OurProcess cms={cms} bgJson={settings.section_bg_our_process} />
+      <Testimonials items={testimonials} />
       <CTABanner cms={cms} bgImage={settings.image_cta} />
     </>
   )
