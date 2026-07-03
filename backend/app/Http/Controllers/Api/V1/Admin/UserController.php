@@ -41,6 +41,7 @@ class UserController extends Controller
 
         $users = User::query()
             ->when($request->role, fn ($q) => $q->where('role', $request->role))
+            ->when($request->exclude_role, fn ($q) => $q->where('role', '!=', $request->exclude_role))
             ->when($request->search, fn ($q) => $q->where(function ($q) use ($request) {
                 $q->where('name', 'like', "%{$request->search}%")
                   ->orWhere('email', 'like', "%{$request->search}%");

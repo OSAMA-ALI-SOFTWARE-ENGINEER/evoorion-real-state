@@ -68,6 +68,7 @@ const ROLE_MAP: Record<UserRole, { variant: BadgeVariant; label: string }> = {
   super_admin: { variant: 'gold',    label: 'Super Admin' },
   manager:     { variant: 'purple',  label: 'Manager' },
   agent:       { variant: 'info',    label: 'Agent' },
+  user:        { variant: 'success', label: 'Website User' },
 }
 
 export function RoleBadge({ role }: { role: UserRole }) {

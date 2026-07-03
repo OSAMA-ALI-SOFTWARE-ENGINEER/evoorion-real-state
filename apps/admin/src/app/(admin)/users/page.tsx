@@ -14,12 +14,14 @@ const ROLE_LABELS: Record<string, string> = {
   super_admin: 'Super Admin',
   manager:     'Manager',
   agent:       'Agent',
+  user:        'Website User',
 }
 
 const ROLE_COLORS: Record<string, string> = {
   super_admin: 'bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300',
   manager:     'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300',
   agent:       'bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300',
+  user:        'bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400',
 }
 
 function fmt(d: string) {
@@ -57,6 +59,7 @@ function EditModal({ user, regions, onSave, onClose }: EditModalProps) {
   const [saving,   setSaving]   = useState(false)
 
   const ROLE_SELECT_OPTIONS = [
+    ...(user.role === 'user' ? [{ value: 'user', label: 'Website User', icon: <IconUser size={14} /> }] : []),
     { value: 'agent',       label: 'Agent',      icon: <IconUser size={14} /> },
     { value: 'manager',     label: 'Manager',    icon: <IconUser size={14} /> },
     { value: 'super_admin', label: 'Super Admin', icon: <IconShield size={14} /> },
@@ -128,6 +131,7 @@ export default function UsersPage() {
   const { user: me } = useAuth()
   const [users,       setUsers]       = useState<AdminUser[]>([])
   const [loading,     setLoading]     = useState(true)
+  const [tab,         setTab]         = useState<'system' | 'website'>('system')
   const [search,      setSearch]      = useState('')
   const [roleFilter,  setRoleFilter]  = useState('')
   const [statusFilter,setStatusFilter]= useState('')
@@ -144,12 +148,17 @@ export default function UsersPage() {
   const load = useCallback(() => {
     setLoading(true)
     const params: Record<string, string> = {}
-    if (search)     params.search = search
-    if (roleFilter) params.role   = roleFilter
+    if (search) params.search = search
+    if (tab === 'website') {
+      params.role = 'user'                    // self-registered via the website
+    } else {
+      params.exclude_role = 'user'            // staff: super_admin / manager / agent
+      if (roleFilter) params.role = roleFilter
+    }
     getUsers(params)
       .then(res => setUsers(res.data ?? []))
       .finally(() => setLoading(false))
-  }, [search, roleFilter])
+  }, [search, roleFilter, tab])
 
   useEffect(load, [load])
 
@@ -195,11 +204,35 @@ export default function UsersPage() {
     <div className="space-y-4">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <span className="text-sm text-slate-500 dark:text-slate-400">{filtered.length} user{filtered.length !== 1 ? 's' : ''}</span>
+        <span className="text-sm text-slate-500 dark:text-slate-400">
+          {filtered.length} {tab === 'website' ? 'website user' : 'system user'}{filtered.length !== 1 ? 's' : ''}
+        </span>
         <Link href="/users/new"
           className="px-4 py-2 rounded-lg bg-[#C9A84C] hover:bg-[#D4B668] text-slate-900 font-semibold text-sm">
           + New User
         </Link>
+      </div>
+
+      {/* System / Website tabs */}
+      <div className="flex gap-1 border-b border-slate-200 dark:border-slate-700">
+        {([
+          { key: 'system',  label: 'System Users' },
+          { key: 'website', label: 'Website Users' },
+        ] as const).map(t => (
+          <button
+            key={t.key}
+            type="button"
+            onClick={() => { setTab(t.key); setRoleFilter(''); setStatusFilter('') }}
+            className={[
+              'px-4 py-2.5 text-sm font-medium whitespace-nowrap transition-colors border-b-2 -mb-px',
+              tab === t.key
+                ? 'border-[#C9A84C] text-[#C9A84C]'
+                : 'border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200',
+            ].join(' ')}
+          >
+            {t.label}
+          </button>
+        ))}
       </div>
 
       {/* Filters */}
@@ -214,9 +247,11 @@ export default function UsersPage() {
             className="pl-8 pr-3.5 py-2 rounded-lg border border-slate-200 dark:border-slate-600 text-sm w-64 focus:outline-none focus:border-[#C9A84C] bg-white dark:bg-slate-800 dark:text-slate-100 placeholder-slate-400"
           />
         </div>
-        <div className="w-44">
-          <CustomSelect value={roleFilter} onChange={setRoleFilter} options={ROLE_OPTIONS} placeholder="All roles" />
-        </div>
+        {tab === 'system' && (
+          <div className="w-44">
+            <CustomSelect value={roleFilter} onChange={setRoleFilter} options={ROLE_OPTIONS} placeholder="All roles" />
+          </div>
+        )}
         <div className="w-44">
           <CustomSelect value={statusFilter} onChange={setStatusFilter} options={STATUS_OPTIONS} placeholder="All statuses" />
         </div>

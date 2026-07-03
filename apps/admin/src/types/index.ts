@@ -1,4 +1,4 @@
-export type UserRole = 'super_admin' | 'manager' | 'agent'
+export type UserRole = 'super_admin' | 'manager' | 'agent' | 'user'
 
 export interface AuthUser {
   id: number

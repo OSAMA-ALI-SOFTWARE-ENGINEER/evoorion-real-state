@@ -424,7 +424,7 @@ export async function restoreAgent(id: number) {
 
 // ── Users ─────────────────────────────────────────────────────────────────────
 
-export async function getUsers(params?: { search?: string; role?: string }) {
+export async function getUsers(params?: { search?: string; role?: string; exclude_role?: string }) {
   return request<PaginatedResponse<AdminUser>>(`/admin/users${qs(params)}`)
 }
 
