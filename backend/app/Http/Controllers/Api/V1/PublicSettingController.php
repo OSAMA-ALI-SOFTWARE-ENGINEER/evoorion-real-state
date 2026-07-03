@@ -65,7 +65,7 @@ class PublicSettingController
     ];
 
     // Region copy fields: region_{code}_{field} — codes are dynamic (regions table)
-    private const REGION_KEY_PATTERN = '/^region_[a-z0-9_\-]+_(hero_title|hero_subtitle|investment_description|cta_label)$/';
+    private const REGION_KEY_PATTERN = '/^region_[a-z0-9_\-]+_(hero_title|hero_subtitle|investment_description|cta_label|whatsapp|contact_email)$/';
 
     public function index(): JsonResponse
     {

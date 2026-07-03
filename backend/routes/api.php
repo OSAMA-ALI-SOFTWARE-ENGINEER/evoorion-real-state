@@ -109,6 +109,9 @@ Route::prefix('v1')->group(function () {
     // Public lead submission (stricter rate limit)
     Route::middleware('throttle:10,1')->post('leads', [LeadController::class, 'store']);
 
+    // Contact-button click tracking (WhatsApp / email CTAs on property pages)
+    Route::middleware('throttle:30,1')->post('properties/{property}/contact-clicks', [\App\Http\Controllers\Api\V1\ContactClickController::class, 'store']);
+
     // Favorites & user preferences (any authenticated user)
     Route::middleware('auth:sanctum')->group(function () {
         Route::get('favorites', [FavoritesController::class, 'index']);
@@ -149,6 +152,7 @@ Route::prefix('v1')->group(function () {
             Route::get('reports/property-performance', [ReportController::class, 'propertyPerformance']);
             Route::get('reports/agent-leaderboard', [ReportController::class, 'agentLeaderboard']);
             Route::get('reports/leads-by-source', [ReportController::class, 'leadsBySource']);
+            Route::get('reports/contact-clicks', [ReportController::class, 'contactClicks']);
 
             // Property-Agent listing & amenities listing (all admin roles can view)
             Route::get('properties/{property}/agents', [PropertyAgentController::class, 'index']);

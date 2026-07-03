@@ -243,6 +243,17 @@ export interface PublicSettings {
   [key: string]:                      string | null | undefined
 }
 
+/** Fire-and-forget click tracking for property contact CTAs (WhatsApp / email). */
+export function trackContactClick(propertySlug: string, channel: 'whatsapp' | 'email'): void {
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000/api/v1'
+  fetch(`${apiUrl}/properties/${propertySlug}/contact-clicks`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+    body: JSON.stringify({ channel }),
+    keepalive: true,
+  }).catch(() => { /* analytics only — never block the user */ })
+}
+
 export async function getPublicSettings(): Promise<PublicSettings> {
   const apiUrl = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000/api/v1'
   try {

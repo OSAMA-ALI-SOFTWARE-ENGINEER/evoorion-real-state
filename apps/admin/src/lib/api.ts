@@ -564,6 +564,31 @@ export async function getLeadsBySource(region?: string) {
   return request<ApiResponse<{ source: string; total: number }[]>>(`/admin/reports/leads-by-source${qs({ region })}`)
 }
 
+export interface ContactClicksReport {
+  whatsapp_total: number
+  email_total: number
+  top_properties: { property_id: number; title: string; slug: string | null; whatsapp_clicks: number; email_clicks: number; total: number }[]
+  by_agent: { agent_id: number; name: string; whatsapp_clicks: number; email_clicks: number; total: number }[]
+}
+
+export async function getContactClicksReport(region?: string) {
+  return request<ApiResponse<ContactClicksReport>>(`/admin/reports/contact-clicks${qs({ region })}`)
+}
+
+// ── Property agent assignment ─────────────────────────────────────────────────
+
+export async function getPropertyAgents(slug: string) {
+  return request<ApiResponse<Agent[]>>(`/admin/properties/${slug}/agents`)
+}
+
+export async function assignPropertyAgent(slug: string, agentId: number) {
+  return request<ApiResponse<Agent[]>>(`/admin/properties/${slug}/agents/${agentId}`, { method: 'POST' })
+}
+
+export async function unassignPropertyAgent(slug: string, agentId: number) {
+  return request<ApiResponse<null>>(`/admin/properties/${slug}/agents/${agentId}`, { method: 'DELETE' })
+}
+
 // ── Create user ───────────────────────────────────────────────────────────────
 
 export async function createUser(data: {

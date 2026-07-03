@@ -6,9 +6,10 @@ import Image from 'next/image'
 import {
   getAreas, getDevelopers, getOperationTypes, createProperty, updateProperty,
   uploadPropertyImage, updatePropertyImage, deletePropertyImage, getRegions,
+  getAgents, getPropertyAgents, assignPropertyAgent, unassignPropertyAgent,
   type Region,
 } from '@/lib/api'
-import type { Area, Developer, OperationType, Property, PropertyImage } from '@/types'
+import type { Agent, Area, Developer, OperationType, Property, PropertyImage } from '@/types'
 import { RichTextEditor } from '@/components/ui/RichTextEditor'
 import { CustomSelect } from '@/components/ui/CustomSelect'
 
@@ -384,6 +385,9 @@ export function PropertyForm({ property }: PropertyFormProps) {
   const [devs,    setDevs]    = useState<Developer[]>([])
   const [opTypes, setOpTypes] = useState<OperationType[]>([])
   const [regions, setRegions] = useState<Region[]>([])
+  const [brokers, setBrokers] = useState<Agent[]>([])
+  const [agentId, setAgentId] = useState('')          // selected broker (one per property)
+  const [initialAgentId, setInitialAgentId] = useState('')
   const [error,   setError]   = useState('')
   const [saving,  setSaving]  = useState(false)
 
@@ -393,13 +397,24 @@ export function PropertyForm({ property }: PropertyFormProps) {
       getDevelopers(),
       getOperationTypes(),
       getRegions(),
-    ]).then(([a, d, o, r]) => {
+      getAgents(),
+    ]).then(([a, d, o, r, ag]) => {
       setAreas(a.data ?? [])
       setDevs(d.data ?? [])
       setOpTypes(o.data ?? [])
       setRegions(r.data ?? [])
+      setBrokers((ag.data as Agent[]) ?? [])
     }).catch(() => { /* non-critical */ })
-  }, [])
+
+    if (isEdit) {
+      getPropertyAgents(property!.slug)
+        .then(res => {
+          const current = res.data?.[0]
+          if (current) { setAgentId(String(current.id)); setInitialAgentId(String(current.id)) }
+        })
+        .catch(() => { /* non-critical */ })
+    }
+  }, [isEdit, property])
 
   function set(key: keyof FormState, value: unknown) {
     setForm(prev => ({ ...prev, [key]: value }))
@@ -410,10 +425,17 @@ export function PropertyForm({ property }: PropertyFormProps) {
     setError('')
     setSaving(true)
     try {
+      let slug = property?.slug
       if (isEdit) {
         await updateProperty(property!.slug, toPayload(form) as Partial<Property>)
       } else {
-        await createProperty(toPayload(form) as Partial<Property>)
+        const created = await createProperty(toPayload(form) as Partial<Property>)
+        slug = created.data?.slug
+      }
+      // Sync single-broker assignment (one broker per property)
+      if (slug && agentId !== initialAgentId) {
+        if (initialAgentId) await unassignPropertyAgent(slug, Number(initialAgentId)).catch(() => {})
+        if (agentId)        await assignPropertyAgent(slug, Number(agentId))
       }
       router.push('/properties')
     } catch (err) {
@@ -639,6 +661,25 @@ export function PropertyForm({ property }: PropertyFormProps) {
                 ]}
                 placeholder="Select region…"
               />
+            </Field>
+
+            <Field label="Assigned Broker">
+              <CustomSelect
+                value={agentId}
+                onChange={v => setAgentId(v)}
+                options={[
+                  { value: '', label: 'No broker' },
+                  ...brokers.map(b => ({
+                    value: String(b.id),
+                    label: `${b.user?.name ?? `Agent #${b.id}`}${b.agency?.name ? ` — ${b.agency.name}` : ''}`,
+                  })),
+                ]}
+                placeholder="Select broker…"
+                searchable={brokers.length > 5}
+              />
+              <p className="text-[11px] text-slate-400 mt-1.5">
+                Website WhatsApp &amp; email buttons on this property will contact this broker directly.
+              </p>
             </Field>
           </div>
 

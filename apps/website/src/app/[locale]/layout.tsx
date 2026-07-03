@@ -9,6 +9,7 @@ import { AuthProvider } from '@/context/AuthContext'
 import { CountryProvider } from '@/context/CountryContext'
 import { HtmlLocale } from '@/components/ui/HtmlLocale'
 import { routing } from '@/i18n/routing'
+import { getPublicSettings } from '@/lib/api'
 
 export default async function LocaleLayout({
   children,
@@ -24,6 +25,7 @@ export default async function LocaleLayout({
   }
 
   const messages = await getMessages()
+  const settings = await getPublicSettings()
 
   return (
     <NextIntlClientProvider messages={messages}>
@@ -34,7 +36,7 @@ export default async function LocaleLayout({
           <Navbar />
           <main className="flex-1">{children}</main>
           <Footer />
-          <WhatsAppButton />
+          <WhatsAppButton number={settings.contact_whatsapp} />
         </AuthProvider>
       </CountryProvider>
     </NextIntlClientProvider>

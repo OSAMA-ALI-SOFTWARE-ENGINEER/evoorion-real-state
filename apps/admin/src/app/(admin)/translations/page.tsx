@@ -426,6 +426,8 @@ export default function TranslationsPage() {
               { key: `region_${region.code}_hero_subtitle`,          label: 'Hero Subtitle' },
               { key: `region_${region.code}_investment_description`, label: 'Investment Description', multiline: true },
               { key: `region_${region.code}_cta_label`,             label: 'CTA Button Label' },
+              { key: `region_${region.code}_whatsapp`,              label: 'WhatsApp Number (fallback for properties without a broker)' },
+              { key: `region_${region.code}_contact_email`,         label: 'Contact Email (fallback for properties without a broker)' },
             ]
             return (
               <div key={region.code} className="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden">

@@ -56,11 +56,30 @@ export interface PropertySummary {
   created_at: string
 }
 
+export interface PropertyAgent {
+  id: number
+  name: string
+  email: string
+  phone?: string | null
+  whatsapp?: string | null
+  avatar_url?: string | null
+  agency?: { id: number; name: string } | null
+}
+
+export interface PropertyRegion {
+  id: number
+  code: string
+  name: string
+  flag?: string | null
+}
+
 export interface Property extends PropertySummary {
   description: string
   developer?: PropertyDeveloper
   operation_type?: PropertyOperationType
   amenities: PropertyAmenity[]
+  agent?: PropertyAgent | null
+  region?: PropertyRegion | null
   meta_title?: string
   meta_description?: string
   updated_at: string

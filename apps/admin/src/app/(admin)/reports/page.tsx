@@ -5,6 +5,7 @@ import Link from 'next/link'
 import {
   getLeadFunnel, getLeadsOverTime, getPropertyPerformance,
   getAgentLeaderboard, getLeadsBySource, getRegions,
+  getContactClicksReport, type ContactClicksReport,
 } from '@/lib/api'
 import type { Region } from '@/types'
 import { CustomSelect } from '@/components/ui/CustomSelect'
@@ -101,7 +102,7 @@ function DonutChart({ data }: { data: { source: string; total: number }[] }) {
   )
 }
 
-type Tab = 'funnel' | 'over-time' | 'properties' | 'leaderboard' | 'sources'
+type Tab = 'funnel' | 'over-time' | 'properties' | 'leaderboard' | 'sources' | 'clicks'
 
 const TABS: { key: Tab; label: string }[] = [
   { key: 'funnel',      label: 'Lead Funnel' },
@@ -109,6 +110,7 @@ const TABS: { key: Tab; label: string }[] = [
   { key: 'properties',  label: 'Property Performance' },
   { key: 'leaderboard', label: 'Agent Leaderboard' },
   { key: 'sources',     label: 'Leads by Source' },
+  { key: 'clicks',      label: 'Contact Clicks' },
 ]
 
 const card = 'bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700'
@@ -134,6 +136,8 @@ export default function ReportsPage() {
   const [boardL,    setBoardL]    = useState(true)
   const [sources,   setSources]   = useState<{ source: string; total: number }[]>([])
   const [sourcesL,  setSourcesL]  = useState(true)
+  const [clicks,    setClicks]    = useState<ContactClicksReport | null>(null)
+  const [clicksL,   setClicksL]   = useState(true)
 
   // Load regions once on mount
   useEffect(() => {
@@ -163,6 +167,11 @@ export default function ReportsPage() {
   useEffect(() => {
     setSourcesL(true)
     getLeadsBySource(regionCode || undefined).then(res => setSources(res.data)).finally(() => setSourcesL(false))
+  }, [regionCode])
+
+  useEffect(() => {
+    setClicksL(true)
+    getContactClicksReport(regionCode || undefined).then(res => setClicks(res.data)).finally(() => setClicksL(false))
   }, [regionCode])
 
   const regionOptions = [
@@ -368,6 +377,98 @@ export default function ReportsPage() {
             <p className="text-slate-400 text-sm">No data.</p>
           ) : (
             <DonutChart data={sources} />
+          )}
+        </div>
+      )}
+
+      {/* ── Contact Clicks ── */}
+      {tab === 'clicks' && (
+        <div className="space-y-5">
+          {clicksL ? (
+            <div className={`${card} p-6`}>{spinner}</div>
+          ) : !clicks ? (
+            <div className={`${card} p-6`}><p className="text-slate-400 text-sm">No data.</p></div>
+          ) : (
+            <>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className={`${card} p-5`}>
+                  <p className="text-sm text-slate-500 dark:text-slate-400 mb-1">WhatsApp Clicks</p>
+                  <p className="text-2xl font-bold text-slate-800 dark:text-slate-100">{clicks.whatsapp_total.toLocaleString()}</p>
+                </div>
+                <div className={`${card} p-5`}>
+                  <p className="text-sm text-slate-500 dark:text-slate-400 mb-1">Email Clicks</p>
+                  <p className="text-2xl font-bold text-slate-800 dark:text-slate-100">{clicks.email_total.toLocaleString()}</p>
+                </div>
+              </div>
+
+              <div className={`${card} overflow-hidden`}>
+                <div className="px-6 py-4 border-b border-slate-100 dark:border-slate-700">
+                  <h2 className="text-base font-semibold text-slate-800 dark:text-slate-100">Top Properties by Contact Clicks</h2>
+                </div>
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm">
+                    <thead>
+                      <tr className="bg-slate-50 dark:bg-slate-700/50 border-b border-slate-100 dark:border-slate-700">
+                        <th className="px-5 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Property</th>
+                        <th className="px-4 py-3 text-right text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">WhatsApp</th>
+                        <th className="px-4 py-3 text-right text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Email</th>
+                        <th className="px-5 py-3 text-right text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Total</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-100 dark:divide-slate-700">
+                      {clicks.top_properties.length === 0 ? (
+                        <tr><td colSpan={4} className="px-5 py-8 text-center text-slate-400">No clicks recorded yet.</td></tr>
+                      ) : clicks.top_properties.map(p => (
+                        <tr key={p.property_id} className="hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors">
+                          <td className="px-5 py-3.5">
+                            {p.slug ? (
+                              <Link href={`/properties/${p.slug}`} className="font-medium text-slate-800 dark:text-slate-100 hover:text-[#C9A84C] transition-colors line-clamp-1">
+                                {p.title}
+                              </Link>
+                            ) : (
+                              <span className="font-medium text-slate-800 dark:text-slate-100">{p.title}</span>
+                            )}
+                          </td>
+                          <td className="px-4 py-3.5 text-right text-slate-600 dark:text-slate-300">{p.whatsapp_clicks}</td>
+                          <td className="px-4 py-3.5 text-right text-slate-600 dark:text-slate-300">{p.email_clicks}</td>
+                          <td className="px-5 py-3.5 text-right font-medium text-slate-800 dark:text-slate-100">{p.total}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              <div className={`${card} overflow-hidden`}>
+                <div className="px-6 py-4 border-b border-slate-100 dark:border-slate-700">
+                  <h2 className="text-base font-semibold text-slate-800 dark:text-slate-100">Clicks by Broker</h2>
+                </div>
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm">
+                    <thead>
+                      <tr className="bg-slate-50 dark:bg-slate-700/50 border-b border-slate-100 dark:border-slate-700">
+                        <th className="px-5 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Broker</th>
+                        <th className="px-4 py-3 text-right text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">WhatsApp</th>
+                        <th className="px-4 py-3 text-right text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Email</th>
+                        <th className="px-5 py-3 text-right text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Total</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-100 dark:divide-slate-700">
+                      {clicks.by_agent.length === 0 ? (
+                        <tr><td colSpan={4} className="px-5 py-8 text-center text-slate-400">No broker-attributed clicks yet.</td></tr>
+                      ) : clicks.by_agent.map(a => (
+                        <tr key={a.agent_id} className="hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors">
+                          <td className="px-5 py-3.5 font-medium text-slate-800 dark:text-slate-100">{a.name}</td>
+                          <td className="px-4 py-3.5 text-right text-slate-600 dark:text-slate-300">{a.whatsapp_clicks}</td>
+                          <td className="px-4 py-3.5 text-right text-slate-600 dark:text-slate-300">{a.email_clicks}</td>
+                          <td className="px-5 py-3.5 text-right font-medium text-slate-800 dark:text-slate-100">{a.total}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </>
           )}
         </div>
       )}

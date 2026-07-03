@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\V1\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Agent;
+use App\Models\ContactClick;
 use App\Models\Lead;
 use App\Models\Property;
 use Illuminate\Http\JsonResponse;
@@ -178,6 +179,70 @@ class ReportController extends Controller
             ->values();
 
         return response()->json(['success' => true, 'data' => $agents]);
+    }
+
+    public function contactClicks(Request $request): JsonResponse
+    {
+        $query = ContactClick::query()
+            ->when($request->date_from, fn ($q) => $q->whereDate('contact_clicks.created_at', '>=', $request->date_from))
+            ->when($request->date_to, fn ($q) => $q->whereDate('contact_clicks.created_at', '<=', $request->date_to))
+            ->when($request->region, fn ($q) => $q->whereHas('property.region', fn ($r) => $r->where('code', $request->region)));
+
+        $byChannel = (clone $query)
+            ->select('channel', DB::raw('count(*) as total'))
+            ->groupBy('channel')
+            ->pluck('total', 'channel');
+
+        $topProperties = (clone $query)
+            ->select(
+                'property_id',
+                DB::raw("sum(case when channel = 'whatsapp' then 1 else 0 end) as whatsapp_clicks"),
+                DB::raw("sum(case when channel = 'email' then 1 else 0 end) as email_clicks"),
+                DB::raw('count(*) as total')
+            )
+            ->with('property:id,title,slug')
+            ->groupBy('property_id')
+            ->orderByDesc('total')
+            ->limit(10)
+            ->get()
+            ->map(fn ($row) => [
+                'property_id'     => $row->property_id,
+                'title'           => $row->property?->title ?? "Property #{$row->property_id}",
+                'slug'            => $row->property?->slug,
+                'whatsapp_clicks' => (int) $row->whatsapp_clicks,
+                'email_clicks'    => (int) $row->email_clicks,
+                'total'           => (int) $row->total,
+            ]);
+
+        $byAgent = (clone $query)
+            ->whereNotNull('agent_id')
+            ->select(
+                'agent_id',
+                DB::raw("sum(case when channel = 'whatsapp' then 1 else 0 end) as whatsapp_clicks"),
+                DB::raw("sum(case when channel = 'email' then 1 else 0 end) as email_clicks"),
+                DB::raw('count(*) as total')
+            )
+            ->with('agent.user:id,name')
+            ->groupBy('agent_id')
+            ->orderByDesc('total')
+            ->get()
+            ->map(fn ($row) => [
+                'agent_id'        => $row->agent_id,
+                'name'            => $row->agent?->user?->name ?? "Agent #{$row->agent_id}",
+                'whatsapp_clicks' => (int) $row->whatsapp_clicks,
+                'email_clicks'    => (int) $row->email_clicks,
+                'total'           => (int) $row->total,
+            ]);
+
+        return response()->json([
+            'success' => true,
+            'data'    => [
+                'whatsapp_total' => (int) ($byChannel['whatsapp'] ?? 0),
+                'email_total'    => (int) ($byChannel['email'] ?? 0),
+                'top_properties' => $topProperties,
+                'by_agent'       => $byAgent,
+            ],
+        ]);
     }
 
     public function leadsBySource(Request $request): JsonResponse

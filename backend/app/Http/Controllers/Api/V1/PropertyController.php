@@ -132,8 +132,26 @@ class PropertyController
             abort(404);
         }
         $this->propertyService->incrementViews($property->id);
-        $property->load('images', 'amenities', 'area', 'developer', 'operationType');
+        $property->load('images', 'amenities', 'area', 'developer', 'operationType', 'region');
 
-        return $this->success($property);
+        // Expose only safe fields of the assigned broker (most recent assignment)
+        $assigned = $property->agents()
+            ->with(['user', 'agency'])
+            ->whereHas('user', fn ($q) => $q->where('is_active', true))
+            ->orderByPivot('assigned_at', 'desc')
+            ->first();
+
+        $payload = $property->toArray();
+        $payload['agent'] = $assigned ? [
+            'id'         => $assigned->id,
+            'name'       => $assigned->user->name,
+            'email'      => $assigned->user->email,
+            'phone'      => $assigned->phone,
+            'whatsapp'   => $assigned->whatsapp,
+            'avatar_url' => $assigned->user->avatar_url ?? null,
+            'agency'     => $assigned->agency ? ['id' => $assigned->agency->id, 'name' => $assigned->agency->name] : null,
+        ] : null;
+
+        return $this->success($payload);
     }
 }

@@ -6,8 +6,9 @@ import { MessageCircle } from 'lucide-react'
 const WA_NUMBER = '971000000000'
 const WA_MESSAGE = 'Hello, I\'m interested in learning more about Dubai real estate investment opportunities with EVOORION.'
 
-export function WhatsAppButton() {
-  const href = `https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(WA_MESSAGE)}`
+export function WhatsAppButton({ number }: { number?: string | null }) {
+  const wa = (number || WA_NUMBER).replace(/[^\d]/g, '')
+  const href = `https://wa.me/${wa}?text=${encodeURIComponent(WA_MESSAGE)}`
 
   return (
     <motion.a

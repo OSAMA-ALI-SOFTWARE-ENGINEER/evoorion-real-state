@@ -7,11 +7,12 @@ import { motion, AnimatePresence } from 'framer-motion'
 import {
   MapPin, BedDouble, Bath, Maximize2, TrendingUp,
   MessageCircle, ArrowLeft, X, ChevronLeft, ChevronRight,
-  Play, FileText, Download, Images,
+  Play, FileText, Download, Images, Mail,
 } from 'lucide-react'
 import { LeadForm } from '@/components/ui/LeadForm'
 import { ScrollReveal } from '@/components/ui/ScrollReveal'
 import { useCountry } from '@/context/CountryContext'
+import { trackContactClick } from '@/lib/api'
 import type { Property, PropertyImage } from '@/types'
 
 function PropertyLocationMap({ location, apiKey }: { location: string; apiKey: string }) {
@@ -310,12 +311,13 @@ function useSafeHtml(html: string | undefined) {
 
 export function PropertyDetailClient({ property }: Props) {
   const { formatPrice } = useCountry()
-  const [mapsKey, setMapsKey] = useState('')
+  const [settings, setSettings] = useState<Record<string, string | null | undefined>>({})
+  const mapsKey = settings.google_maps_key ?? ''
   const allMedia   = property.images ?? []
 
   useEffect(() => {
     const api = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000/api/v1'
-    fetch(`${api}/settings`).then(r => r.json()).then(j => setMapsKey(j?.data?.google_maps_key ?? '')).catch(() => {})
+    fetch(`${api}/settings`).then(r => r.json()).then(j => setSettings(j?.data ?? {})).catch(() => {})
   }, [])
   const imageMedia = allMedia.filter((m) => !m.type || m.type === 'image')
   const videoMedia = allMedia.filter((m) => m.type === 'video')
@@ -324,9 +326,28 @@ export function PropertyDetailClient({ property }: Props) {
   const [lightboxIdx, setLightboxIdx] = useState<number | null>(null)
   const descRef = useSafeHtml(property.description)
 
-  const wa = `https://wa.me/971000000000?text=${encodeURIComponent(
+  // Contact routing: assigned broker first, then region default, then company default
+  const broker     = property.agent
+  const regionCode = property.region?.code
+  const waNumber   = String(
+    broker?.whatsapp
+    || (regionCode ? settings[`region_${regionCode}_whatsapp`] : null)
+    || settings.contact_whatsapp
+    || '971000000000',
+  ).replace(/[^\d]/g, '')
+  const wa = `https://wa.me/${waNumber}?text=${encodeURIComponent(
     `Hi, I'm interested in: ${property.title}`,
   )}`
+
+  const emailAddr = String(
+    broker?.email
+    || (regionCode ? settings[`region_${regionCode}_contact_email`] : null)
+    || settings.contact_email
+    || '',
+  )
+  const emailHref = emailAddr
+    ? `mailto:${emailAddr}?subject=${encodeURIComponent(`Enquiry: ${property.title}`)}&body=${encodeURIComponent(`Hi, I'm interested in: ${property.title}`)}`
+    : ''
 
   return (
     <>
@@ -517,17 +538,54 @@ export function PropertyDetailClient({ property }: Props) {
                 </ScrollReveal>
               )}
 
-              {/* WhatsApp CTA */}
+              {/* Broker contact CTA */}
               <ScrollReveal>
-                <a
-                  href={wa}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-3 px-6 py-3.5 bg-[#25D366] text-white font-semibold text-sm tracking-wide rounded-sm hover:bg-[#20bf5b] transition-colors"
-                >
-                  <MessageCircle size={18} className="fill-white" />
-                  Enquire on WhatsApp
-                </a>
+                <div className="p-5 border border-gold-border rounded-sm bg-brand-section/50">
+                  {broker && (
+                    <div className="flex items-center gap-4 mb-5">
+                      {broker.avatar_url ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img
+                          src={broker.avatar_url}
+                          alt={broker.name}
+                          className="w-12 h-12 rounded-full object-cover border border-gold-border"
+                        />
+                      ) : (
+                        <div className="w-12 h-12 rounded-full bg-gold/10 flex items-center justify-center text-gold font-semibold text-lg">
+                          {broker.name.charAt(0)}
+                        </div>
+                      )}
+                      <div>
+                        <p className="text-white font-medium">{broker.name}</p>
+                        <p className="text-muted text-xs">
+                          {broker.agency?.name ? `${broker.agency.name} · ` : ''}Property Consultant
+                        </p>
+                      </div>
+                    </div>
+                  )}
+                  <div className="flex flex-wrap gap-3">
+                    <a
+                      href={wa}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={() => trackContactClick(property.slug, 'whatsapp')}
+                      className="inline-flex items-center gap-3 px-6 py-3.5 bg-[#25D366] text-white font-semibold text-sm tracking-wide rounded-sm hover:bg-[#20bf5b] transition-colors"
+                    >
+                      <MessageCircle size={18} className="fill-white" />
+                      Enquire on WhatsApp
+                    </a>
+                    {emailHref && (
+                      <a
+                        href={emailHref}
+                        onClick={() => trackContactClick(property.slug, 'email')}
+                        className="inline-flex items-center gap-3 px-6 py-3.5 border border-gold-border text-gold font-semibold text-sm tracking-wide rounded-sm hover:bg-gold/10 transition-colors"
+                      >
+                        <Mail size={18} />
+                        Email {broker ? broker.name.split(' ')[0] : 'Us'}
+                      </a>
+                    )}
+                  </div>
+                </div>
               </ScrollReveal>
             </div>
 
