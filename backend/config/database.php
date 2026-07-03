@@ -62,6 +62,12 @@ return [
             'options' => extension_loaded('pdo_mysql') ? array_filter([
                 (PHP_VERSION_ID >= 80500 ? Mysql::ATTR_SSL_CA : PDO::MYSQL_ATTR_SSL_CA) => env('MYSQL_ATTR_SSL_CA'),
             ]) : [],
+
+            // Local dev (Windows/Laragon) does not have mysqldump on PATH; point
+            // spatie/laravel-backup's db-dumper at the bundled MySQL client tools.
+            'dump' => [
+                'dump_binary_path' => 'D:\\laragon\\bin\\mysql\\mysql-8.0.30-winx64\\bin',
+            ],
         ],
 
         'mariadb' => [
