@@ -8,6 +8,7 @@ import {
 } from '@/lib/api'
 import type { Lead, LeadNote, LeadTask, LeadStatus, AdminUser } from '@/types'
 import { LeadStatusBadge } from '@/components/ui/Badge'
+import { IconWhatsApp, IconMail, IconPhone } from '@/components/ui/icons'
 import { useAuth } from '@/context/AuthContext'
 
 const STATUSES: LeadStatus[] = ['new', 'contacted', 'qualified', 'closed', 'lost']
@@ -362,6 +363,31 @@ export default function LeadDetailPage({ params }: { params: Promise<{ id: strin
                 <p className="text-sm text-slate-500 dark:text-slate-400">{lead.email}</p>
                 {lead.phone    && <p className="text-sm text-slate-500 dark:text-slate-400">{lead.phone}</p>}
                 {lead.whatsapp && <p className="text-sm text-slate-500 dark:text-slate-400">WhatsApp: {lead.whatsapp}</p>}
+                <div className="flex flex-wrap gap-2 mt-3">
+                  {lead.whatsapp && (
+                    <a
+                      href={`https://wa.me/${lead.whatsapp.replace(/[^\d]/g, '')}?text=${encodeURIComponent(`Hi ${lead.name.split(' ')[0]}, this is EVOORION regarding your enquiry.`)}`}
+                      target="_blank" rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 text-xs font-semibold hover:bg-emerald-100 dark:hover:bg-emerald-900/50 transition-colors"
+                    >
+                      <IconWhatsApp size={13} /> WhatsApp
+                    </a>
+                  )}
+                  <a
+                    href={`mailto:${lead.email}?subject=${encodeURIComponent('Your EVOORION enquiry')}`}
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 text-xs font-semibold hover:bg-blue-100 dark:hover:bg-blue-900/50 transition-colors"
+                  >
+                    <IconMail size={13} /> Email
+                  </a>
+                  {lead.phone && (
+                    <a
+                      href={`tel:${lead.phone}`}
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 text-xs font-semibold hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors"
+                    >
+                      <IconPhone size={13} /> Call
+                    </a>
+                  )}
+                </div>
               </div>
               <LeadStatusBadge status={lead.status as LeadStatus} />
             </div>
