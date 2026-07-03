@@ -52,3 +52,5 @@ backend/public/storage
 /*.md
 !/README.md
 /EVOORION_LOGO/*.pdf
+CLAUDE.md
+AGENTS.md
