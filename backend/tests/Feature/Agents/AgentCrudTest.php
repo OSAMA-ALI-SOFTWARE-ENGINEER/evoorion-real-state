@@ -31,6 +31,24 @@ class AgentCrudTest extends TestCase
         $this->assertDatabaseHas('agents', ['agency_id' => $agency->id]);
     }
 
+    public function test_manager_can_create_agent_without_agency_or_phone()
+    {
+        $manager = User::factory()->create(['role' => 'manager']);
+
+        $response = $this->actingAs($manager)->postJson('/api/v1/admin/agents', [
+            'name'                  => 'Solo Agent',
+            'email'                 => 'soloagent@example.com',
+            'password'              => 'password123',
+            'password_confirmation' => 'password123',
+        ]);
+
+        $response->assertStatus(201)
+            ->assertJsonPath('data.user.name', 'Solo Agent')
+            ->assertJsonPath('data.agency_id', null);
+
+        $this->assertDatabaseHas('agents', ['agency_id' => null, 'phone' => null]);
+    }
+
     public function test_agent_email_must_be_unique()
     {
         $manager = User::factory()->create(['role' => 'manager']);
