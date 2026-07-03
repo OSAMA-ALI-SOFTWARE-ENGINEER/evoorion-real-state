@@ -27,6 +27,7 @@ export default async function LocaleLayout({
 
   const messages = await getMessages()
   const settings = await getPublicSettings()
+  const gaId = /^G-[A-Z0-9-]{4,20}$/i.test(settings.google_analytics_id ?? '') ? settings.google_analytics_id : null
 
   return (
     <NextIntlClientProvider messages={messages}>
@@ -38,14 +39,14 @@ export default async function LocaleLayout({
           <main className="flex-1">{children}</main>
           <Footer />
           <WhatsAppButton number={settings.contact_whatsapp} />
-          {settings.google_analytics_id && (
+          {gaId && (
             <>
-              <Script src={`https://www.googletagmanager.com/gtag/js?id=${settings.google_analytics_id}`} strategy="afterInteractive" />
+              <Script src={`https://www.googletagmanager.com/gtag/js?id=${gaId}`} strategy="afterInteractive" />
               <Script id="ga4-init" strategy="afterInteractive">{`
                 window.dataLayer = window.dataLayer || [];
                 function gtag(){dataLayer.push(arguments);}
                 gtag('js', new Date());
-                gtag('config', '${settings.google_analytics_id}');
+                gtag('config', '${gaId}');
               `}</Script>
             </>
           )}
