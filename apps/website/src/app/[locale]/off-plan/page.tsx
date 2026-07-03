@@ -8,9 +8,12 @@ import { OffPlanGrid } from '@/components/ui/OffPlanGrid'
 import { getCmsContent, getPublicSettings } from '@/lib/api'
 import type { PropertySummary, OperationType } from '@/types'
 
-export const metadata: Metadata = {
-  title: 'Off-Plan Properties Dubai | New Developments | EVOORION',
-  description: 'Invest in Dubai\'s most anticipated new developments. Pre-launch pricing, flexible payment plans, and 20–40% capital appreciation during construction.',
+export async function generateMetadata(): Promise<Metadata> {
+  const cms = await getCmsContent('off-plan')
+  return {
+    title:       (cms?.meta_title as string)       ?? 'Off-Plan Properties Dubai | New Developments | EVOORION',
+    description: (cms?.meta_description as string) ?? 'Invest in Dubai\'s most anticipated new developments. Pre-launch pricing, flexible payment plans, and 20–40% capital appreciation during construction.',
+  }
 }
 
 const BENEFITS = [
@@ -79,10 +82,34 @@ async function fetchOffPlanProperties(): Promise<PropertySummary[]> {
 }
 
 export default async function OffPlanPage() {
-  const [properties, settings] = await Promise.all([
+  const [properties, settings, cms] = await Promise.all([
     fetchOffPlanProperties(),
     getPublicSettings().catch(() => ({} as Awaited<ReturnType<typeof getPublicSettings>>)),
+    getCmsContent('off-plan'),
   ])
+
+  const heroEyebrow        = (cms.hero_eyebrow as string)        ?? 'New Developments'
+  const heroHeadlinePrefix = (cms.hero_headline_prefix as string) ?? "Own Dubai's"
+  const heroHeadlineGold   = (cms.hero_headline_gold as string)   ?? 'Future Skyline'
+  const heroHeadlineSuffix = (cms.hero_headline_suffix as string) ?? 'First'
+  const heroSubtext  = (cms.hero_subtext as string)  ?? "Pre-launch access to Dubai's most anticipated new developments. Entry pricing, structured payment plans, and capital appreciation that begins the moment you sign — before a single brick is laid."
+  const heroCtaPrimary   = (cms.hero_cta_primary as string)   ?? 'View Developments'
+  const heroCtaSecondary = (cms.hero_cta_secondary as string) ?? 'Book Private Briefing'
+
+  const benefitsEyebrow  = (cms.benefits_eyebrow as string)  ?? 'Why Off-Plan'
+  const benefitsHeadline = (cms.benefits_headline as string) ?? 'The Off-Plan Advantage'
+
+  const developmentsEyebrow  = (cms.developments_eyebrow as string)  ?? 'Portfolio'
+  const developmentsHeadline = (cms.developments_headline as string) ?? 'Current Developments'
+
+  const processEyebrow  = (cms.process_eyebrow as string)  ?? 'The Process'
+  const processHeadline = (cms.process_headline as string) ?? 'How It Works'
+
+  const ctaEyebrow   = (cms.cta_eyebrow as string)   ?? 'Get Started'
+  const ctaHeadline  = (cms.cta_headline as string)  ?? 'Reserve Your Off-Plan Unit'
+  const ctaBody      = (cms.cta_body as string)      ?? "Speak with a dedicated off-plan advisor. We'll match you with the right development based on your budget, timeline, and investment goals — and guide you from reservation through to handover."
+  const formTitle    = (cms.form_title as string)    ?? 'Book an Off-Plan Briefing'
+  const formSubtitle = (cms.form_subtitle as string) ?? 'An advisor will contact you within 2 hours during office hours.'
 
   return (
     <>
@@ -96,31 +123,29 @@ export default async function OffPlanPage() {
           <div className="max-w-3xl">
             <div className="flex items-center gap-3 mb-6">
               <div className="h-px w-10 bg-gold" />
-              <span className="text-gold text-xs tracking-[0.35em] uppercase">New Developments</span>
+              <span className="text-gold text-xs tracking-[0.35em] uppercase">{heroEyebrow}</span>
             </div>
             <h1 className="font-serif text-5xl sm:text-6xl lg:text-7xl font-bold text-white leading-[1.05] mb-6">
-              Own Dubai&apos;s{' '}
-              <span className="text-gold-gradient">Future Skyline</span>{' '}
-              First
+              {heroHeadlinePrefix}{' '}
+              <span className="text-gold-gradient">{heroHeadlineGold}</span>{' '}
+              {heroHeadlineSuffix}
             </h1>
             <p className="text-muted text-lg max-w-2xl mb-10 leading-relaxed">
-              Pre-launch access to Dubai&apos;s most anticipated new developments.
-              Entry pricing, structured payment plans, and capital appreciation that begins
-              the moment you sign — before a single brick is laid.
+              {heroSubtext}
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
               <Link
                 href="#developments"
                 className="group inline-flex items-center gap-2.5 px-8 py-4 bg-gold text-brand font-semibold text-sm tracking-widest uppercase rounded-sm hover:bg-gold-light transition-colors duration-300"
               >
-                View Developments
+                {heroCtaPrimary}
                 <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
               </Link>
               <Link
                 href="/contact"
                 className="inline-flex items-center gap-2.5 px-8 py-4 border border-gold/50 text-white text-sm tracking-widest uppercase rounded-sm hover:border-gold hover:bg-gold/5 transition-all duration-300"
               >
-                Book Private Briefing
+                {heroCtaSecondary}
               </Link>
             </div>
           </div>
@@ -134,11 +159,11 @@ export default async function OffPlanPage() {
             <div className="text-center mb-14">
               <div className="inline-flex items-center gap-3 mb-4">
                 <div className="h-px w-8 bg-gold" />
-                <span className="text-gold text-xs tracking-[0.3em] uppercase">Why Off-Plan</span>
+                <span className="text-gold text-xs tracking-[0.3em] uppercase">{benefitsEyebrow}</span>
                 <div className="h-px w-8 bg-gold" />
               </div>
               <h2 className="font-serif text-4xl font-bold text-white">
-                The Off-Plan Advantage
+                {benefitsHeadline}
               </h2>
             </div>
           </ScrollReveal>
@@ -170,10 +195,10 @@ export default async function OffPlanPage() {
               <div>
                 <div className="inline-flex items-center gap-3 mb-4">
                   <div className="h-px w-8 bg-gold" />
-                  <span className="text-gold text-xs tracking-[0.3em] uppercase">Portfolio</span>
+                  <span className="text-gold text-xs tracking-[0.3em] uppercase">{developmentsEyebrow}</span>
                 </div>
                 <h2 className="font-serif text-4xl font-bold text-white">
-                  Current Developments
+                  {developmentsHeadline}
                 </h2>
               </div>
               <Link
@@ -196,10 +221,10 @@ export default async function OffPlanPage() {
             <div className="text-center mb-14">
               <div className="inline-flex items-center gap-3 mb-4">
                 <div className="h-px w-8 bg-gold" />
-                <span className="text-gold text-xs tracking-[0.3em] uppercase">The Process</span>
+                <span className="text-gold text-xs tracking-[0.3em] uppercase">{processEyebrow}</span>
                 <div className="h-px w-8 bg-gold" />
               </div>
-              <h2 className="font-serif text-4xl font-bold text-white">How It Works</h2>
+              <h2 className="font-serif text-4xl font-bold text-white">{processHeadline}</h2>
             </div>
           </ScrollReveal>
 
@@ -230,15 +255,13 @@ export default async function OffPlanPage() {
             <ScrollReveal>
               <div className="inline-flex items-center gap-3 mb-5">
                 <div className="h-px w-8 bg-gold" />
-                <span className="text-gold text-xs tracking-[0.3em] uppercase">Get Started</span>
+                <span className="text-gold text-xs tracking-[0.3em] uppercase">{ctaEyebrow}</span>
               </div>
               <h2 className="font-serif text-4xl font-bold text-white mb-5">
-                Reserve Your Off-Plan Unit
+                {ctaHeadline}
               </h2>
               <p className="text-muted leading-relaxed mb-8">
-                Speak with a dedicated off-plan advisor. We&apos;ll match you with the right
-                development based on your budget, timeline, and investment goals — and
-                guide you from reservation through to handover.
+                {ctaBody}
               </p>
               <ul className="space-y-3">
                 {[
@@ -258,8 +281,8 @@ export default async function OffPlanPage() {
             <ScrollReveal delay={0.15}>
               <div className="p-8 border border-gold-border rounded-sm bg-brand/60">
                 <LeadForm
-                  title="Book an Off-Plan Briefing"
-                  subtitle="An advisor will contact you within 2 hours during office hours."
+                  title={formTitle}
+                  subtitle={formSubtitle}
                 />
               </div>
             </ScrollReveal>

@@ -2,10 +2,14 @@ import type { Metadata } from 'next'
 import { Building2, Key, TrendingUp, FileText, ShieldCheck, Globe, Users, BarChart3 } from 'lucide-react'
 import { ScrollReveal } from '@/components/ui/ScrollReveal'
 import { LeadForm } from '@/components/ui/LeadForm'
+import { getCmsContent } from '@/lib/api'
 
-export const metadata: Metadata = {
-  title: 'Our Services | Dubai Real Estate Advisory | EVOORION',
-  description: 'Comprehensive real estate services in Dubai — buy, sell, rent, property management, investment advisory, and legal support.',
+export async function generateMetadata(): Promise<Metadata> {
+  const cms = await getCmsContent('services')
+  return {
+    title:       (cms?.meta_title as string)       ?? 'Our Services | Dubai Real Estate Advisory | EVOORION',
+    description: (cms?.meta_description as string) ?? 'Comprehensive real estate services in Dubai — buy, sell, rent, property management, investment advisory, and legal support.',
+  }
 }
 
 const SERVICES = [
@@ -59,19 +63,30 @@ const SERVICES = [
   },
 ]
 
-export default function ServicesPage() {
+export default async function ServicesPage() {
+  const cms = await getCmsContent('services')
+
+  const heroEyebrow        = (cms.hero_eyebrow as string)        ?? 'What We Offer'
+  const heroHeadlinePrefix = (cms.hero_headline_prefix as string) ?? 'Full-Spectrum'
+  const heroHeadlineGold   = (cms.hero_headline_gold as string)   ?? 'Real Estate Services'
+  const heroSubtext        = (cms.hero_subtext as string)        ?? 'From your first property search to long-term portfolio management, EVOORION provides every service you need to invest with confidence in Dubai.'
+
+  const ctaEyebrow   = (cms.cta_eyebrow as string)   ?? 'Get in Touch'
+  const ctaHeadline  = (cms.cta_headline as string)  ?? 'How Can We Help You?'
+  const ctaBody      = (cms.cta_body as string)      ?? 'Tell us which service you need and a dedicated advisor will be in touch within 24 hours.'
+
   return (
     <main className="min-h-screen bg-brand text-white">
       {/* Hero */}
       <section className="pt-40 pb-24 px-4 bg-gradient-to-b from-brand-section to-brand">
         <div className="max-w-4xl mx-auto text-center">
           <ScrollReveal>
-            <p className="text-gold text-xs tracking-[0.3em] uppercase mb-4">What We Offer</p>
+            <p className="text-gold text-xs tracking-[0.3em] uppercase mb-4">{heroEyebrow}</p>
             <h1 className="font-serif text-5xl md:text-6xl font-light text-white mb-6 leading-tight">
-              Full-Spectrum<br /><span className="text-gold">Real Estate Services</span>
+              {heroHeadlinePrefix}<br /><span className="text-gold">{heroHeadlineGold}</span>
             </h1>
             <p className="text-muted text-lg max-w-2xl mx-auto">
-              From your first property search to long-term portfolio management, EVOORION provides every service you need to invest with confidence in Dubai.
+              {heroSubtext}
             </p>
           </ScrollReveal>
         </div>
@@ -115,12 +130,12 @@ export default function ServicesPage() {
           <div className="max-w-2xl mx-auto">
             <ScrollReveal>
               <div className="text-center mb-10">
-                <p className="text-gold text-xs tracking-[0.3em] uppercase mb-3">Get in Touch</p>
+                <p className="text-gold text-xs tracking-[0.3em] uppercase mb-3">{ctaEyebrow}</p>
                 <h2 className="font-serif text-3xl md:text-4xl font-light text-white mb-3">
-                  How Can We Help You?
+                  {ctaHeadline}
                 </h2>
                 <p className="text-muted">
-                  Tell us which service you need and a dedicated advisor will be in touch within 24 hours.
+                  {ctaBody}
                 </p>
               </div>
             </ScrollReveal>

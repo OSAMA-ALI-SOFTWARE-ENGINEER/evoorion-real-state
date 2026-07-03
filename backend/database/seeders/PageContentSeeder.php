@@ -213,6 +213,123 @@ class PageContentSeeder extends Seeder
                 'meta_description' => 'Explore off-plan investments, ready properties, and private advisory services for Dubai real estate.',
             ],
 
+            // ── OFF-PLAN ──────────────────────────────────────────────────────
+
+            'off-plan' => [
+
+                'hero_eyebrow'         => 'New Developments',
+                'hero_headline_prefix' => "Own Dubai's",
+                'hero_headline_gold'   => 'Future Skyline',
+                'hero_headline_suffix' => 'First',
+                'hero_subtext'         => "Pre-launch access to Dubai's most anticipated new developments. Entry pricing, structured payment plans, and capital appreciation that begins the moment you sign — before a single brick is laid.",
+                'hero_cta_primary'     => 'View Developments',
+                'hero_cta_secondary'   => 'Book Private Briefing',
+
+                'benefits_eyebrow'  => 'Why Off-Plan',
+                'benefits_headline' => 'The Off-Plan Advantage',
+
+                'developments_eyebrow'  => 'Portfolio',
+                'developments_headline' => 'Current Developments',
+
+                'process_eyebrow'  => 'The Process',
+                'process_headline' => 'How It Works',
+
+                'cta_eyebrow'  => 'Get Started',
+                'cta_headline' => 'Reserve Your Off-Plan Unit',
+                'cta_body'     => "Speak with a dedicated off-plan advisor. We'll match you with the right development based on your budget, timeline, and investment goals — and guide you from reservation through to handover.",
+
+                'form_title'    => 'Book an Off-Plan Briefing',
+                'form_subtitle' => 'An advisor will contact you within 2 hours during office hours.',
+
+                'meta_title'       => 'Off-Plan Properties Dubai | New Developments | EVOORION',
+                'meta_description' => "Invest in Dubai's most anticipated new developments. Pre-launch pricing, flexible payment plans, and 20–40% capital appreciation during construction.",
+            ],
+
+            // ── SELL ──────────────────────────────────────────────────────────
+
+            'sell' => [
+
+                'hero_eyebrow'         => 'Sell with Confidence',
+                'hero_headline_prefix' => 'List Your Property',
+                'hero_headline_gold'   => 'With EVOORION',
+                'hero_subtext'         => 'Get a free valuation, professional marketing, and access to our exclusive network of 4,800+ qualified buyers — all with zero upfront fees.',
+                'hero_cta'             => 'Get Free Valuation',
+
+                'process_eyebrow'  => 'The Process',
+                'process_headline' => 'How We Sell Your Property',
+
+                'inclusions_eyebrow'  => 'Full Service',
+                'inclusions_headline' => 'Everything Included',
+
+                'form_eyebrow'  => 'Get Started',
+                'form_headline' => 'Request Your Free Valuation',
+                'form_body'     => 'Leave your details and a senior agent will contact you within 24 hours.',
+
+                'meta_title'       => 'Sell Your Property in Dubai | List With Us | EVOORION',
+                'meta_description' => 'List your Dubai property with EVOORION and reach thousands of qualified buyers. Free valuation, professional photography, and full-service representation.',
+            ],
+
+            // ── AGENTS ────────────────────────────────────────────────────────
+
+            'agents' => [
+
+                'hero_eyebrow'         => 'Our Team',
+                'hero_headline_prefix' => 'Expert Property',
+                'hero_headline_gold'   => 'Advisors',
+                'hero_subtext'         => 'Licensed, market-tested professionals committed to finding your perfect Dubai property investment.',
+
+                'empty_state_text' => 'Our team profiles are coming soon.',
+
+                'cta_eyebrow'  => 'Work With Us',
+                'cta_headline' => 'Speak to an Agent',
+                'cta_body'     => "Tell us what you're looking for and we'll match you with the right advisor.",
+
+                'meta_title'       => 'Our Agents | Expert Dubai Property Advisors | EVOORION',
+                'meta_description' => 'Meet our team of licensed Dubai property advisors. Each agent brings deep market knowledge and a dedicated commitment to finding your perfect investment.',
+            ],
+
+            // ── SERVICES ──────────────────────────────────────────────────────
+
+            'services' => [
+
+                'hero_eyebrow'         => 'What We Offer',
+                'hero_headline_prefix' => 'Full-Spectrum',
+                'hero_headline_gold'   => 'Real Estate Services',
+                'hero_subtext'         => 'From your first property search to long-term portfolio management, EVOORION provides every service you need to invest with confidence in Dubai.',
+
+                'cta_eyebrow'  => 'Get in Touch',
+                'cta_headline' => 'How Can We Help You?',
+                'cta_body'     => 'Tell us which service you need and a dedicated advisor will be in touch within 24 hours.',
+
+                'meta_title'       => 'Our Services | Dubai Real Estate Advisory | EVOORION',
+                'meta_description' => 'Comprehensive real estate services in Dubai — buy, sell, rent, property management, investment advisory, and legal support.',
+            ],
+
+            // ── PROPERTY MANAGEMENT ───────────────────────────────────────────
+
+            'property-management' => [
+
+                'hero_eyebrow'         => 'Passive Income, Perfected',
+                'hero_headline_prefix' => 'Property Management',
+                'hero_headline_gold'   => 'Done Right',
+                'hero_subtext'         => 'We take care of everything — tenants, maintenance, rent, and compliance — so your Dubai investment earns passively while you focus on what matters.',
+                'hero_cta'             => 'Get a Free Quote',
+
+                'features_eyebrow'  => 'What We Handle',
+                'features_headline' => 'Everything, End to End',
+
+                'inclusions_eyebrow'  => 'All-Inclusive',
+                'inclusions_headline' => 'No Hidden Extras',
+                'inclusions_body'     => 'Our flat 5% management fee covers everything listed below — no surprise charges.',
+
+                'form_eyebrow'  => 'Free Quote',
+                'form_headline' => 'Hand Over the Keys',
+                'form_body'     => "Tell us about your property and we'll prepare a tailored management proposal.",
+
+                'meta_title'       => 'Property Management Dubai | Hassle-Free Rental Management | EVOORION',
+                'meta_description' => 'Professional property management in Dubai. Tenant sourcing, rent collection, maintenance coordination, and financial reporting — all handled for you.',
+            ],
+
         ];
     }
 }

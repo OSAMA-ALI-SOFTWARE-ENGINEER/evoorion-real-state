@@ -2,10 +2,14 @@ import type { Metadata } from 'next'
 import { CheckCircle2, TrendingUp, Eye, FileText, Users, Clock } from 'lucide-react'
 import { ScrollReveal } from '@/components/ui/ScrollReveal'
 import { LeadForm } from '@/components/ui/LeadForm'
+import { getCmsContent } from '@/lib/api'
 
-export const metadata: Metadata = {
-  title: 'Sell Your Property in Dubai | List With Us | EVOORION',
-  description: 'List your Dubai property with EVOORION and reach thousands of qualified buyers. Free valuation, professional photography, and full-service representation.',
+export async function generateMetadata(): Promise<Metadata> {
+  const cms = await getCmsContent('sell')
+  return {
+    title:       (cms?.meta_title as string)       ?? 'Sell Your Property in Dubai | List With Us | EVOORION',
+    description: (cms?.meta_description as string) ?? 'List your Dubai property with EVOORION and reach thousands of qualified buyers. Free valuation, professional photography, and full-service representation.',
+  }
 }
 
 const STATS = [
@@ -59,7 +63,25 @@ const INCLUSIONS = [
   'Regular progress updates',
 ]
 
-export default function SellPage() {
+export default async function SellPage() {
+  const cms = await getCmsContent('sell')
+
+  const heroEyebrow        = (cms.hero_eyebrow as string)        ?? 'Sell with Confidence'
+  const heroHeadlinePrefix = (cms.hero_headline_prefix as string) ?? 'List Your Property'
+  const heroHeadlineGold   = (cms.hero_headline_gold as string)   ?? 'With EVOORION'
+  const heroSubtext        = (cms.hero_subtext as string)        ?? 'Get a free valuation, professional marketing, and access to our exclusive network of 4,800+ qualified buyers — all with zero upfront fees.'
+  const heroCta            = (cms.hero_cta as string)            ?? 'Get Free Valuation'
+
+  const processEyebrow  = (cms.process_eyebrow as string)  ?? 'The Process'
+  const processHeadline = (cms.process_headline as string) ?? 'How We Sell Your Property'
+
+  const inclusionsEyebrow  = (cms.inclusions_eyebrow as string)  ?? 'Full Service'
+  const inclusionsHeadline = (cms.inclusions_headline as string) ?? 'Everything Included'
+
+  const formEyebrow  = (cms.form_eyebrow as string)  ?? 'Get Started'
+  const formHeadline = (cms.form_headline as string) ?? 'Request Your Free Valuation'
+  const formBody     = (cms.form_body as string)     ?? 'Leave your details and a senior agent will contact you within 24 hours.'
+
   return (
     <main className="min-h-screen bg-brand text-white">
       {/* Hero */}
@@ -68,19 +90,19 @@ export default function SellPage() {
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(var(--color-gold-rgb,200,160,80),0.08),transparent_60%)]" />
         <div className="relative max-w-4xl mx-auto text-center">
           <ScrollReveal>
-            <p className="text-gold text-xs tracking-[0.3em] uppercase mb-4">Sell with Confidence</p>
+            <p className="text-gold text-xs tracking-[0.3em] uppercase mb-4">{heroEyebrow}</p>
             <h1 className="font-serif text-5xl md:text-6xl font-light text-white mb-6 leading-tight">
-              List Your Property<br />
-              <span className="text-gold">With EVOORION</span>
+              {heroHeadlinePrefix}<br />
+              <span className="text-gold">{heroHeadlineGold}</span>
             </h1>
             <p className="text-muted text-lg max-w-2xl mx-auto mb-10">
-              Get a free valuation, professional marketing, and access to our exclusive network of 4,800+ qualified buyers — all with zero upfront fees.
+              {heroSubtext}
             </p>
             <a
               href="#sell-form"
               className="inline-flex items-center gap-2 px-8 py-4 bg-gold text-brand font-semibold text-sm tracking-widest uppercase rounded-sm hover:bg-gold-light transition-colors"
             >
-              Get Free Valuation
+              {heroCta}
             </a>
           </ScrollReveal>
         </div>
@@ -107,8 +129,8 @@ export default function SellPage() {
         <div className="max-w-5xl mx-auto">
           <ScrollReveal>
             <div className="text-center mb-14">
-              <p className="text-gold text-xs tracking-[0.3em] uppercase mb-3">The Process</p>
-              <h2 className="font-serif text-3xl md:text-4xl font-light text-white">How We Sell Your Property</h2>
+              <p className="text-gold text-xs tracking-[0.3em] uppercase mb-3">{processEyebrow}</p>
+              <h2 className="font-serif text-3xl md:text-4xl font-light text-white">{processHeadline}</h2>
             </div>
           </ScrollReveal>
 
@@ -142,8 +164,8 @@ export default function SellPage() {
           <div className="max-w-4xl mx-auto">
             <ScrollReveal>
               <div className="text-center mb-12">
-                <p className="text-gold text-xs tracking-[0.3em] uppercase mb-3">Full Service</p>
-                <h2 className="font-serif text-3xl md:text-4xl font-light text-white">Everything Included</h2>
+                <p className="text-gold text-xs tracking-[0.3em] uppercase mb-3">{inclusionsEyebrow}</p>
+                <h2 className="font-serif text-3xl md:text-4xl font-light text-white">{inclusionsHeadline}</h2>
               </div>
             </ScrollReveal>
 
@@ -166,12 +188,12 @@ export default function SellPage() {
         <div className="max-w-2xl mx-auto">
           <ScrollReveal>
             <div className="text-center mb-10">
-              <p className="text-gold text-xs tracking-[0.3em] uppercase mb-3">Get Started</p>
+              <p className="text-gold text-xs tracking-[0.3em] uppercase mb-3">{formEyebrow}</p>
               <h2 className="font-serif text-3xl md:text-4xl font-light text-white mb-3">
-                Request Your Free Valuation
+                {formHeadline}
               </h2>
               <p className="text-muted">
-                Leave your details and a senior agent will contact you within 24 hours.
+                {formBody}
               </p>
             </div>
           </ScrollReveal>

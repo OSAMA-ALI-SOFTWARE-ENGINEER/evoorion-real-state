@@ -2,10 +2,14 @@ import type { Metadata } from 'next'
 import { Wrench, BarChart3, Shield, Users, Clock, BadgePercent, CheckCircle2 } from 'lucide-react'
 import { ScrollReveal } from '@/components/ui/ScrollReveal'
 import { LeadForm } from '@/components/ui/LeadForm'
+import { getCmsContent } from '@/lib/api'
 
-export const metadata: Metadata = {
-  title: 'Property Management Dubai | Hassle-Free Rental Management | EVOORION',
-  description: 'Professional property management in Dubai. Tenant sourcing, rent collection, maintenance coordination, and financial reporting — all handled for you.',
+export async function generateMetadata(): Promise<Metadata> {
+  const cms = await getCmsContent('property-management')
+  return {
+    title:       (cms?.meta_title as string)       ?? 'Property Management Dubai | Hassle-Free Rental Management | EVOORION',
+    description: (cms?.meta_description as string) ?? 'Professional property management in Dubai. Tenant sourcing, rent collection, maintenance coordination, and financial reporting — all handled for you.',
+  }
 }
 
 const STATS = [
@@ -61,7 +65,26 @@ const INCLUSIONS = [
   'Owner portal access',
 ]
 
-export default function PropertyManagementPage() {
+export default async function PropertyManagementPage() {
+  const cms = await getCmsContent('property-management')
+
+  const heroEyebrow        = (cms.hero_eyebrow as string)        ?? 'Passive Income, Perfected'
+  const heroHeadlinePrefix = (cms.hero_headline_prefix as string) ?? 'Property Management'
+  const heroHeadlineGold   = (cms.hero_headline_gold as string)   ?? 'Done Right'
+  const heroSubtext        = (cms.hero_subtext as string)        ?? 'We take care of everything — tenants, maintenance, rent, and compliance — so your Dubai investment earns passively while you focus on what matters.'
+  const heroCta            = (cms.hero_cta as string)            ?? 'Get a Free Quote'
+
+  const featuresEyebrow  = (cms.features_eyebrow as string)  ?? 'What We Handle'
+  const featuresHeadline = (cms.features_headline as string) ?? 'Everything, End to End'
+
+  const inclusionsEyebrow  = (cms.inclusions_eyebrow as string)  ?? 'All-Inclusive'
+  const inclusionsHeadline = (cms.inclusions_headline as string) ?? 'No Hidden Extras'
+  const inclusionsBody     = (cms.inclusions_body as string)     ?? 'Our flat 5% management fee covers everything listed below — no surprise charges.'
+
+  const formEyebrow  = (cms.form_eyebrow as string)  ?? 'Free Quote'
+  const formHeadline = (cms.form_headline as string) ?? 'Hand Over the Keys'
+  const formBody     = (cms.form_body as string)     ?? "Tell us about your property and we'll prepare a tailored management proposal."
+
   return (
     <main className="min-h-screen bg-brand text-white">
       {/* Hero */}
@@ -69,18 +92,18 @@ export default function PropertyManagementPage() {
         <div className="absolute inset-0 bg-gradient-to-br from-brand via-brand to-brand-section" />
         <div className="relative max-w-4xl mx-auto text-center">
           <ScrollReveal>
-            <p className="text-gold text-xs tracking-[0.3em] uppercase mb-4">Passive Income, Perfected</p>
+            <p className="text-gold text-xs tracking-[0.3em] uppercase mb-4">{heroEyebrow}</p>
             <h1 className="font-serif text-5xl md:text-6xl font-light text-white mb-6 leading-tight">
-              Property Management<br /><span className="text-gold">Done Right</span>
+              {heroHeadlinePrefix}<br /><span className="text-gold">{heroHeadlineGold}</span>
             </h1>
             <p className="text-muted text-lg max-w-2xl mx-auto mb-10">
-              We take care of everything — tenants, maintenance, rent, and compliance — so your Dubai investment earns passively while you focus on what matters.
+              {heroSubtext}
             </p>
             <a
               href="#management-form"
               className="inline-flex items-center gap-2 px-8 py-4 bg-gold text-brand font-semibold text-sm tracking-widest uppercase rounded-sm hover:bg-gold-light transition-colors"
             >
-              Get a Free Quote
+              {heroCta}
             </a>
           </ScrollReveal>
         </div>
@@ -107,8 +130,8 @@ export default function PropertyManagementPage() {
         <div className="max-w-5xl mx-auto">
           <ScrollReveal>
             <div className="text-center mb-14">
-              <p className="text-gold text-xs tracking-[0.3em] uppercase mb-3">What We Handle</p>
-              <h2 className="font-serif text-3xl md:text-4xl font-light text-white">Everything, End to End</h2>
+              <p className="text-gold text-xs tracking-[0.3em] uppercase mb-3">{featuresEyebrow}</p>
+              <h2 className="font-serif text-3xl md:text-4xl font-light text-white">{featuresHeadline}</h2>
             </div>
           </ScrollReveal>
 
@@ -137,9 +160,9 @@ export default function PropertyManagementPage() {
           <div className="max-w-4xl mx-auto">
             <ScrollReveal>
               <div className="text-center mb-12">
-                <p className="text-gold text-xs tracking-[0.3em] uppercase mb-3">All-Inclusive</p>
-                <h2 className="font-serif text-3xl md:text-4xl font-light text-white">No Hidden Extras</h2>
-                <p className="text-muted mt-3 max-w-xl mx-auto">Our flat 5% management fee covers everything listed below — no surprise charges.</p>
+                <p className="text-gold text-xs tracking-[0.3em] uppercase mb-3">{inclusionsEyebrow}</p>
+                <h2 className="font-serif text-3xl md:text-4xl font-light text-white">{inclusionsHeadline}</h2>
+                <p className="text-muted mt-3 max-w-xl mx-auto">{inclusionsBody}</p>
               </div>
             </ScrollReveal>
             <div className="grid sm:grid-cols-2 gap-x-10 gap-y-4">
@@ -161,11 +184,11 @@ export default function PropertyManagementPage() {
         <div className="max-w-2xl mx-auto">
           <ScrollReveal>
             <div className="text-center mb-10">
-              <p className="text-gold text-xs tracking-[0.3em] uppercase mb-3">Free Quote</p>
+              <p className="text-gold text-xs tracking-[0.3em] uppercase mb-3">{formEyebrow}</p>
               <h2 className="font-serif text-3xl md:text-4xl font-light text-white mb-3">
-                Hand Over the Keys
+                {formHeadline}
               </h2>
-              <p className="text-muted">Tell us about your property and we&apos;ll prepare a tailored management proposal.</p>
+              <p className="text-muted">{formBody}</p>
             </div>
           </ScrollReveal>
           <LeadForm />

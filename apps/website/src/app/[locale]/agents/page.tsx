@@ -3,11 +3,14 @@ import Image from 'next/image'
 import { Phone, Mail, MessageCircle, Building2, LayoutGrid } from 'lucide-react'
 import { ScrollReveal } from '@/components/ui/ScrollReveal'
 import { LeadForm } from '@/components/ui/LeadForm'
-import { getAgents, type PublicAgent } from '@/lib/api'
+import { getAgents, getCmsContent, type PublicAgent } from '@/lib/api'
 
-export const metadata: Metadata = {
-  title: 'Our Agents | Expert Dubai Property Advisors | EVOORION',
-  description: 'Meet our team of licensed Dubai property advisors. Each agent brings deep market knowledge and a dedicated commitment to finding your perfect investment.',
+export async function generateMetadata(): Promise<Metadata> {
+  const cms = await getCmsContent('agents')
+  return {
+    title:       (cms?.meta_title as string)       ?? 'Our Agents | Expert Dubai Property Advisors | EVOORION',
+    description: (cms?.meta_description as string) ?? 'Meet our team of licensed Dubai property advisors. Each agent brings deep market knowledge and a dedicated commitment to finding your perfect investment.',
+  }
 }
 
 export const revalidate = 3600
@@ -98,6 +101,18 @@ export default async function AgentsPage() {
   } catch {
     agents = []
   }
+  const cms = await getCmsContent('agents')
+
+  const heroEyebrow        = (cms.hero_eyebrow as string)        ?? 'Our Team'
+  const heroHeadlinePrefix = (cms.hero_headline_prefix as string) ?? 'Expert Property'
+  const heroHeadlineGold   = (cms.hero_headline_gold as string)   ?? 'Advisors'
+  const heroSubtext        = (cms.hero_subtext as string)        ?? 'Licensed, market-tested professionals committed to finding your perfect Dubai property investment.'
+
+  const emptyStateText = (cms.empty_state_text as string) ?? 'Our team profiles are coming soon.'
+
+  const ctaEyebrow   = (cms.cta_eyebrow as string)   ?? 'Work With Us'
+  const ctaHeadline  = (cms.cta_headline as string)  ?? 'Speak to an Agent'
+  const ctaBody      = (cms.cta_body as string)      ?? "Tell us what you're looking for and we'll match you with the right advisor."
 
   return (
     <main className="min-h-screen bg-brand text-white">
@@ -105,12 +120,12 @@ export default async function AgentsPage() {
       <section className="pt-40 pb-20 px-4 bg-gradient-to-b from-brand-section to-brand">
         <div className="max-w-3xl mx-auto text-center">
           <ScrollReveal>
-            <p className="text-gold text-xs tracking-[0.3em] uppercase mb-4">Our Team</p>
+            <p className="text-gold text-xs tracking-[0.3em] uppercase mb-4">{heroEyebrow}</p>
             <h1 className="font-serif text-5xl md:text-6xl font-light text-white mb-6">
-              Expert Property<br /><span className="text-gold">Advisors</span>
+              {heroHeadlinePrefix}<br /><span className="text-gold">{heroHeadlineGold}</span>
             </h1>
             <p className="text-muted text-lg max-w-xl mx-auto">
-              Licensed, market-tested professionals committed to finding your perfect Dubai property investment.
+              {heroSubtext}
             </p>
           </ScrollReveal>
         </div>
@@ -129,7 +144,7 @@ export default async function AgentsPage() {
             </div>
           ) : (
             <div className="text-center py-20">
-              <p className="text-muted text-sm">Our team profiles are coming soon.</p>
+              <p className="text-muted text-sm">{emptyStateText}</p>
             </div>
           )}
         </div>
@@ -141,11 +156,11 @@ export default async function AgentsPage() {
           <div className="max-w-2xl mx-auto">
             <ScrollReveal>
               <div className="text-center mb-10">
-                <p className="text-gold text-xs tracking-[0.3em] uppercase mb-3">Work With Us</p>
+                <p className="text-gold text-xs tracking-[0.3em] uppercase mb-3">{ctaEyebrow}</p>
                 <h2 className="font-serif text-3xl md:text-4xl font-light text-white mb-3">
-                  Speak to an Agent
+                  {ctaHeadline}
                 </h2>
-                <p className="text-muted">Tell us what you&apos;re looking for and we&apos;ll match you with the right advisor.</p>
+                <p className="text-muted">{ctaBody}</p>
               </div>
             </ScrollReveal>
             <LeadForm />
