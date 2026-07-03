@@ -28,18 +28,24 @@ class CloudinaryService
 
     public function uploadImage(UploadedFile $file, string $folder = 'properties'): array
     {
-        $result = $this->sdk()->uploadApi()->upload($file->getRealPath(), [
+        $options = [
             'folder'        => $folder,
             'resource_type' => 'auto',
+        ];
+
+        // Incoming transform would flatten multi-page PDFs to one page — images only.
+        if (strtolower($file->getClientOriginalExtension()) !== 'pdf') {
             // Cap huge camera originals and let Cloudinary pick optimal quality/format
-            'transformation' => [
+            $options['transformation'] = [
                 'width'   => 2560,
                 'height'  => 2560,
                 'crop'    => 'limit',
                 'quality' => 'auto:good',
                 'fetch_format' => 'auto',
-            ],
-        ]);
+            ];
+        }
+
+        $result = $this->sdk()->uploadApi()->upload($file->getRealPath(), $options);
 
         return ['url' => $result['secure_url'], 'public_id' => $result['public_id']];
     }

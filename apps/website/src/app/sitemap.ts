@@ -10,7 +10,7 @@ const STATIC_PATHS = [
 
 async function fetchSlugs(path: string): Promise<{ slug: string; updated_at?: string }[]> {
   try {
-    const res = await fetch(`${API}${path}`, { next: { revalidate: 3600 } })
+    const res = await fetch(`${API}${path}`, { next: { revalidate: 3600 }, signal: AbortSignal.timeout(5000) })
     if (!res.ok) return []
     const json = await res.json()
     return (json?.data ?? []) as { slug: string; updated_at?: string }[]
@@ -22,7 +22,7 @@ async function fetchSlugs(path: string): Promise<{ slug: string; updated_at?: st
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const [properties, posts] = await Promise.all([
     fetchSlugs('/properties?per_page=100'),
-    fetchSlugs('/blog?per_page=100'),
+    fetchSlugs('/blog?per_page=50'),
   ])
 
   const locales = ['en', 'de', 'ar']
@@ -41,7 +41,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       })
     }
     for (const post of posts) {
-      entries.push({ url: `${BASE}/${locale}/blog/${post.slug}`, changeFrequency: 'monthly', priority: 0.5 })
+      entries.push({
+        url: `${BASE}/${locale}/blog/${post.slug}`,
+        lastModified: post.updated_at ? new Date(post.updated_at) : undefined,
+        changeFrequency: 'monthly',
+        priority: 0.5,
+      })
     }
   }
 
