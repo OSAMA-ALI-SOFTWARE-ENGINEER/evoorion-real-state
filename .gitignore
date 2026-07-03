@@ -43,3 +43,12 @@ backend/public/storage
 
 .vercel
 .env*
+
+# Docs & planning files — local only, never pushed
+/docs/
+/backend/docs/
+/*.pdf
+/*.docx
+/*.md
+!/README.md
+/EVOORION_LOGO/*.pdf
