@@ -57,13 +57,23 @@ export default function MediaPage() {
   async function uploadFiles(files: File[]) {
     if (!files.length) return
     setUploading(true)
+    const failed: { name: string; reason: string }[] = []
     try {
       for (const file of files) {
-        await uploadMedia(file, folder === 'all' ? 'misc' : folder)
+        try {
+          await uploadMedia(file, folder === 'all' ? 'misc' : folder)
+        } catch (err) {
+          failed.push({
+            name: file.name,
+            reason: err instanceof Error ? err.message : 'Unknown error',
+          })
+        }
+      }
+      if (failed.length > 0) {
+        const failedMsg = failed.map(f => `${f.name} (${f.reason})`).join(', ')
+        alert(`Failed to upload: ${failedMsg}`)
       }
       load()
-    } catch (err) {
-      alert(err instanceof Error ? err.message : 'Upload failed')
     } finally {
       setUploading(false)
       if (fileRef.current) fileRef.current.value = ''
