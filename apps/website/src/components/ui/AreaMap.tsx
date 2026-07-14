@@ -42,6 +42,7 @@ export function AreaMap({ lat, lng, name, propertyCount, zoom = 14, apiKey: apiK
           zoomControl
           gestureHandling="cooperative"
           className="w-full h-full"
+          mapId="DEMO_MAP_ID"
         >
           <AdvancedMarker position={{ lat, lng }}>
             <div className="flex flex-col items-center select-none">

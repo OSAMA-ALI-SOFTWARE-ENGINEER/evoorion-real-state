@@ -53,6 +53,7 @@ export function LocationsMap({ areas, apiKey: apiKeyProp }: { areas: Area[]; api
           zoomControl
           gestureHandling="cooperative"
           className="w-full h-full"
+          mapId="DEMO_MAP_ID"
         >
           {areasWithCoords.map((area) => (
             <AdvancedMarker
