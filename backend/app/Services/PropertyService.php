@@ -52,7 +52,7 @@ class PropertyService
         $key = 'properties:list:' . md5(json_encode($params));
 
         return Cache::tags(['properties'])->remember($key, 3600, function () use ($request) {
-            $query = Property::available()->where('is_active', true);
+            $query = Property::available()->where('is_active', true)->with(['images', 'area']);
 
             if ($request->filled('search')) {
                 $query = $query->search($request->input('search'));

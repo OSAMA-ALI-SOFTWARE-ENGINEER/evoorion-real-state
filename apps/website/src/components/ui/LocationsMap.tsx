@@ -10,15 +10,27 @@ const DUBAI_CENTER = { lat: 25.2048, lng: 55.2708 }
 
 function AreaPin({ name, selected }: { name: string; selected: boolean }) {
   return (
-    <div className={`flex flex-col items-center cursor-pointer select-none transition-all duration-200 ${selected ? 'scale-125' : 'hover:scale-110'}`}>
-      <div className={`px-2 py-0.5 rounded-[3px] text-[11px] font-bold tracking-[0.04em] whitespace-nowrap border shadow-lg ${
+    <div className="group relative flex flex-col items-center cursor-pointer select-none">
+      {/* Pin Body */}
+      <div className={`p-2 rounded-full border shadow-lg transition-all duration-200 ${
         selected
-          ? 'bg-gold text-brand border-gold shadow-[0_4px_16px_rgba(201,168,76,0.45)]'
-          : 'bg-brand/90 text-gold border-gold/50 backdrop-blur-sm shadow-[0_2px_8px_rgba(0,0,0,0.5)]'
+          ? 'bg-gold text-brand border-gold scale-125 shadow-[0_4px_16px_rgba(201,168,76,0.45)]'
+          : 'bg-brand/90 text-gold border-gold/50 backdrop-blur-sm hover:scale-110 hover:border-gold hover:text-white shadow-[0_2px_8px_rgba(0,0,0,0.5)]'
       }`}>
-        {name}
+        <MapPin size={16} fill={selected ? 'currentColor' : 'none'} className="transition-transform duration-200" />
       </div>
-      <div className={`w-2 h-2 rotate-45 -mt-1 ${selected ? 'bg-gold' : 'bg-gold/50'}`} />
+      {/* Pin Tip */}
+      <div className={`w-1.5 h-1.5 rotate-45 -mt-[3px] transition-colors ${selected ? 'bg-gold' : 'bg-gold/50 group-hover:bg-gold'}`} />
+
+      {/* Hover Tooltip */}
+      <div className="absolute bottom-[calc(100%+6px)] left-1/2 -translate-x-1/2 opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity duration-200 z-[1000] min-w-[150px]">
+        <div className="bg-brand/95 backdrop-blur-sm border border-gold/45 text-white p-2 rounded-sm shadow-xl text-center">
+          <p className="font-serif font-bold text-xs text-gold truncate">{name}</p>
+          <p className="text-[9px] text-white/60 mt-0.5 whitespace-nowrap">Click to see details</p>
+        </div>
+        {/* Tooltip Arrow */}
+        <div className="w-1.5 h-1.5 bg-brand border-r border-b border-gold/45 rotate-45 mx-auto -mt-[4px]" />
+      </div>
     </div>
   )
 }
@@ -26,6 +38,7 @@ function AreaPin({ name, selected }: { name: string; selected: boolean }) {
 export function LocationsMap({ areas, apiKey: apiKeyProp }: { areas: Area[]; apiKey?: string }) {
   const apiKey = apiKeyProp ?? process.env.NEXT_PUBLIC_GOOGLE_MAPS_KEY ?? ''
   const [selectedArea, setSelectedArea] = useState<Area | null>(null)
+  const [mapStyle, setMapStyle] = useState<'roadmap' | 'satellite'>('roadmap')
 
   const areasWithCoords = areas.filter(
     (a) => a.latitude != null && a.longitude != null,
@@ -48,7 +61,7 @@ export function LocationsMap({ areas, apiKey: apiKeyProp }: { areas: Area[]; api
         <Map
           defaultCenter={DUBAI_CENTER}
           defaultZoom={11}
-          mapTypeId="roadmap"
+          mapTypeId={mapStyle}
           disableDefaultUI
           zoomControl
           gestureHandling="cooperative"
@@ -67,6 +80,24 @@ export function LocationsMap({ areas, apiKey: apiKeyProp }: { areas: Area[]; api
             </AdvancedMarker>
           ))}
         </Map>
+
+        {/* Satellite / Map toggle */}
+        <div className="absolute top-3 right-3 z-[500] flex rounded-sm overflow-hidden border border-gold/40 shadow-lg">
+          {(['roadmap', 'satellite'] as const).map((style) => (
+            <button
+              key={style}
+              type="button"
+              onClick={() => setMapStyle(style)}
+              className={`px-3 py-1.5 text-[11px] font-semibold tracking-wider uppercase transition-colors ${
+                mapStyle === style
+                  ? 'bg-gold text-brand'
+                  : 'bg-brand/90 text-white/60 hover:text-white'
+              }`}
+            >
+              {style === 'roadmap' ? 'Map' : 'Satellite'}
+            </button>
+          ))}
+        </div>
 
         {/* Hint pill */}
         {!selectedArea && areasWithCoords.length > 0 && (

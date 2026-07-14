@@ -30,35 +30,25 @@ const TILE_LAYERS: Record<MapStyle, { url: string; attribution: string; maxZoom:
 const DEFAULT_CENTER: [number, number] = [25.2048, 55.2708]
 const DEFAULT_ZOOM = 11
 
-function buildMarkerHtml(count: number, price: string): string {
+function buildMarkerHtml(name: string): string {
   return `
-    <div style="
-      position:relative;
-      display:flex;
-      flex-direction:column;
-      align-items:center;
-    ">
-      <div style="
-        background:var(--color-gold,#C9A84C);
-        color:var(--color-brand,#0A0F1E);
-        font-weight:700;
-        font-size:11px;
-        letter-spacing:0.05em;
-        padding:4px 9px;
-        border-radius:2px;
-        white-space:nowrap;
-        box-shadow:0 2px 8px rgba(0,0,0,0.4);
-        line-height:1.4;
-        text-align:center;
-      ">
-        ${count > 1 ? `${count} properties` : price}
+    <div class="ev-pin-container">
+      <!-- Pin Body -->
+      <div class="ev-pin-body">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: block;"><path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
       </div>
-      <div style="
-        width:0;height:0;
-        border-left:5px solid transparent;
-        border-right:5px solid transparent;
-        border-top:6px solid var(--color-gold,#C9A84C);
-      "></div>
+      <!-- Pin Tip -->
+      <div class="ev-pin-tip"></div>
+
+      <!-- Hover Tooltip -->
+      <div class="ev-pin-tooltip">
+        <div class="ev-tooltip-content">
+          <p class="ev-tooltip-title">${name}</p>
+          <p class="ev-tooltip-sub">Click to see details</p>
+        </div>
+        <!-- Tooltip Arrow -->
+        <div class="ev-tooltip-arrow"></div>
+      </div>
     </div>
   `
 }
@@ -144,9 +134,9 @@ export function PropertyMapView({ properties, areas }: PropertyMapViewProps) {
         parseFloat(p.price) < parseFloat(min.price) ? p : min, props[0])
 
       const icon = L.divIcon({
-        html: buildMarkerHtml(props.length, formatPrice(cheapest.price)),
+        html: buildMarkerHtml(area.name),
         className: '',
-        iconAnchor: [0, 36],
+        iconAnchor: [17, 39],
       })
 
       const marker = L.marker([lat, lng], { icon }).addTo(map)
@@ -275,6 +265,87 @@ export function PropertyMapView({ properties, areas }: PropertyMapViewProps) {
         }
         .ev-popup .leaflet-popup-content { margin: 0; }
         .ev-popup .leaflet-popup-tip-container { display: none; }
+
+        .ev-pin-container {
+          position: relative;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          cursor: pointer;
+        }
+        .ev-pin-body {
+          padding: 8px;
+          border-radius: 9999px;
+          border: 1px solid rgba(201,168,76,0.5);
+          background-color: var(--color-brand, #0A0F1E);
+          color: var(--color-gold, #C9A84C);
+          box-shadow: 0 2px 8px rgba(0,0,0,0.5);
+          transition: all 0.2s ease;
+        }
+        .ev-pin-container:hover .ev-pin-body {
+          transform: scale(1.1);
+          border-color: var(--color-gold, #C9A84C);
+          color: #fff;
+        }
+        .ev-pin-tip {
+          width: 6px;
+          height: 6px;
+          background-color: rgba(201,168,76,0.5);
+          transform: rotate(45deg);
+          margin-top: -3px;
+        }
+        .ev-pin-container:hover .ev-pin-tip {
+          background-color: var(--color-gold, #C9A84C);
+        }
+        .ev-pin-tooltip {
+          position: absolute;
+          bottom: calc(100% + 6px);
+          left: 50%;
+          transform: translateX(-50%);
+          opacity: 0;
+          pointer-events: none;
+          transition: opacity 0.2s ease;
+          min-width: 150px;
+          z-index: 1000;
+        }
+        .ev-pin-container:hover .ev-pin-tooltip {
+          opacity: 1;
+        }
+        .ev-tooltip-content {
+          background-color: rgba(10,15,30,0.95);
+          backdrop-filter: blur(4px);
+          border: 1px solid rgba(201,168,76,0.45);
+          color: #fff;
+          padding: 8px;
+          border-radius: 2px;
+          box-shadow: 0 4px 16px rgba(0,0,0,0.5);
+          text-align: center;
+        }
+        .ev-tooltip-title {
+          font-family: serif;
+          font-weight: bold;
+          font-size: 12px;
+          color: var(--color-gold, #C9A84C);
+          margin: 0;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+        .ev-tooltip-sub {
+          font-size: 9px;
+          color: rgba(255,255,255,0.6);
+          margin: 2px 0 0 0;
+          white-space: nowrap;
+        }
+        .ev-tooltip-arrow {
+          width: 6px;
+          height: 6px;
+          background-color: rgb(10,15,30);
+          border-right: 1px solid rgba(201,168,76,0.45);
+          border-bottom: 1px solid rgba(201,168,76,0.45);
+          transform: rotate(45deg);
+          margin: -3px auto 0 auto;
+        }
       `}</style>
       <div className="relative isolate">
         <div
