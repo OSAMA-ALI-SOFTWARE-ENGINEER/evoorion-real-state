@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
-import { MapPin, TrendingUp, ArrowRight } from 'lucide-react'
+import { MapPin, TrendingUp, ArrowRight, LayoutGrid, Map } from 'lucide-react'
 import { getAreas } from '@/lib/api'
 import { ScrollReveal } from '@/components/ui/ScrollReveal'
 import { SectionBackground } from '@/components/ui/SectionBackground'
@@ -82,6 +82,7 @@ export default function LocationsPage() {
   const [loading, setLoading] = useState(true)
   const [heroBg, setHeroBg] = useState<string | null>(null)
   const [mapsKey, setMapsKey] = useState<string>('')
+  const [viewMode, setViewMode] = useState<'grid' | 'map'>('grid')
 
   useEffect(() => {
     getAreas()
@@ -139,42 +140,77 @@ export default function LocationsPage() {
         </div>
       </section>
 
-      {/* Interactive map */}
+      {/* View mode toggle */}
       {!loading && areas.length > 0 && (
-        <section className="bg-brand py-10">
-          <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex items-center gap-3 mb-5">
+        <section className="bg-brand pt-10 pb-4">
+          <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between border-b border-white/5 pb-4">
+            <div className="flex items-center gap-3">
               <div className="h-px w-8 bg-gold" />
-              <span className="text-gold text-xs tracking-[0.3em] uppercase">Map View</span>
+              <span className="text-gold text-xs tracking-[0.3em] uppercase">
+                {viewMode === 'map' ? 'Map View' : 'Explore Locations'}
+              </span>
             </div>
+
+            <div className="flex rounded-sm border border-white/10 overflow-hidden shrink-0">
+              <button
+                type="button"
+                onClick={() => setViewMode('grid')}
+                title="Grid view"
+                className={`flex items-center justify-center w-9 h-9 transition-colors ${
+                  viewMode === 'grid' ? 'bg-gold text-brand' : 'text-muted hover:text-white'
+                }`}
+              >
+                <LayoutGrid size={14} />
+              </button>
+              <button
+                type="button"
+                onClick={() => setViewMode('map')}
+                title="Map view"
+                className={`flex items-center justify-center w-9 h-9 border-l border-white/10 transition-colors ${
+                  viewMode === 'map' ? 'bg-gold text-brand' : 'text-muted hover:text-white'
+                }`}
+              >
+                <Map size={14} />
+              </button>
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* Interactive map */}
+      {!loading && areas.length > 0 && viewMode === 'map' && (
+        <section className="bg-brand py-6">
+          <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
             <LocationsMap areas={areas} apiKey={mapsKey} />
           </div>
         </section>
       )}
 
       {/* Area cards grid */}
-      <section className="py-16 bg-brand min-h-[60vh]">
-        <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
-          {loading ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {Array.from({ length: 6 }).map((_, i) => (
-                <div key={i} className="h-80 rounded-sm bg-brand-section/50 animate-pulse" />
-              ))}
-            </div>
-          ) : areas.length === 0 ? (
-            <div className="text-center py-24">
-              <MapPin size={40} className="text-gold/30 mx-auto mb-4" />
-              <p className="text-muted">No locations available yet.</p>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {areas.map((area, i) => (
-                <AreaCard key={area.id} area={area} index={i} />
-              ))}
-            </div>
-          )}
-        </div>
-      </section>
+      {viewMode === 'grid' && (
+        <section className="py-10 bg-brand min-h-[60vh]">
+          <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
+            {loading ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {Array.from({ length: 6 }).map((_, i) => (
+                  <div key={i} className="h-80 rounded-sm bg-brand-section/50 animate-pulse" />
+                ))}
+              </div>
+            ) : areas.length === 0 ? (
+              <div className="text-center py-24">
+                <MapPin size={40} className="text-gold/30 mx-auto mb-4" />
+                <p className="text-muted">No locations available yet.</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {areas.map((area, i) => (
+                  <AreaCard key={area.id} area={area} index={i} />
+                ))}
+              </div>
+            )}
+          </div>
+        </section>
+      )}
 
       {/* Bottom CTA */}
       <section className="py-16 bg-brand-section border-t border-white/5">

@@ -196,6 +196,7 @@ function PropertiesPageInner() {
       opId: number,
       prKey: string,
       sKey: string,
+      limit: number = 9,
     ) => {
       setLoading(true)
       try {
@@ -207,7 +208,7 @@ function PropertiesPageInner() {
           ...getPriceParams(prKey),
           ...getSortParams(sKey),
           page: p,
-          per_page: 9,
+          per_page: limit,
           region,
         })
         setProperties(res.data)
@@ -223,8 +224,10 @@ function PropertiesPageInner() {
 
   useEffect(() => {
     if (!initialized) return
-    fetchProperties(page, debouncedSearch, activeType, areaId, opTypeId, priceKey, sortKey)
-  }, [page, debouncedSearch, activeType, areaId, opTypeId, priceKey, sortKey, fetchProperties, initialized])
+    const limit = viewMode === 'map' ? 1000 : 9
+    const currentPage = viewMode === 'map' ? 1 : page
+    fetchProperties(currentPage, debouncedSearch, activeType, areaId, opTypeId, priceKey, sortKey, limit)
+  }, [page, debouncedSearch, activeType, areaId, opTypeId, priceKey, sortKey, viewMode, fetchProperties, initialized])
 
   // Reset to page 1 when filters change
   useEffect(() => {
@@ -514,7 +517,7 @@ function PropertiesPageInner() {
             )
           )}
 
-          {totalPages > 1 && !loading && (
+          {totalPages > 1 && !loading && viewMode !== 'map' && (
             <div className="flex justify-center gap-2 mt-12">
               {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
                 <button

@@ -33,6 +33,7 @@ class PublicSettingController
         'social_youtube',
         // Integrations
         'google_analytics_id',
+        'google_maps_key',
         // Theme colours
         'color_brand',
         'color_brand_section',

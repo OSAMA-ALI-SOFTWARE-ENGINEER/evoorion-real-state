@@ -31,7 +31,7 @@ class PropertyFilterRequest extends FormRequest
             'sort_by'            => 'nullable|in:price,created_at,views_count,area_sqft,bedrooms',
             'sort_direction'     => 'nullable|in:asc,desc',
             'page'               => 'nullable|integer|min:1',
-            'per_page'           => 'nullable|integer|min:1|max:100',
+            'per_page'           => 'nullable|integer|min:1|max:1000',
             'region'             => 'nullable|string|max:50',
         ];
     }

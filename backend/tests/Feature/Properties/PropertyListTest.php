@@ -59,4 +59,25 @@ class PropertyListTest extends TestCase
             ->assertJsonPath('meta.pagination.total', 30)
             ->assertJsonPath('meta.pagination.per_page', 10);
     }
+
+    public function test_properties_per_page_maximum_limit(): void
+    {
+        $area = Area::factory()->create();
+        $developer = Developer::factory()->create();
+        $operationType = OperationType::factory()->create();
+
+        Property::factory(5)->create([
+            'area_id' => $area->id,
+            'developer_id' => $developer->id,
+            'operation_type_id' => $operationType->id,
+        ]);
+
+        // 1000 should be valid and return successfully
+        $response = $this->getJson('/api/v1/properties?per_page=1000');
+        $response->assertStatus(200);
+
+        // 1001 should fail validation
+        $responseErr = $this->getJson('/api/v1/properties?per_page=1001');
+        $responseErr->assertStatus(422);
+    }
 }

@@ -15,4 +15,13 @@ class PublicSettingsTest extends TestCase
             ->assertStatus(200)
             ->assertJsonPath('data.google_analytics_id', 'G-TEST123');
     }
+
+    public function test_public_settings_expose_google_maps_key(): void
+    {
+        Setting::set('google_maps_key', 'AIzaSyTest123');
+
+        $this->getJson('/api/v1/settings')
+            ->assertStatus(200)
+            ->assertJsonPath('data.google_maps_key', 'AIzaSyTest123');
+    }
 }
