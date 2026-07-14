@@ -1,4 +1,4 @@
-﻿export type PropertyMediaType = 'image' | 'video' | 'file'
+export type PropertyMediaType = 'image' | 'video' | 'file'
 
 export interface PropertyImage {
   id: number
@@ -19,6 +19,8 @@ export interface PropertyAmenity {
 export interface PropertyArea {
   id: number
   name: string
+  latitude?: number | null
+  longitude?: number | null
 }
 
 export interface PropertyDeveloper {

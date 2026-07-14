@@ -14,26 +14,99 @@ import { ScrollReveal } from '@/components/ui/ScrollReveal'
 import { useCountry } from '@/context/CountryContext'
 import { trackContactClick } from '@/lib/api'
 import type { Property, PropertyImage } from '@/types'
+import { APIProvider, Map, AdvancedMarker } from '@vis.gl/react-google-maps'
 
-function PropertyLocationMap({ location, apiKey }: { location: string; apiKey: string }) {
-  const q = encodeURIComponent(location)
-  const src = apiKey
-    ? `https://www.google.com/maps/embed/v1/place?key=${apiKey}&q=${q}`
-    : `https://maps.google.com/maps?q=${q}&output=embed`
+function PropertyLocationMap({
+  location,
+  lat,
+  lng,
+  name,
+  apiKey,
+}: {
+  location: string
+  lat?: number | null
+  lng?: number | null
+  name: string
+  apiKey: string
+}) {
+  const [mapStyle, setMapStyle] = useState<'roadmap' | 'satellite'>('roadmap')
+
+  if (!apiKey || lat == null || lng == null) {
+    const q = encodeURIComponent(location)
+    const src = apiKey
+      ? `https://www.google.com/maps/embed/v1/place?key=${apiKey}&q=${q}`
+      : `https://maps.google.com/maps?q=${q}&output=embed`
+
+    return (
+      <div className="relative isolate rounded-sm overflow-hidden border border-white/5 h-64">
+        <iframe
+          src={src}
+          width="100%"
+          height="100%"
+          style={{ border: 0 }}
+          allowFullScreen
+          loading="lazy"
+          referrerPolicy="no-referrer-when-downgrade"
+          title="Property Location"
+        />
+      </div>
+    )
+  }
 
   return (
-    <div className="relative isolate rounded-sm overflow-hidden border border-white/5 h-64">
-      <iframe
-        src={src}
-        width="100%"
-        height="100%"
-        style={{ border: 0 }}
-        allowFullScreen
-        loading="lazy"
-        referrerPolicy="no-referrer-when-downgrade"
-        title="Property Location"
-      />
-    </div>
+    <APIProvider apiKey={apiKey}>
+      <div className="relative isolate rounded-sm overflow-hidden border border-white/5 h-64">
+        <Map
+          defaultCenter={{ lat, lng }}
+          defaultZoom={14}
+          mapTypeId={mapStyle}
+          disableDefaultUI
+          zoomControl
+          gestureHandling="cooperative"
+          className="w-full h-full"
+          mapId="DEMO_MAP_ID"
+        >
+          <AdvancedMarker position={{ lat, lng }}>
+            <div className="group relative flex flex-col items-center cursor-pointer select-none">
+              {/* Pin Body */}
+              <div className="p-2 rounded-full border shadow-lg transition-all duration-200 bg-brand/90 text-gold border-gold/50 backdrop-blur-sm hover:scale-110 hover:border-gold hover:text-white shadow-[0_2px_8px_rgba(0,0,0,0.5)]">
+                <MapPin size={16} fill="none" className="transition-transform duration-200" />
+              </div>
+              {/* Pin Tip */}
+              <div className="w-1.5 h-1.5 rotate-45 -mt-[3px] bg-gold/50" />
+
+              {/* Hover Tooltip */}
+              <div className="absolute bottom-[calc(100%+6px)] left-1/2 -translate-x-1/2 opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity duration-200 z-[1000] min-w-[150px]">
+                <div className="bg-brand/95 backdrop-blur-sm border border-gold/45 text-white p-2 rounded-sm shadow-xl text-center">
+                  <p className="font-serif font-bold text-xs text-gold truncate">{name}</p>
+                  <p className="text-[9px] text-white/60 mt-0.5 whitespace-nowrap">This property</p>
+                </div>
+                {/* Tooltip Arrow */}
+                <div className="w-1.5 h-1.5 bg-brand border-r border-b border-gold/45 rotate-45 mx-auto -mt-[4px]" />
+              </div>
+            </div>
+          </AdvancedMarker>
+        </Map>
+
+        {/* Satellite / Map toggle */}
+        <div className="absolute top-3 right-3 z-[500] flex rounded-sm overflow-hidden border border-gold/40 shadow-lg">
+          {(['roadmap', 'satellite'] as const).map((style) => (
+            <button
+              key={style}
+              type="button"
+              onClick={() => setMapStyle(style)}
+              className={`px-3 py-1.5 text-[11px] font-semibold tracking-wider uppercase transition-colors ${
+                mapStyle === style
+                  ? 'bg-gold text-brand'
+                  : 'bg-brand/90 text-white/60 hover:text-white'
+              }`}
+            >
+              {style === 'roadmap' ? 'Map' : 'Satellite'}
+            </button>
+          ))}
+        </div>
+      </div>
+    </APIProvider>
   )
 }
 
@@ -454,6 +527,9 @@ export function PropertyDetailClient({ property }: Props) {
                   <h2 className="text-white font-semibold mb-3 tracking-wide">Location</h2>
                   <PropertyLocationMap
                     location={[property.area?.name, property.location].filter(Boolean).join(', ') + ', Dubai, UAE'}
+                    lat={property.area?.latitude}
+                    lng={property.area?.longitude}
+                    name={property.title}
                     apiKey={mapsKey}
                   />
                 </ScrollReveal>

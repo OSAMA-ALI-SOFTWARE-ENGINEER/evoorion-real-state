@@ -164,8 +164,6 @@ export function PropertyMapView({ properties, areas }: PropertyMapViewProps) {
       props.slice(0, 3).forEach((p, idx) => {
         const link = document.createElement('a')
         link.href = `/properties/${encodeURIComponent(p.slug)}`
-        link.target = '_blank'
-        link.rel = 'noopener noreferrer'
         Object.assign(link.style, {
           display: 'flex', gap: '10px', alignItems: 'flex-start',
           padding: '8px 0',
@@ -215,8 +213,6 @@ export function PropertyMapView({ properties, areas }: PropertyMapViewProps) {
       if (props.length > 3) {
         const more = document.createElement('a')
         more.href = `/properties?area=${encodeURIComponent(area.slug)}`
-        more.target = '_blank'
-        more.rel = 'noopener noreferrer'
         Object.assign(more.style, {
           display: 'block', marginTop: '8px',
           color: '#C9A84C', fontSize: '11px',
